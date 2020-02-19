@@ -1,0 +1,16 @@
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\bin\Debug\netcoreapp2.2\appsettings.Development.json
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\bin\Debug\netcoreapp2.2\appsettings.json
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\bin\Debug\netcoreapp2.2\Properties\launchSettings.json
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\bin\Debug\netcoreapp2.2\ProductsAPIServices.deps.json
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\bin\Debug\netcoreapp2.2\ProductsAPIServices.runtimeconfig.json
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\bin\Debug\netcoreapp2.2\ProductsAPIServices.runtimeconfig.dev.json
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\bin\Debug\netcoreapp2.2\ProductsAPIServices.dll
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\obj\Debug\netcoreapp2.2\ProductsAPIServices.csprojAssemblyReference.cache
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\obj\Debug\netcoreapp2.2\ProductsAPIServices.RazorAssemblyInfo.cache
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\obj\Debug\netcoreapp2.2\ProductsAPIServices.RazorAssemblyInfo.cs
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\obj\Debug\netcoreapp2.2\ProductsAPIServices.AssemblyInfoInputs.cache
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\obj\Debug\netcoreapp2.2\ProductsAPIServices.AssemblyInfo.cs
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\obj\Debug\netcoreapp2.2\ProductsAPIServices.RazorTargetAssemblyInfo.cache
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\bin\Debug\netcoreapp2.2\ProductsAPIServices.pdb
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\obj\Debug\netcoreapp2.2\ProductsAPIServices.dll
+D:\learningData\CN9\SWP49X\Service\UTService\ProductsAPIServices\obj\Debug\netcoreapp2.2\ProductsAPIServices.pdb
