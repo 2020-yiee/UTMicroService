@@ -12,9 +12,10 @@
       "UseServiceDiscovery": true,
       "ServiceName": "service-customer",
       "UpstreamPathTemplate": "/api/customers",
-      "UpstreamHttpMethod": [ "Get" ],
+      "UpstreamHttpMethod": [ "Get" ]
+      ,
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "TestKey",
+        "AuthenticationProviderKey": "CustomerKey",
         "AllowedScopes": []
       }
     },
@@ -30,18 +31,22 @@
       "UseServiceDiscovery": true,
       "ServiceName": "service-customer",
       "UpstreamPathTemplate": "/api/customers/{id}",
-      "UpstreamHttpMethod": [ "Get" ]
+      "UpstreamHttpMethod": [ "Get" ] //,
+      //"AuthenticationOptions": {
+      //  "AuthenticationProviderKey": "CustomerKey",
+      //  "AllowedScopes": []
+      //}
     },
     {
-      "DownstreamPathTemplate": "/api/products",
+      "DownstreamPathTemplate": "/api/values",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 9002
+          "Port": 9001
         }
       ],
-      "UpstreamPathTemplate": "/api/products",
+      "UpstreamPathTemplate": "/api/customers/test",
       "UpstreamHttpMethod": [ "Get" ]
     }
   ],

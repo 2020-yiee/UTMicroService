@@ -1,51 +1,40 @@
 {
   "ReRoutes": [
     {
+      "DownstreamPathTemplate": "/api/auth/login",
+      "DownstreamScheme": "http",
+      "UseServiceDiscovery": true,
+      "ServiceName": "service-auth",
+      "UpstreamPathTemplate": "/api/login",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
       "DownstreamPathTemplate": "/api/customers",
       "DownstreamScheme": "http",
-      //"DownstreamHostAndPorts": [
-      //  {
-      //    "Host": "localhost",
-      //    "Port": 9001
-      //  }
-      //],
       "UseServiceDiscovery": true,
       "ServiceName": "service-customer",
       "UpstreamPathTemplate": "/api/customers",
       "UpstreamHttpMethod": [ "Get" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "TestKey",
+        "AuthenticationProviderKey": "CustomerKey",
         "AllowedScopes": []
       }
     },
     {
       "DownstreamPathTemplate": "/api/customers/{id}",
       "DownstreamScheme": "http",
-      //"DownstreamHostAndPorts": [
-      //  {
-      //    "Host": "localhost",
-      //    "Port": 9001
-      //  }
-      //],
-      "UseServiceDiscovery": true,
+      "UseServiceDiscovery": true,  
       "ServiceName": "service-customer",
-      "UpstreamPathTemplate": "/api/customers/{id}",
-      "UpstreamHttpMethod": [ "Get" ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/products",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 9002
-        }
-      ],
-      "UpstreamPathTemplate": "/api/products",
-      "UpstreamHttpMethod": [ "Get" ]
+      "UpstreamPathTemplate": "/api/customer/{id}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "CustomerKey",
+        "AllowedScopes": []
+      }
     }
   ],
   "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:9000",
     "RequestIdKey": "OcRequestId",
     "AdministrationPath": "/administration",
     "ServiceDiscoveryProvider": {

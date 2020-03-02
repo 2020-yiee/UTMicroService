@@ -21,11 +21,10 @@ namespace APIGateway
             WebHost.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((host, config) =>
             {
-                  config.AddJsonFile("configuration.json")
-                        .AddEnvironmentVariables()
-                        .SetBasePath(host.HostingEnvironment.ContentRootPath);
+                config.AddJsonFile("configuration.json")
+                      .AddEnvironmentVariables()
+                      .SetBasePath(host.HostingEnvironment.ContentRootPath);
             })
-                .UseStartup<Startup>()
-                .UseUrls("https://localhost:9000");
+                .UseStartup<Startup>();
     }
 }

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service-service
+spec:
+  selector:
+    app: auth-service-pod
+  ports:
+    - port: 9003
+      targetPort: 80
+  type: LoadBalancer

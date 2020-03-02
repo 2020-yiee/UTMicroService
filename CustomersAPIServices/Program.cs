@@ -20,14 +20,13 @@ namespace CustomersAPIServices
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-            //.UseHttpSys(options =>
-            //{
-            //    options.Authentication.Schemes = AuthenticationSchemes.NTLM;
-            //    options.Authentication.AllowAnonymous = true;
-            //    options.MaxConnections = 100;
-            //    options.MaxRequestBodySize = 30000000;
-            //})
-                .UseStartup<Startup>()
-                .UseUrls("http://localhost:9001");
+                //.UseHttpSys(options =>
+                //{
+                //    options.Authentication.Schemes = AuthenticationSchemes.NTLM;
+                //    options.Authentication.AllowAnonymous = true;
+                //    options.MaxConnections = 100;
+                //    options.MaxRequestBodySize = 30000000;
+                //})
+                .UseStartup<Startup>();
     }
 }

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+spec:
+  selector:
+    matchLabels:
+      app: auth-service-pod
+  template:
+    metadata:
+      labels:
+        app: auth-service-pod
+    spec:
+      containers:
+        - name: auth-service-container
+          image: auth-service:local
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80
