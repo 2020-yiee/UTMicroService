@@ -78,7 +78,6 @@ namespace APIGateway
                 c.SwaggerEndPoints.Add(new SwaggerEndPoint { Name = "Api Gateway for UT", Url = "/swagger/v1/swagger.json" });
             });
 
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
