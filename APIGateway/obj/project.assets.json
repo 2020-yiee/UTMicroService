@@ -12853,7 +12853,6 @@
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets >= 1.9.10",
       "Ocelot >= 13.5.2",
       "Ocelot.Provider.Eureka >= 13.5.0",
-      "OcelotSwagger >= 0.0.5",
       "Steeltoe.Discovery.ClientCore >= 2.4.2",
       "Swashbuckle.AspNetCore >= 5.0.0"
     ]
