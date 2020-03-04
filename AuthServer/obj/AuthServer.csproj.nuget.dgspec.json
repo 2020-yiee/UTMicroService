@@ -41,6 +41,10 @@
       "frameworks": {
         "netcoreapp2.2": {
           "dependencies": {
+            "BCrypt.Net": {
+              "target": "Package",
+              "version": "[0.1.0, )"
+            },
             "EntityFramework": {
               "target": "Package",
               "version": "[6.4.0, )"

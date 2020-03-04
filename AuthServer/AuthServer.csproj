@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net" Version="0.1.0" />
     <PackageReference Include="EntityFramework" Version="6.4.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="9.0.0-preview3" />
     <PackageReference Include="JWT" Version="6.1.0" />
