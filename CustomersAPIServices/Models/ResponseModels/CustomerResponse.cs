@@ -7,11 +7,19 @@ namespace CustomersAPIServices.Models.ResponseModels
 {
     public class CustomerResponse
     {
-        public string name { get; set; }
+        public int customerId { get; set; }
+        public string username { get; set; }
+        public string fullname { get; set; }
+        public string email { get; set; }
+        public string role { get; set; }
 
-        public CustomerResponse(string name)
+        public CustomerResponse(int customerId,string username, string fullname, string email, string role)
         {
-            this.name = name;
+            this.customerId = customerId;
+            this.username = username;
+            this.fullname = fullname;
+            this.email = email;
+            this.role = role;
         }
     }
 }

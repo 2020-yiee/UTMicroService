@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CustomersAPIServices.Commands;
 using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
-using CustomersAPIServices.Queries;
-using MediatR;
+using CustomersAPIServices.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,40 +13,44 @@ namespace CustomersAPIServices.Controllers
     [Route("api/[controller]")]
     public class CustomersController : Controller
     {
-        private readonly IMediator _mediator;
-
-        public CustomersController(Mediator mediator)
-        {
-            _mediator = mediator; 
-        }
-
-
+        ICustomerRepository repository;
+        [Authorize]
         [HttpGet]
-        [Authorize( Roles = "admin")]
-        public async Task<IActionResult> GetAsync()
+        public IActionResult GetAllCustomers()
         {
-            var query = new GetAllCustomerQuery();
-            var result = await _mediator.Send(query);
-            return Ok(result);
-            //return new string[] { "Catcher Wong", "James Li", Request.Host.Port.ToString() };
+            repository = new CustomerRepositoryImpl();
+            return Ok(repository.getAllCustomers());
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetAsync(int id)
+        [Authorize]
+        [HttpPost("customer")]
+        public IActionResult getCustomer(GetCustomerRequest request)
         {
-            var query = new GetCustomerByIdQuery(id);
-            var result = await _mediator.Send(query);
-            return result != null ? (IActionResult) Ok(result) : NotFound();
-            //return $"Catcher Wong - {id} - {Request.Host.Port}";
+            repository = new CustomerRepositoryImpl();
+            return Ok(repository.getCustomer(request));
         }
 
-
-        [HttpPost]
-        public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerCommand createCustomerCommand)
+        [HttpPost("create")]
+        public IActionResult CreateCustomer(CreateCustomerRequest request)
         {
-            var result = await _mediator.Send(createCustomerCommand);
-            return result != null ? (IActionResult)Ok(result) : NotFound();
-            //return $"Catcher Wong - {id} - {Request.Host.Port}";
+            repository = new CustomerRepositoryImpl();
+            return Ok(repository.createCustomer(request));
         }
+
+        [HttpPost("delete")]
+        public IActionResult deleteCustomer([FromBody] int customerId)
+        {
+            repository = new CustomerRepositoryImpl();
+            return Ok(repository.deleteCustomer(customerId));
+        }
+
+        [HttpPost("update")]
+        public IActionResult updateCustomer([FromBody] UpdateCustomerRequest request)
+        {
+            repository = new CustomerRepositoryImpl();
+            return Ok(repository.updateCustomer(request));
+        }
+
+        
     }
 }

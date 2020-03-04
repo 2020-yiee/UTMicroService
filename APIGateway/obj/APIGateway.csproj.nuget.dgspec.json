@@ -70,9 +70,17 @@
               "target": "Package",
               "version": "[13.5.0, )"
             },
+            "OcelotSwagger": {
+              "target": "Package",
+              "version": "[0.0.5, )"
+            },
             "Steeltoe.Discovery.ClientCore": {
               "target": "Package",
               "version": "[2.4.2, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[5.0.0, )"
             }
           },
           "imports": [
@@ -85,7 +93,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
         }
       }
     }
