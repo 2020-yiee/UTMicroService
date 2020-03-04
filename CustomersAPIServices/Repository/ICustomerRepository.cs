@@ -14,5 +14,8 @@ namespace CustomersAPIServices.Repository
         IEnumerable<CustomerResponse> getAllCustomers();
         CustomerResponse getCustomer(GetCustomerRequest request);
 
+        Boolean deleteCustomer(int customerId);
+        Boolean updateCustomer(UpdateCustomerRequest request);
+
     }
 }

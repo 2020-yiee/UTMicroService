@@ -11,5 +11,6 @@ namespace HeatMapAPIServices.Repository
     {
         Boolean createDataStore(SaveDataRequest data);
         IEnumerable<DataStore> getData(GetDataRequest request);
+        Boolean deleteData(DeleteDataRequest request);
     }
 }

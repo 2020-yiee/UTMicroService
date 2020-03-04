@@ -41,6 +41,30 @@
       "UpstreamHttpMethod": [ "Post" ]
     },
     {
+      "DownstreamPathTemplate": "/api/customers/update",
+      "DownstreamScheme": "http",
+      "UseServiceDiscovery": true,
+      "ServiceName": "service-customer",
+      "UpstreamPathTemplate": "/api/customers/update",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "CustomerKey",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/customers/delete",
+      "DownstreamScheme": "http",
+      "UseServiceDiscovery": true,
+      "ServiceName": "service-customer",
+      "UpstreamPathTemplate": "/api/customers/delete",
+      "UpstreamHttpMethod": [ "Post" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "CustomerKey",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/api/values",
       "DownstreamScheme": "http",
       "UseServiceDiscovery": true,
@@ -62,6 +86,14 @@
       "UseServiceDiscovery": true,
       "ServiceName": "service-heatmap",
       "UpstreamPathTemplate": "/api/heatmap/data",
+      "UpstreamHttpMethod": [ "Post" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/heatmap/delete",
+      "DownstreamScheme": "http",
+      "UseServiceDiscovery": true,
+      "ServiceName": "service-heatmap",
+      "UpstreamPathTemplate": "/api/heatmap/delete",
       "UpstreamHttpMethod": [ "Post" ]
     }
 

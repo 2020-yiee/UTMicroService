@@ -28,5 +28,12 @@ namespace HeatMapAPIServices.Controllers
             repository = new HeatmapRepositoryImpl();
             return Ok(repository.getData(request));
         }
+
+        [HttpPost("delete")]
+        public IActionResult deleteData(DeleteDataRequest request)
+        {
+            repository = new HeatmapRepositoryImpl();
+            return Ok(repository.deleteData(request));
+        }
     }
 }

@@ -32,13 +32,30 @@ namespace CustomersAPIServices.Repository
             }
         }
 
+        public bool deleteCustomer(int customerId)
+        {
+            Customer customer = context.Customer.Where(s => s.CustomerId == customerId)
+                .FirstOrDefault();
+            try
+            {
+                context.Customer.Remove(customer);
+                context.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+
         public IEnumerable<CustomerResponse> getAllCustomers()
         {
             List<CustomerResponse> result = new List<CustomerResponse>();
             List<Customer> customers = context.Customer.ToList();
             foreach (var customer in customers)
             {
-                result.Add(new CustomerResponse(customer.UserName, customer.FullName, customer.Email, customer.Role));
+                result.Add(new CustomerResponse(customer.CustomerId,customer.UserName, customer.FullName, customer.Email, customer.Role));
             }
             return result;
         }
@@ -48,7 +65,26 @@ namespace CustomersAPIServices.Repository
             Customer customer = context.Customer.Where(s => s.CustomerId == request.customerId)
                 .Where(s => s.Email == request.email).FirstOrDefault();
 
-            return new CustomerResponse(customer.UserName,customer.FullName,customer.Email,customer.Role);
+            return new CustomerResponse(customer.CustomerId,customer.UserName,customer.FullName,customer.Email,customer.Role);
+        }
+
+        public bool updateCustomer(UpdateCustomerRequest request)
+        {
+            Customer customer = context.Customer.Where(s => s.CustomerId == request.customerId)
+                .FirstOrDefault();
+            customer.FullName = request.fullname;
+            customer.Email = request.email;
+            customer.Role = request.role;
+            try
+            {
+                context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
     }
 }

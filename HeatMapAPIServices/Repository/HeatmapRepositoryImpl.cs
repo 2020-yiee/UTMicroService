@@ -29,6 +29,26 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
+        public bool deleteData(DeleteDataRequest request)
+        {
+            try
+            {
+                IEnumerable<DataStore> datas = context.DataStore.Where(s => s.WebId == request.webId)
+                    .Where(s => s.Type == request.type).ToList();
+                foreach (var data in datas)
+                {
+                    context.DataStore.Remove(data);
+                }
+                context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+                return false;
+            }
+        }
+
         public IEnumerable<DataStore> getData(GetDataRequest request)
         {
             try

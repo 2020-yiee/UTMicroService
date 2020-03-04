@@ -15,8 +15,8 @@ namespace CustomersAPIServices.Controllers
     {
         ICustomerRepository repository;
         [Authorize]
-       [HttpGet]
-       public IActionResult GetAllCustomers()
+        [HttpGet]
+        public IActionResult GetAllCustomers()
         {
             repository = new CustomerRepositoryImpl();
             return Ok(repository.getAllCustomers());
@@ -35,6 +35,20 @@ namespace CustomersAPIServices.Controllers
         {
             repository = new CustomerRepositoryImpl();
             return Ok(repository.createCustomer(request));
+        }
+
+        [HttpPost("delete")]
+        public IActionResult deleteCustomer([FromBody] int customerId)
+        {
+            repository = new CustomerRepositoryImpl();
+            return Ok(repository.deleteCustomer(customerId));
+        }
+
+        [HttpPost("update")]
+        public IActionResult updateCustomer([FromBody] UpdateCustomerRequest request)
+        {
+            repository = new CustomerRepositoryImpl();
+            return Ok(repository.updateCustomer(request));
         }
 
         
