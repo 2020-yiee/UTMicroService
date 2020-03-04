@@ -21,16 +21,24 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/api/customers/{id}",
+      "DownstreamPathTemplate": "/api/customers/customer",
       "DownstreamScheme": "http",
       "UseServiceDiscovery": true,
       "ServiceName": "service-customer",
-      "UpstreamPathTemplate": "/api/customer/{id}",
-      "UpstreamHttpMethod": [ "Get" ],
+      "UpstreamPathTemplate": "/api/customers/customer",
+      "UpstreamHttpMethod": [ "Post" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "CustomerKey",
         "AllowedScopes": []
       }
+    },
+    {
+      "DownstreamPathTemplate": "/api/customers/create",
+      "DownstreamScheme": "http",
+      "UseServiceDiscovery": true,
+      "ServiceName": "service-customer",
+      "UpstreamPathTemplate": "/api/customers/create",
+      "UpstreamHttpMethod": [ "Post" ]
     },
     {
       "DownstreamPathTemplate": "/api/values",
@@ -39,7 +47,24 @@
       "ServiceName": "service-customer",
       "UpstreamPathTemplate": "/api/customers/test",
       "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/heatmap/data",
+      "DownstreamScheme": "http",
+      "UseServiceDiscovery": true,
+      "ServiceName": "service-heatmap",
+      "UpstreamPathTemplate": "/api/heatmap/data",
+      "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/heatmap/data",
+      "DownstreamScheme": "http",
+      "UseServiceDiscovery": true,
+      "ServiceName": "service-heatmap",
+      "UpstreamPathTemplate": "/api/heatmap/data",
+      "UpstreamHttpMethod": [ "Post" ]
     }
+
   ],
   "GlobalConfiguration": {
     "BaseUrl": "https://localhost:9000",

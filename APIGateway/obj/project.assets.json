@@ -36,6 +36,18 @@
           "lib/netstandard2.0/FluentValidation.dll": {}
         }
       },
+      "JetBrains.Annotations/10.2.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Runtime": "4.1.0"
+        },
+        "compile": {
+          "lib/netstandard1.0/JetBrains.Annotations.NetStandard.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.0/JetBrains.Annotations.NetStandard.dll": {}
+        }
+      },
       "Microsoft.AspNet.WebApi.Client/5.2.6": {
         "type": "package",
         "dependencies": {
@@ -2856,6 +2868,21 @@
           "lib/netstandard2.0/Ocelot.Provider.Eureka.dll": {}
         }
       },
+      "OcelotSwagger/0.0.5": {
+        "type": "package",
+        "dependencies": {
+          "JetBrains.Annotations": "10.2.1",
+          "Microsoft.AspNetCore.Http.Abstractions": "2.2.0",
+          "Ocelot": "13.5.2",
+          "Swashbuckle.AspNetCore": "4.0.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/OcelotSwagger.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/OcelotSwagger.dll": {}
+        }
+      },
       "Remotion.Linq/2.2.0": {
         "type": "package",
         "dependencies": {
@@ -4792,6 +4819,25 @@
         "lib/netstandard1.6/FluentValidation.xml",
         "lib/netstandard2.0/FluentValidation.dll",
         "lib/netstandard2.0/FluentValidation.xml"
+      ]
+    },
+    "JetBrains.Annotations/10.2.1": {
+      "sha512": "yTPQ3CsP2I/3vgAsXWby3Bf+dbzsQC5I8/aOsktLi/cSvr50tVTANcL5rTrEmIllbEhZbtZ0rxzxJ2RU8UkMRg==",
+      "type": "package",
+      "path": "jetbrains.annotations/10.2.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "jetbrains.annotations.10.2.1.nupkg.sha512",
+        "jetbrains.annotations.nuspec",
+        "lib/net/JetBrains.Annotations.dll",
+        "lib/net/JetBrains.Annotations.xml",
+        "lib/netstandard1.0/JetBrains.Annotations.NetStandard.dll",
+        "lib/netstandard1.0/JetBrains.Annotations.NetStandard.xml",
+        "lib/portable-net4+sl4+wp7+netcore45/JetBrains.Annotations.PCL1.dll",
+        "lib/portable-net4+sl4+wp7+netcore45/JetBrains.Annotations.PCL1.xml",
+        "lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/JetBrains.Annotations.PCL328.dll",
+        "lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/JetBrains.Annotations.PCL328.xml"
       ]
     },
     "Microsoft.AspNet.WebApi.Client/5.2.6": {
@@ -7922,6 +7968,18 @@
         "lib/netstandard2.0/Ocelot.Provider.Eureka.dll",
         "ocelot.provider.eureka.13.5.0.nupkg.sha512",
         "ocelot.provider.eureka.nuspec"
+      ]
+    },
+    "OcelotSwagger/0.0.5": {
+      "sha512": "WgcCKKpr5qC0Trz2Ida/2aIOYa9eX0Q36LiA6N+ZnOvD4TIs3dNjpX68pckt5eeGVOvZfFlr7dqWvSWJiDKkxQ==",
+      "type": "package",
+      "path": "ocelotswagger/0.0.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/OcelotSwagger.dll",
+        "ocelotswagger.0.0.5.nupkg.sha512",
+        "ocelotswagger.nuspec"
       ]
     },
     "Remotion.Linq/2.2.0": {
@@ -12795,6 +12853,7 @@
       "Microsoft.VisualStudio.Azure.Containers.Tools.Targets >= 1.9.10",
       "Ocelot >= 13.5.2",
       "Ocelot.Provider.Eureka >= 13.5.0",
+      "OcelotSwagger >= 0.0.5",
       "Steeltoe.Discovery.ClientCore >= 2.4.2",
       "Swashbuckle.AspNetCore >= 5.0.0"
     ]
@@ -12868,6 +12927,10 @@
           "Ocelot.Provider.Eureka": {
             "target": "Package",
             "version": "[13.5.0, )"
+          },
+          "OcelotSwagger": {
+            "target": "Package",
+            "version": "[0.0.5, )"
           },
           "Steeltoe.Discovery.ClientCore": {
             "target": "Package",

@@ -30,6 +30,7 @@
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "1.9.10",
           "Ocelot": "13.5.2",
           "Ocelot.Provider.Eureka": "13.5.0",
+          "OcelotSwagger": "0.0.5",
           "Steeltoe.Discovery.ClientCore": "2.4.2",
           "Swashbuckle.AspNetCore": "5.0.0"
         },
@@ -76,6 +77,20 @@
         },
         "compile": {
           "lib/netstandard2.0/FluentValidation.dll": {}
+        }
+      },
+      "JetBrains.Annotations/10.2.1": {
+        "dependencies": {
+          "System.Runtime": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard1.0/JetBrains.Annotations.NetStandard.dll": {
+            "assemblyVersion": "10.2.1.0",
+            "fileVersion": "10.2.1.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard1.0/JetBrains.Annotations.NetStandard.dll": {}
         }
       },
       "Microsoft.Bcl.AsyncInterfaces/1.0.0": {
@@ -140,6 +155,23 @@
         },
         "compile": {
           "lib/netstandard2.0/Ocelot.Provider.Eureka.dll": {}
+        }
+      },
+      "OcelotSwagger/0.0.5": {
+        "dependencies": {
+          "JetBrains.Annotations": "10.2.1",
+          "Microsoft.AspNetCore.Http.Abstractions": "2.2.0",
+          "Ocelot": "13.5.2",
+          "Swashbuckle.AspNetCore": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/OcelotSwagger.dll": {
+            "assemblyVersion": "0.0.5.0",
+            "fileVersion": "0.0.5.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/OcelotSwagger.dll": {}
         }
       },
       "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {},
@@ -3576,6 +3608,13 @@
       "path": "fluentvalidation/8.4.0",
       "hashPath": "fluentvalidation.8.4.0.nupkg.sha512"
     },
+    "JetBrains.Annotations/10.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-yTPQ3CsP2I/3vgAsXWby3Bf+dbzsQC5I8/aOsktLi/cSvr50tVTANcL5rTrEmIllbEhZbtZ0rxzxJ2RU8UkMRg==",
+      "path": "jetbrains.annotations/10.2.1",
+      "hashPath": "jetbrains.annotations.10.2.1.nupkg.sha512"
+    },
     "Microsoft.Bcl.AsyncInterfaces/1.0.0": {
       "type": "package",
       "serviceable": true,
@@ -3624,6 +3663,13 @@
       "sha512": "sha512-Uf0QtjZTC7ciIe6SGlAxATTS9EjzW7YixeR4xOFpZ3BT+mD2yCWv4juiNx2VATiaRRMUvVRu6nVKTLoly0TVWA==",
       "path": "ocelot.provider.eureka/13.5.0",
       "hashPath": "ocelot.provider.eureka.13.5.0.nupkg.sha512"
+    },
+    "OcelotSwagger/0.0.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WgcCKKpr5qC0Trz2Ida/2aIOYa9eX0Q36LiA6N+ZnOvD4TIs3dNjpX68pckt5eeGVOvZfFlr7dqWvSWJiDKkxQ==",
+      "path": "ocelotswagger/0.0.5",
+      "hashPath": "ocelotswagger.0.0.5.nupkg.sha512"
     },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {
       "type": "package",

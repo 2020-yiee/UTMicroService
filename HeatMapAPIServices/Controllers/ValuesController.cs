@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CustomersAPIServices.Controllers
+namespace HeatMapAPIServices.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

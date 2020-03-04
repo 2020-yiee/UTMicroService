@@ -25,9 +25,10 @@ namespace AuthServer.Repository
             {
                 var customer = context.Customer
                     .Where(s => s.UserName == model.name)
-                    .Where(s => s.Password == model.password)
+                    .Where(s => s.Password == Hashing.HashPassword(model.password))
                     .FirstOrDefault();
-                return customer;
+                
+                return Hashing.ValidatePassword(model.password, customer.Password)? customer:null;
             }
         }
     }

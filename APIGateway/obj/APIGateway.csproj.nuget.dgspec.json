@@ -70,6 +70,10 @@
               "target": "Package",
               "version": "[13.5.0, )"
             },
+            "OcelotSwagger": {
+              "target": "Package",
+              "version": "[0.0.5, )"
+            },
             "Steeltoe.Discovery.ClientCore": {
               "target": "Package",
               "version": "[2.4.2, )"
