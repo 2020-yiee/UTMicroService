@@ -23,7 +23,7 @@
     {
       "DownstreamPathTemplate": "/api/customers/{id}",
       "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,  
+      "UseServiceDiscovery": true,
       "ServiceName": "service-customer",
       "UpstreamPathTemplate": "/api/customer/{id}",
       "UpstreamHttpMethod": [ "Get" ],
@@ -31,6 +31,14 @@
         "AuthenticationProviderKey": "CustomerKey",
         "AllowedScopes": []
       }
+    },
+    {
+      "DownstreamPathTemplate": "/api/values",
+      "DownstreamScheme": "http",
+      "UseServiceDiscovery": true,
+      "ServiceName": "service-customer",
+      "UpstreamPathTemplate": "/api/customers/test",
+      "UpstreamHttpMethod": [ "Get" ]
     }
   ],
   "GlobalConfiguration": {
