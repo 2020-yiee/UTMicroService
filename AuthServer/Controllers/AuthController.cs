@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace AuthServer.Controllers
 {
     [Route("api/[controller]")]
-    public class AuthController : Controller
+    public class AuthController : ControllerBase
     {
         ICustomerRepository repository;
         [HttpPost("login")]
@@ -46,19 +47,26 @@ namespace AuthServer.Controllers
                 );
 
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+                var customerresponse = new
+                {
+                    fullname = customer.FullName,
+                    email = customer.Email,
+                    role = customer.Role
+                };
                 var responseJson = new
                 {
                     access_token = encodedJwt,
-                    expires_in = (int)TimeSpan.FromDays(1).TotalSeconds
-                };
+                    expires_in = (int)TimeSpan.FromDays(30).TotalSeconds,
+                    customer = customerresponse
+            };
 
-                return Json(responseJson);
-            }
+            return Ok(responseJson);
+        }
             else
             {
-                return Json("");
-            }
+                return StatusCode(401);
+    }
 
-        }
+}
     }
 }

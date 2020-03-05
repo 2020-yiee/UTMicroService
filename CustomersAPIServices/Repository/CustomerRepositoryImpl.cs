@@ -18,16 +18,16 @@ namespace CustomersAPIServices.Repository
             addcustomer.FullName = customer.fullname;
             addcustomer.UserName = customer.userName;
             addcustomer.Password = Hashing.HashPassword(customer.password);
-            addcustomer.Role = "user";
+            addcustomer.Role = "webowner";
             try
             {
                 context.Customer.Add(addcustomer);
                 context.SaveChanges();
                 return addcustomer;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                Console.WriteLine(ex.Message);
                 return null;
             }
         }

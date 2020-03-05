@@ -31,10 +31,12 @@ namespace CustomersAPIServices.Controllers
         }
 
         [HttpPost("create")]
-        public IActionResult CreateCustomer(CreateCustomerRequest request)
+        public IActionResult CreateCustomer( [FromBody] CreateCustomerRequest request)
         {
             repository = new CustomerRepositoryImpl();
-            return Ok(repository.createCustomer(request));
+            var customer = repository.createCustomer(request);
+
+            return customer !=null? Ok() : StatusCode(400);
         }
 
         [HttpPost("delete")]
