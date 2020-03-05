@@ -1,4 +1,3 @@
-D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.csprojAssemblyReference.cache
 D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.RazorAssemblyInfo.cache
 D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.RazorAssemblyInfo.cs
 D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.AssemblyInfoInputs.cache

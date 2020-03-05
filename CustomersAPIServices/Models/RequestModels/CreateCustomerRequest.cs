@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 
 namespace CustomersAPIServices.Models.RequestModels
 {
-    public class CreateCustomerRequest
+    public class CreateWebOwnerRequest
     {
-        public string userName { get; set; }
-        public string email { get; set; }
-        public string fullname { get; set; }
-        public string password { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string FullName { get; set; }
+        public string Password { get; set; }
+        public string WebUrl { get; set; }
     }
 }

@@ -5,7 +5,6 @@ D:\learningData\CN9\SWP49X\Service\UTService\CustomersAPIServices\bin\Debug\netc
 D:\learningData\CN9\SWP49X\Service\UTService\CustomersAPIServices\bin\Debug\netcoreapp2.2\CustomersAPIServices.runtimeconfig.json
 D:\learningData\CN9\SWP49X\Service\UTService\CustomersAPIServices\bin\Debug\netcoreapp2.2\CustomersAPIServices.runtimeconfig.dev.json
 D:\learningData\CN9\SWP49X\Service\UTService\CustomersAPIServices\bin\Debug\netcoreapp2.2\CustomersAPIServices.dll
-D:\learningData\CN9\SWP49X\Service\UTService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.csprojAssemblyReference.cache
 D:\learningData\CN9\SWP49X\Service\UTService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.RazorAssemblyInfo.cache
 D:\learningData\CN9\SWP49X\Service\UTService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.RazorAssemblyInfo.cs
 D:\learningData\CN9\SWP49X\Service\UTService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.AssemblyInfoInputs.cache

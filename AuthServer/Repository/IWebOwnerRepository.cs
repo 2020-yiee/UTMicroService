@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace AuthServer.Repository
 {
-    public interface ICustomerRepository
+    public interface IWebOwnerRepository
     {
-        List<Customer> GetAllCustomers();
-        Customer getCustomerByUsernameAndPassword(LoginRequestModel model);
+        WebOwner getCustomerByUsernameAndPassword(LoginRequestModel model);
 
     }
 }

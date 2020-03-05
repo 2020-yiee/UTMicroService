@@ -16,14 +16,14 @@ namespace AuthServer.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        ICustomerRepository repository;
+        IWebOwnerRepository repository;
         [HttpPost("login")]
         public IActionResult Get([FromBody] LoginRequestModel model)
         {
-            repository = new CustomerRepositoryImpl();
-            var customer = repository.getCustomerByUsernameAndPassword(model);
+            repository = new WebOwnerRepositoryImpl();
+            var webOwner = repository.getCustomerByUsernameAndPassword(model);
             //just hard code here.  
-            if (customer != null)
+            if (webOwner != null)
             {
 
                 var now = DateTime.UtcNow;
@@ -33,7 +33,7 @@ namespace AuthServer.Controllers
                     new Claim(JwtRegisteredClaimNames.Sub, model.name),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64),
-                    new Claim(ClaimTypes.Role, customer.Role)
+                    new Claim(ClaimTypes.Role, webOwner.Role)
                 };
 
                 var signingKey = new SymmetricSecurityKey(Encoding.Default.GetBytes("SecretKeyForUserTrackingSystems"));
@@ -42,16 +42,16 @@ namespace AuthServer.Controllers
                     audience: "Aud",
                     claims: claims,
                     notBefore: now,
-                    expires: now.Add(TimeSpan.FromDays(1)),
+                    expires: now.Add(TimeSpan.FromDays(30)),
                     signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
                 );
 
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
                 var customerresponse = new
                 {
-                    fullname = customer.FullName,
-                    email = customer.Email,
-                    role = customer.Role
+                    full_name = webOwner.FullName,
+                    email = webOwner.Email,
+                    role = webOwner.Role
                 };
                 var responseJson = new
                 {

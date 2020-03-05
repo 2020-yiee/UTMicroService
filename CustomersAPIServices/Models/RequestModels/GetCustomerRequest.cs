@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace CustomersAPIServices.Models.RequestModels
 {
-    public class GetCustomerRequest
+    public class GetWebOwnerRequest
     {
-        public int customerId { get; set; }
-        public string email { get; set; }
+        public int WebOwnerId { get; set; }
+        public string Email { get; set; }
     }
 }

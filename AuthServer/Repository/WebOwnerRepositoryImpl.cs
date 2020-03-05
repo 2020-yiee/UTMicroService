@@ -8,23 +8,15 @@ using System.Threading.Tasks;
 
 namespace AuthServer.Repository
 {
-    public class CustomerRepositoryImpl : ICustomerRepository
+    public class WebOwnerRepositoryImpl : IWebOwnerRepository
     {
-        public List<Customer> GetAllCustomers()
+        public WebOwner getCustomerByUsernameAndPassword(LoginRequestModel model)
         {
             using (var context = new DBUTContext())
             {
-                var listCustomers = context.Customer.ToList();
-                return listCustomers;
-            }
-        }
-
-        public Customer getCustomerByUsernameAndPassword(LoginRequestModel model)
-        {
-            using (var context = new DBUTContext())
-            {
-                var customer = context.Customer
-                    .Where(s => s.UserName == model.name)
+                var customer = context.WebOwner
+                    .Where(s => s.Username == model.name)
+                    .Where(s => s.IsRemoved == false)
                     .FirstOrDefault();
                 if (customer != null)
                 {

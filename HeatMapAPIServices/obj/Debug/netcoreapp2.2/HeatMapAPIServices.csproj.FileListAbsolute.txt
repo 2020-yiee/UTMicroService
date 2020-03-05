@@ -5,7 +5,6 @@ D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\bin\Debug\netcor
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\bin\Debug\netcoreapp2.2\HeatMapAPIServices.runtimeconfig.json
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\bin\Debug\netcoreapp2.2\HeatMapAPIServices.runtimeconfig.dev.json
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\bin\Debug\netcoreapp2.2\HeatMapAPIServices.dll
-D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.csprojAssemblyReference.cache
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.RazorAssemblyInfo.cache
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.RazorAssemblyInfo.cs
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.AssemblyInfoInputs.cache

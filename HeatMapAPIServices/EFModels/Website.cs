@@ -7,14 +7,15 @@ namespace HeatMapAPIServices.EFModels
     {
         public Website()
         {
-            DataStore = new HashSet<DataStore>();
+            TrackingInfor = new HashSet<TrackingInfor>();
         }
 
         public int WebId { get; set; }
-        public int CustomerId { get; set; }
+        public int WebOwnerId { get; set; }
         public string WebUrl { get; set; }
+        public bool IsRemoved { get; set; }
 
-        public virtual Customer Customer { get; set; }
-        public virtual ICollection<DataStore> DataStore { get; set; }
+        public virtual WebOwner WebOwner { get; set; }
+        public virtual ICollection<TrackingInfor> TrackingInfor { get; set; }
     }
 }

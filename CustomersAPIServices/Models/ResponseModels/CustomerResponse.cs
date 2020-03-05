@@ -5,21 +5,21 @@ using System.Threading.Tasks;
 
 namespace CustomersAPIServices.Models.ResponseModels
 {
-    public class CustomerResponse
+    public class WebOwnerResponse
     {
-        public int customerId { get; set; }
-        public string username { get; set; }
-        public string fullname { get; set; }
-        public string email { get; set; }
-        public string role { get; set; }
+        public int WebOwnerId { get; set; }
+        public string Username { get; set; }
+        public string FullName { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; }
 
-        public CustomerResponse(int customerId,string username, string fullname, string email, string role)
+        public WebOwnerResponse(int customerId,string username, string fullname, string email, string role)
         {
-            this.customerId = customerId;
-            this.username = username;
-            this.fullname = fullname;
-            this.email = email;
-            this.role = role;
+            this.WebOwnerId = customerId;
+            this.Username = username;
+            this.FullName = fullname;
+            this.Email = email;
+            this.Role = role;
         }
     }
 }
