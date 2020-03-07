@@ -15,7 +15,7 @@ namespace AuthServer.Repository
             using (var context = new DBUTContext())
             {
                 var customer = context.WebOwner
-                    .Where(s => s.Username == model.name)
+                    .Where(s => s.Username == model.username)
                     .Where(s => s.IsRemoved == false)
                     .FirstOrDefault();
                 if (customer != null)

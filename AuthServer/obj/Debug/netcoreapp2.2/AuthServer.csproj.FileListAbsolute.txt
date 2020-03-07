@@ -13,3 +13,4 @@ D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\obj\Debug\netcoreapp2.2\
 D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\bin\Debug\netcoreapp2.2\AuthServer.pdb
 D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.dll
 D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.pdb
+D:\learningData\CN9\SWP49X\Service\UTService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.csprojAssemblyReference.cache

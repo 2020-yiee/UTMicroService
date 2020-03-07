@@ -30,7 +30,7 @@ namespace AuthServer.Controllers
 
                 var claims = new Claim[]
                 {
-                    new Claim(JwtRegisteredClaimNames.Sub, model.name),
+                    new Claim(JwtRegisteredClaimNames.Sub, model.username),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64),
                     new Claim(ClaimTypes.Role, webOwner.Role)

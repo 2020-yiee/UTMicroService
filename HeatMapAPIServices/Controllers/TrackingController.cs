@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HeatMapAPIServices.EFModels;
 using HeatMapAPIServices.Models;
 using HeatMapAPIServices.Repository;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatMapAPIServices.Controllers
@@ -30,6 +31,7 @@ namespace HeatMapAPIServices.Controllers
         }
 
         [HttpDelete("data")]
+        [Authorize(Roles ="admin")]
         public IActionResult deleteData([FromBody]DeleteDataRequest request)
         {
             repository = new HeatmapRepositoryImpl();
@@ -48,6 +50,7 @@ namespace HeatMapAPIServices.Controllers
         //==================================================================================
 
         [HttpPost("info")]
+        [Authorize]
         public IActionResult createTrackingInfo([FromBody]CreateTrackingInforRequest request)
         {
             repository = new HeatmapRepositoryImpl();
@@ -61,6 +64,7 @@ namespace HeatMapAPIServices.Controllers
         }
 
         [HttpPut("info")]
+        [Authorize]
         public IActionResult updateTrackingInfo([FromBody]UpdateTrackingInforRequest request)
         {
             repository = new HeatmapRepositoryImpl();
@@ -74,7 +78,8 @@ namespace HeatMapAPIServices.Controllers
         }
 
         [HttpDelete("info")]
-        public IActionResult deleteTrackingInfo([FromBody]int trackingId)
+        [Authorize]
+        public IActionResult deleteTrackingInfo(int trackingId)
         {
             repository = new HeatmapRepositoryImpl();
 
