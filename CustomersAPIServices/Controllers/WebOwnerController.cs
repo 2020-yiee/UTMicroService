@@ -47,10 +47,10 @@ namespace CustomersAPIServices.Controllers
 
         [HttpDelete]
         [Authorize]
-        public IActionResult deleteWebOwner(int customerId)
+        public IActionResult deleteWebOwner(int webOwnerId)
         {
             repository = new WebOwnerRepositoryImpl();
-            bool result = repository.deleteWebOwner(customerId);
+            bool result = repository.deleteWebOwner(webOwnerId);
             if (result) return Ok();
             return BadRequest();
         }
@@ -69,10 +69,10 @@ namespace CustomersAPIServices.Controllers
 
         [HttpGet("websites")]
         [Authorize]
-        public IActionResult getWebSites(int customerId)
+        public IActionResult getWebSites(int webOwnerId)
         {
             repository = new WebOwnerRepositoryImpl();
-            IEnumerable<WebsiteResponse> result = repository.getWebsites(customerId);
+            IEnumerable<WebsiteResponse> result = repository.getWebsites(webOwnerId);
             if (result != null) return Ok(result);
             return NotFound();
         }
@@ -93,7 +93,7 @@ namespace CustomersAPIServices.Controllers
         public IActionResult deleteWebsite([FromBody] DeleteWebsiteRequest request)
         {
             repository = new WebOwnerRepositoryImpl();
-            bool result = repository.deleteWebsite(request.customerId,request.webId);
+            bool result = repository.deleteWebsite(request.webOwnerId,request.webId);
             if (result) return Ok();
             return BadRequest();
         }
