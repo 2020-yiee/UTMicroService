@@ -49,6 +49,7 @@ namespace AuthServer.Controllers
                 var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
                 var customerresponse = new
                 {
+                    id = webOwner.WebOwnerId,
                     full_name = webOwner.FullName,
                     email = webOwner.Email,
                     role = webOwner.Role
