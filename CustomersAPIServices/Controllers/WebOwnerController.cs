@@ -12,13 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CustomersAPIServices.Controllers
 {
-    [Route("api/web-owner")]
     [EnableCors]
     public class WebOwnerController : Controller
     {
         IWebOwnerRepository repository;
         [Authorize(Roles ="admin")]
-        [HttpGet("get-all")]
+        [HttpGet("api/web-owners")]
         public IActionResult GetAllWebOwners()
         {
             repository = new WebOwnerRepositoryImpl();
@@ -28,7 +27,7 @@ namespace CustomersAPIServices.Controllers
         }
 
         [Authorize]
-        [HttpGet]   
+        [HttpGet("api/web-owner")]   
         public IActionResult getWebOwner([FromBody] GetWebOwnerRequest request)
         {
             repository = new WebOwnerRepositoryImpl();
@@ -37,7 +36,7 @@ namespace CustomersAPIServices.Controllers
             return NotFound();
         }
 
-        [HttpPost]
+        [HttpPost("api/web-owner")]
         public IActionResult CreateWebOwner([FromBody] CreateWebOwnerRequest request)
         {
             repository = new WebOwnerRepositoryImpl();
@@ -46,7 +45,7 @@ namespace CustomersAPIServices.Controllers
             return BadRequest(webOwner);
         }
 
-        [HttpDelete]
+        [HttpDelete("api/web-owner")]
         [Authorize]
         public IActionResult deleteWebOwner(int web_owner_id)
         {
@@ -56,7 +55,7 @@ namespace CustomersAPIServices.Controllers
             return BadRequest();
         }
 
-        [HttpPut]
+        [HttpPut("api/web-owner")]
         [Authorize]
         public IActionResult updateWebOwner([FromBody] UpdateWebOwnerRequest request)
         {
@@ -66,7 +65,7 @@ namespace CustomersAPIServices.Controllers
             return BadRequest();
         }
 
-        [HttpGet("check")]
+        [HttpGet("api/web-owner/check")]
         public IActionResult checkUsernameOrEmail(string username, string email)
         {
             repository = new WebOwnerRepositoryImpl();
@@ -77,7 +76,7 @@ namespace CustomersAPIServices.Controllers
         
         //=======================================================================================
 
-        [HttpGet("websites")]
+        [HttpGet("api/web-owner/websites")]
         [Authorize]
         public IActionResult getWebSites(int webOwnerId)
         {
@@ -87,7 +86,7 @@ namespace CustomersAPIServices.Controllers
             return NotFound();
         }
 
-        [HttpPost("website")]
+        [HttpPost("api/web-owner/website")]
         [Authorize]
         public IActionResult CreateWebSite([FromBody] CreateWebsiteRequest request)
         {
@@ -98,7 +97,7 @@ namespace CustomersAPIServices.Controllers
             return StatusCode(400);
         }
 
-        [HttpDelete("website")]
+        [HttpDelete("api/web-owner/website")]
         [Authorize]
         public IActionResult deleteWebsite([FromBody] DeleteWebsiteRequest request)
         {
