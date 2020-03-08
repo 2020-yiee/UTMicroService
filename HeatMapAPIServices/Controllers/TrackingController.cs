@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeatMapAPIServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/tracking")]
     [ApiController]
     [EnableCors]
     public class TrackingController : ControllerBase
