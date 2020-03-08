@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-webowner-85776bc5bf-x2tkm
+spec:
+  type: ClusterIP
+  selector:
+    component: service-webowner
+  ports:
+  - port: 80
+    targetPort: 80
