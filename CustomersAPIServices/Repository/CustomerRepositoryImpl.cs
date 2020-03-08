@@ -100,14 +100,15 @@ namespace CustomersAPIServices.Repository
         {
             try
             {
-                IEnumerable<Website> websites = context.Website
-                    .Where(s => s.WebOwnerId == webOwnerId).ToList();
-                List<WebsiteResponse> results = new List<WebsiteResponse>();
-                foreach (Website website in websites)
-                {
-                    results.Add(new WebsiteResponse(website.WebId, website.WebOwnerId, website.WebUrl, website.IsRemoved));
-                }
-                return results;
+                var websites = context.Website
+                    .Where(s => s.WebOwnerId == webOwnerId).Select(x=> new  WebsiteResponse(x.WebId, x.WebOwnerId, x.WebUrl, x.IsRemoved)).ToList();
+                return websites;
+                //List<WebsiteResponse> results = new List<WebsiteResponse>();
+                //foreach (Website website in websites)
+                //{
+                //    results.Add(new WebsiteResponse(website.WebId, website.WebOwnerId, website.WebUrl, website.IsRemoved));
+                //}
+                //return results;
             }
             catch (Exception ex)
             {
@@ -121,9 +122,9 @@ namespace CustomersAPIServices.Repository
             try
             {
                 Website website = context.Website
-                    .Where(s => s.WebOwnerId == webOwnerId)
-                    .Where(s => s.WebId == webId)
-                    .FirstOrDefault();
+                    //.Where(s => s.WebOwnerId == webOwnerId)
+                    //.Where(s => s.WebId == webId)
+                    .FirstOrDefault(x=>x.WebOwnerId == webOwnerId && x.WebId == webId);
                 if (website != null)
                 {
                     website.IsRemoved = true;
@@ -150,9 +151,9 @@ namespace CustomersAPIServices.Repository
             {
                 context.Website.Add(website);
                 context.SaveChanges();
-                Website temp = context.Website.Where(s => s.WebOwnerId == website.WebOwnerId)
-                    .Where(s => s.WebUrl == website.WebUrl).FirstOrDefault();
-                return new WebsiteResponse(temp.WebId, temp.WebOwnerId, temp.WebUrl, temp.IsRemoved);
+                //Website temp = context.Website.Where(s => s.WebOwnerId == website.WebOwnerId)
+                //    .Where(s => s.WebUrl == website.WebUrl).FirstOrDefault();
+                return new WebsiteResponse(website.WebId, website.WebOwnerId, website.WebUrl, website.IsRemoved);
             }
             catch (Exception ex)
             {
