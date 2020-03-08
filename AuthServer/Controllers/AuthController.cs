@@ -14,7 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace AuthServer.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [EnableCors]
     public class AuthController : ControllerBase
     {
