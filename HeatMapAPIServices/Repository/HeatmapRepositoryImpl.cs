@@ -11,15 +11,17 @@ namespace HeatMapAPIServices.Repository
     {
         private readonly DBUTContext context = new DBUTContext();
 
-        public TrackingInfor checkTrackingType(checkingRequest request)
+        public TrackingInforResponse checkTrackingType(checkingRequest request)
         {
             try
             {
-                return context.TrackingInfor
-                    .Where(s => s.WebId == request.WebId)
-                    .Where(s => s.TrackingUrl == request.TrackingUrl)
+                TrackingInfor trackingInfo = context.TrackingInfor
+                    .Where(s => s.WebId == request.web_id)
+                    .Where(s => s.TrackingUrl == request.tracking_url)
                     .Where(s => s.IsRemoved == false)
                     .FirstOrDefault();
+
+                return trackingInfo != null ? new TrackingInforResponse(trackingInfo.TrackingId, trackingInfo.WebId, trackingInfo.TrackingUrl, trackingInfo.TrackingType, trackingInfo.IsRemoved) : null;
             }
             catch (Exception ex)
             {
@@ -33,8 +35,8 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 TrackedData trackedData = new TrackedData();
-                trackedData.TrackingId = data.TrackingId;
-                trackedData.Data = data.Data;
+                trackedData.TrackingId = data.tracking_id;
+                trackedData.Data = data.data;
                 context.TrackedData.Add(trackedData);
                 context.SaveChanges();
                 return true;
@@ -49,9 +51,9 @@ namespace HeatMapAPIServices.Repository
         public bool createTrackingInfor(CreateTrackingInforRequest request)
         {
             TrackingInfor info = new TrackingInfor();
-            info.WebId = request.WebId;
-            info.TrackingUrl = request.TrackingUrl;
-            info.TrackingType = request.TrackingType;
+            info.WebId = request.web_id;
+            info.TrackingUrl = request.tracking_url;
+            info.TrackingType = request.tracking_type;
             info.IsRemoved = false;
             try
             {
@@ -71,7 +73,7 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 IEnumerable<TrackedData> datas = context.TrackedData
-                    .Where(s => s.TrackingId == request.TrackingId)
+                    .Where(s => s.TrackingId == request.tracking_id)
                     .ToList();
                 foreach (var data in datas)
                 {
@@ -109,14 +111,19 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public IEnumerable<TrackedData> getData(GetDataRequest request)
+        public IEnumerable<TrackingDataResponse> getData(GetDataRequest request)
         {
             try
             {
                 IEnumerable<TrackedData> data = context.TrackedData
-                    .Where(s => s.TrackingId == request.TrackingId)
+                    .Where(s => s.TrackingId == request.tracking_id)
                     .ToList();
-                return data;
+                List<TrackingDataResponse> response = new List<TrackingDataResponse>();
+                foreach (var data1 in data)
+                {
+                    response.Add(new TrackingDataResponse(data1.TrackedDataId, data1.TrackingId, data1.Data));
+                }
+                return response;
             }
             catch (Exception ex)
             {
@@ -131,12 +138,12 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 TrackingInfor info = context.TrackingInfor
-                    .Where(s => s.TrackingId == request.TrackingId).FirstOrDefault();
+                    .Where(s => s.TrackingId == request.tracking_id).FirstOrDefault();
                 if (info != null)
                 {
-                    info.WebId = request.WebId;
-                    info.TrackingUrl = request.TrackingUrl;
-                    info.TrackingType = request.TrackingType;
+                    info.WebId = request.web_id;
+                    info.TrackingUrl = request.tracking_url;
+                    info.TrackingType = request.tracking_type;
                     context.SaveChangesAsync();
                     return true;
                 }

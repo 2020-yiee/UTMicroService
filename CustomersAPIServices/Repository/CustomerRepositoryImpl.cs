@@ -14,10 +14,10 @@ namespace CustomersAPIServices.Repository
         public Object createWebOwner(CreateWebOwnerRequest webOwner)
         {
             WebOwner addWebOwner = new WebOwner();
-            addWebOwner.Email = webOwner.Email;
-            addWebOwner.FullName = webOwner.FullName;
-            addWebOwner.Username = webOwner.Username;
-            addWebOwner.Password = Hashing.HashPassword(webOwner.Password);
+            addWebOwner.Email = webOwner.email;
+            addWebOwner.FullName = webOwner.full_name;
+            addWebOwner.Username = webOwner.username;
+            addWebOwner.Password = Hashing.HashPassword(webOwner.password);
             addWebOwner.Role = "WebOwner";
             try
             {
@@ -26,10 +26,10 @@ namespace CustomersAPIServices.Repository
                 WebOwner temp = context.WebOwner
                     .Where(s => s.Username == addWebOwner.Username)
                     .FirstOrDefault();
-                WebsiteResponse website = createWebsite(new CreateWebsiteRequest(temp.WebOwnerId, webOwner.WebUrl));
+                WebsiteResponse website = createWebsite(new CreateWebsiteRequest(temp.WebOwnerId, webOwner.web_url));
                 return new
                 {
-                    webOwner = new WebOwnerResponse(temp.WebOwnerId, temp.Username, temp.FullName, temp.Email, temp.Role),
+                    web_owner = new WebOwnerResponse(temp.WebOwnerId, temp.Username, temp.FullName, temp.Email, temp.Role),
                     website = website
                 };
             }
@@ -71,19 +71,19 @@ namespace CustomersAPIServices.Repository
 
         public WebOwnerResponse getWebOwner(GetWebOwnerRequest request)
         {
-            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == request.WebOwnerId)
-                .Where(s => s.Email == request.Email).Where(s => s.IsRemoved == false).FirstOrDefault();
+            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == request.web_owner_id)
+                .Where(s => s.Email == request.email).Where(s => s.IsRemoved == false).FirstOrDefault();
 
             return new WebOwnerResponse(webOwner.WebOwnerId, webOwner.Username, webOwner.FullName, webOwner.Email, webOwner.Role);
         }
 
         public bool updateWebOwner(UpdateWebOwnerRequest request)
         {
-            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == request.WebOwnerId)
+            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == request.web_owner_id)
                 .FirstOrDefault();
-            webOwner.FullName = request.FullName;
-            webOwner.Email = request.Email;
-            webOwner.Role = request.Role;
+            webOwner.FullName = request.full_name;
+            webOwner.Email = request.email;
+            webOwner.Role = request.role;
             try
             {
                 context.SaveChanges();
@@ -143,8 +143,8 @@ namespace CustomersAPIServices.Repository
         public WebsiteResponse createWebsite(CreateWebsiteRequest request)
         {
             Website website = new Website();
-            website.WebOwnerId = request.webOwnerId;
-            website.WebUrl = request.webUrl;
+            website.WebOwnerId = request.web_owner_id;
+            website.WebUrl = request.web_url;
             website.IsRemoved = false;
             try
             {
@@ -167,13 +167,13 @@ namespace CustomersAPIServices.Repository
             if (owner != null) return new
             {
                 type = "ERROR",
-                nameMessage = "Username has been existed"
+                name_message = "Username has been existed"
             };
             owner = context.WebOwner.Where(s => s.Email == email).FirstOrDefault();
             if (owner != null) return new
             {
                 type = "ERROR",
-                emailMessage = "Email has been existed"
+                email_message = "Email has been existed"
             };
             return new { type = "SUCCESS"};
             

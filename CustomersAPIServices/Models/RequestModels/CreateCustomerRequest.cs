@@ -7,10 +7,10 @@ namespace CustomersAPIServices.Models.RequestModels
 {
     public class CreateWebOwnerRequest
     {
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string FullName { get; set; }
-        public string Password { get; set; }
-        public string WebUrl { get; set; }
+        public string username { get; set; }
+        public string email { get; set; }
+        public string full_name { get; set; }
+        public string password { get; set; }
+        public string web_url { get; set; }
     }
 }

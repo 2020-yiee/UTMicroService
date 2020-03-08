@@ -7,8 +7,8 @@ namespace HeatMapAPIServices.Models
 {
     public class CreateTrackingInforRequest
     {
-        public int WebId { get; set; }
-        public string TrackingUrl { get; set; }
-        public string TrackingType { get; set; }
+        public int web_id { get; set; }
+        public string tracking_url { get; set; }
+        public string tracking_type { get; set; }
     }
 }

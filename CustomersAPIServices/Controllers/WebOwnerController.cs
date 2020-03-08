@@ -12,13 +12,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CustomersAPIServices.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/web-owner")]
     [EnableCors]
     public class WebOwnerController : Controller
     {
         IWebOwnerRepository repository;
-        [Authorize]
-        [HttpGet]
+        [Authorize(Roles ="admin")]
+        [HttpGet("get-all")]
         public IActionResult GetAllWebOwners()
         {
             repository = new WebOwnerRepositoryImpl();
@@ -28,7 +28,7 @@ namespace CustomersAPIServices.Controllers
         }
 
         [Authorize]
-        [HttpGet("WebOwner")]   
+        [HttpGet]   
         public IActionResult getWebOwner([FromBody] GetWebOwnerRequest request)
         {
             repository = new WebOwnerRepositoryImpl();
@@ -48,10 +48,10 @@ namespace CustomersAPIServices.Controllers
 
         [HttpDelete]
         [Authorize]
-        public IActionResult deleteWebOwner(int webOwnerId)
+        public IActionResult deleteWebOwner(int web_owner_id)
         {
             repository = new WebOwnerRepositoryImpl();
-            bool result = repository.deleteWebOwner(webOwnerId);
+            bool result = repository.deleteWebOwner(web_owner_id);
             if (result) return Ok();
             return BadRequest();
         }
@@ -103,7 +103,7 @@ namespace CustomersAPIServices.Controllers
         public IActionResult deleteWebsite([FromBody] DeleteWebsiteRequest request)
         {
             repository = new WebOwnerRepositoryImpl();
-            bool result = repository.deleteWebsite(request.webOwnerId,request.webId);
+            bool result = repository.deleteWebsite(request.web_owner_id,request.web_id);
             if (result) return Ok();
             return BadRequest();
         }

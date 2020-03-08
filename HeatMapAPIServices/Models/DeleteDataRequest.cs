@@ -7,6 +7,6 @@ namespace HeatMapAPIServices.Models
 {
     public class DeleteDataRequest
     {
-        public int TrackingId { get; set; }
+        public int tracking_id { get; set; }
     }
 }

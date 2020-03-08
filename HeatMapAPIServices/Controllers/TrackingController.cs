@@ -44,7 +44,7 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult checkTrackingType([FromBody] checkingRequest request)
         {
             repository = new HeatmapRepositoryImpl();
-            TrackingInfor infor = repository.checkTrackingType(request);
+            TrackingInforResponse infor = repository.checkTrackingType(request);
             if (infor != null) return Ok(infor);
             return NotFound();
         }
@@ -81,11 +81,11 @@ namespace HeatMapAPIServices.Controllers
 
         [HttpDelete("info")]
         [Authorize]
-        public IActionResult deleteTrackingInfo(int trackingId)
+        public IActionResult deleteTrackingInfo(int tracking_id)
         {
             repository = new HeatmapRepositoryImpl();
 
-            bool result = repository.deleteTrackingInfor(trackingId);
+            bool result = repository.deleteTrackingInfor(tracking_id);
             if (result)
             {
                 return Ok();

@@ -7,9 +7,9 @@ namespace CustomersAPIServices.Models.RequestModels
 {
     public class UpdateWebOwnerRequest
     {
-        public int WebOwnerId { get; set; }
-        public string Email { get; set; }
-        public string FullName { get; set; }
-        public string Role { get; set; }
+        public int web_owner_id { get; set; }
+        public string email { get; set; }
+        public string full_name { get; set; }
+        public string role { get; set; }
     }
 }

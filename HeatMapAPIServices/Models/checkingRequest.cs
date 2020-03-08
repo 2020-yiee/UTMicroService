@@ -7,7 +7,7 @@ namespace HeatMapAPIServices.Models
 {
     public class checkingRequest
     {
-        public int WebId { get; set; }
-        public string TrackingUrl { get; set; }
+        public int web_id { get; set; }
+        public string tracking_url { get; set; }
     }
 }

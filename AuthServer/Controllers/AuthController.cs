@@ -60,7 +60,7 @@ namespace AuthServer.Controllers
                 {
                     access_token = encodedJwt,
                     expires_in = (int)TimeSpan.FromDays(30).TotalSeconds,
-                    customer = customerresponse
+                    web_owner = customerresponse
             };
 
             return Ok(responseJson);

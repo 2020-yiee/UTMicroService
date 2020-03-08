@@ -7,13 +7,13 @@ namespace CustomersAPIServices.Models.RequestModels
 {
     public class CreateWebsiteRequest
     {
-        public int webOwnerId { get; set; }
-        public string webUrl { get; set; }
+        public int web_owner_id { get; set; }
+        public string web_url { get; set; }
 
         public CreateWebsiteRequest(int webOwnerId, string webUrl)
         {
-            this.webOwnerId = webOwnerId;
-            this.webUrl = webUrl;
+            this.web_owner_id = webOwnerId;
+            this.web_url = webUrl;
         }
     }
 }

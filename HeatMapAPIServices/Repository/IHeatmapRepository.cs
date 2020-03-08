@@ -10,9 +10,9 @@ namespace HeatMapAPIServices.Repository
     interface IHeatmapRepository
     {
         Boolean createDataStore(SaveDataRequest data);
-        IEnumerable<TrackedData> getData(GetDataRequest request);
+        IEnumerable<TrackingDataResponse> getData(GetDataRequest request);
         Boolean deleteData(DeleteDataRequest request);
-        TrackingInfor checkTrackingType(checkingRequest request);
+        TrackingInforResponse checkTrackingType(checkingRequest request);
         bool createTrackingInfor(CreateTrackingInforRequest request);
         bool updateTrackingInfor(UpdateTrackingInforRequest request);
         bool deleteTrackingInfor(int trackingId);
