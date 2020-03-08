@@ -7,7 +7,7 @@ namespace CustomersAPIServices.Models.RequestModels
 {
     public class GetWebOwnerRequest
     {
-        public int web_owner_id { get; set; }
+        public int webOwnerId { get; set; }
         public string email { get; set; }
     }
 }

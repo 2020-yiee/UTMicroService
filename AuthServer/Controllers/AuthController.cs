@@ -52,15 +52,15 @@ namespace AuthServer.Controllers
                 var customerresponse = new
                 {
                     id = webOwner.WebOwnerId,
-                    full_name = webOwner.FullName,
+                    fullName = webOwner.FullName,
                     email = webOwner.Email,
                     role = webOwner.Role
                 };
                 var responseJson = new
                 {
-                    access_token = encodedJwt,
-                    expires_in = (int)TimeSpan.FromDays(30).TotalSeconds,
-                    web_owner = customerresponse
+                    accessToken = encodedJwt,
+                    expiresIn = (int)TimeSpan.FromDays(30).TotalSeconds,
+                    webOwner = customerresponse
             };
 
             return Ok(responseJson);

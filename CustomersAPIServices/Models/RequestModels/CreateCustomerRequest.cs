@@ -9,8 +9,8 @@ namespace CustomersAPIServices.Models.RequestModels
     {
         public string username { get; set; }
         public string email { get; set; }
-        public string full_name { get; set; }
+        public string fullName { get; set; }
         public string password { get; set; }
-        public string web_url { get; set; }
+        public string webUrl { get; set; }
     }
 }

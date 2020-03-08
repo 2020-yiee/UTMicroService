@@ -7,17 +7,17 @@ namespace CustomersAPIServices.Models.ResponseModels
 {
     public class WebOwnerResponse
     {
-        public int web_owner_id { get; set; }
+        public int webOwnerId { get; set; }
         public string username { get; set; }
-        public string full_name { get; set; }
+        public string fullName { get; set; }
         public string email { get; set; }
         public string role { get; set; }
 
         public WebOwnerResponse(int customerId,string username, string fullname, string email, string role)
         {
-            this.web_owner_id = customerId;
+            this.webOwnerId = customerId;
             this.username = username;
-            this.full_name = fullname;
+            this.fullName = fullname;
             this.email = email;
             this.role = role;
         }

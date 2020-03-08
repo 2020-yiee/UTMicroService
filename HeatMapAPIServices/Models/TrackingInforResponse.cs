@@ -7,19 +7,19 @@ namespace HeatMapAPIServices.Models
 {
     public class TrackingInforResponse
     {
-        public int tracking_id { get; set; }
-        public int web_id { get; set; }
-        public string tracking_url { get; set; }
-        public string tracking_type { get; set; }
-        public bool is_removed { get; set; }
+        public int trackingId { get; set; }
+        public int webId { get; set; }
+        public string trackingUrl { get; set; }
+        public string trackingType { get; set; }
+        public bool isRemoved { get; set; }
 
-        public TrackingInforResponse(int tracking_id, int web_id, string tracking_url, string tracking_type, bool is_removed)
+        public TrackingInforResponse(int trackingId, int webId, string trackingUrl, string trackingType, bool isRemoved)
         {
-            this.tracking_id = tracking_id;
-            this.web_id = web_id;
-            this.tracking_url = tracking_url;
-            this.tracking_type = tracking_type;
-            this.is_removed = is_removed;
+            this.trackingId = trackingId;
+            this.webId = webId;
+            this.trackingUrl = trackingUrl;
+            this.trackingType = trackingType;
+            this.isRemoved = isRemoved;
         }
     }
 }
