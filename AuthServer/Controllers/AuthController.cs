@@ -8,12 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using AuthServer.Models;
 using AuthServer.Repository;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AuthServer.Controllers
 {
     [Route("api/[controller]")]
+    [EnableCors]
     public class AuthController : ControllerBase
     {
         IWebOwnerRepository repository;

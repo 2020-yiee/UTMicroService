@@ -7,11 +7,13 @@ using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
 using CustomersAPIServices.Repository;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CustomersAPIServices.Controllers
 {
     [Route("api/[controller]")]
+    [EnableCors]
     public class WebOwnerController : Controller
     {
         IWebOwnerRepository repository;
@@ -40,9 +42,8 @@ namespace CustomersAPIServices.Controllers
         {
             repository = new WebOwnerRepositoryImpl();
             var webOwner = repository.createWebOwner(request);
-
             if (webOwner != null) return Ok(webOwner);
-            return StatusCode(400);
+            return BadRequest(webOwner);
         }
 
         [HttpDelete]
@@ -62,6 +63,15 @@ namespace CustomersAPIServices.Controllers
             repository = new WebOwnerRepositoryImpl();
             bool result = repository.updateWebOwner(request);
             if (result) return Ok();
+            return BadRequest();
+        }
+
+        [HttpGet("check")]
+        public IActionResult checkUsernameOrEmail(string username, string email)
+        {
+            repository = new WebOwnerRepositoryImpl();
+            var result = repository.checkUsernnameOrEmail(username, email);
+            if (result != null) return Ok(result);
             return BadRequest();
         }
         

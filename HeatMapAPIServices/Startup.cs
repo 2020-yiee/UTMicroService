@@ -26,12 +26,25 @@ namespace HeatMapAPIServices
         {
             Configuration = configuration;
         }
+        
 
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //CORS
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                builder =>
+                {
+                    builder.WithOrigins("*")
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
 
             //authorize
             var signingKey = new SymmetricSecurityKey(Encoding.Default.GetBytes("SecretKeyForUserTrackingSystems"));
@@ -102,6 +115,7 @@ namespace HeatMapAPIServices
             app.UseAuthentication();
             app.UseDiscoveryClient();
             app.UseMvc();
+            app.UseCors();
         }
     }
 }

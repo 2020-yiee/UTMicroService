@@ -13,3 +13,4 @@ D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\obj\Debug\netcor
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\bin\Debug\netcoreapp2.2\HeatMapAPIServices.pdb
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.dll
 D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.pdb
+D:\learningData\CN9\SWP49X\Service\UTService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.csprojAssemblyReference.cache

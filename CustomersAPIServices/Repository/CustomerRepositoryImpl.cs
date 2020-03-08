@@ -160,5 +160,23 @@ namespace CustomersAPIServices.Repository
                 return null;
             }
         }
+
+        public object checkUsernnameOrEmail(string username, string email)
+        {
+            WebOwner owner = context.WebOwner.Where(s => s.Username == username).FirstOrDefault();
+            if (owner != null) return new
+            {
+                type = "ERROR",
+                nameMessage = "Username has been existed"
+            };
+            owner = context.WebOwner.Where(s => s.Email == email).FirstOrDefault();
+            if (owner != null) return new
+            {
+                type = "ERROR",
+                emailMessage = "Email has been existed"
+            };
+            return new { type = "SUCCESS"};
+            
+        }
     }
 }

@@ -19,5 +19,6 @@ namespace CustomersAPIServices.Repository
         IEnumerable<WebsiteResponse> getWebsites(int webOwnerId);
         bool deleteWebsite(int webOwnerId, int webId);
         WebsiteResponse createWebsite(CreateWebsiteRequest request);
+        object checkUsernnameOrEmail(string username, string email);
     }
 }

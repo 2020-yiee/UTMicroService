@@ -27,13 +27,26 @@ namespace CustomersAPIServices
             Configuration = configuration;
         }
 
+        
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //authorize
+            //CORS
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                builder =>
+                {
+                    builder.WithOrigins("*")
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
 
+            //authorize
             var signingKey = new SymmetricSecurityKey(Encoding.Default.GetBytes("SecretKeyForUserTrackingSystems"));
             var tokenValidationParameters = new TokenValidationParameters
             {
@@ -102,6 +115,7 @@ namespace CustomersAPIServices
             app.UseAuthentication();
             app.UseDiscoveryClient();
             app.UseMvc();
+            app.UseCors();
         }
     }
 }

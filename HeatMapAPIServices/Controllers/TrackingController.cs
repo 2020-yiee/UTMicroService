@@ -6,12 +6,14 @@ using HeatMapAPIServices.EFModels;
 using HeatMapAPIServices.Models;
 using HeatMapAPIServices.Repository;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeatMapAPIServices.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors]
     public class TrackingController : ControllerBase
     {
         private IHeatmapRepository repository;
