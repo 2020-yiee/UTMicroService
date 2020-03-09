@@ -16,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using NSwag.Generation.Processors.Security;
+using NSwag;
 using Steeltoe.Discovery.Client;
 
 namespace CustomersAPIServices
@@ -78,13 +80,34 @@ namespace CustomersAPIServices
                 b => b.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
 
 
-            services.AddSwaggerGen((option) =>
+            //services.AddSwaggerGen((option) =>
+            //{
+            //    option.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            //    {
+            //        Title = "Customer api for User tracking",
+            //        Version = "v1"
+            //    });
+            //});
+            //add swagger
+            services.AddOpenApiDocument(config =>
             {
-                option.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                config.PostProcess = document =>
                 {
-                    Title = "Customer api for User tracking",
-                    Version = "v1"
+                    document.Info.Version = "v1";
+                    document.Info.Title = string.Format($"Campaign Service");
+                    document.Info.Description = string.Format($"Developer Documentation Page For Campaign Service");
+                };
+
+                config.AddSecurity("JWT", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+                {
+                    Type = OpenApiSecuritySchemeType.ApiKey,
+                    Name = "Authorization",
+                    In = OpenApiSecurityApiKeyLocation.Header,
+                    Description = "Using: Bearer + your jwt token"
                 });
+
+                config.OperationProcessors.Add(
+                        new AspNetCoreOperationSecurityScopeProcessor("JWT"));
             });
         }
 
@@ -93,13 +116,8 @@ namespace CustomersAPIServices
         {
 
             //Enable middleware to serve generated swagger as a JSON endpoint.
-            app.UseSwagger();
-
-            //spercify the Swagger JSON endpoint
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Customer api for User tracking v1");
-            });
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
 
             if (env.IsDevelopment())
             {

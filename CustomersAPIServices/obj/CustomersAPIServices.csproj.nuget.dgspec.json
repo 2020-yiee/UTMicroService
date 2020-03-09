@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\CustomersAPIServices\\CustomersAPIServices.csproj": {}
+    "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\CustomersAPIServices\\CustomersAPIServices.csproj": {}
   },
   "projects": {
-    "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\CustomersAPIServices\\CustomersAPIServices.csproj": {
+    "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\CustomersAPIServices\\CustomersAPIServices.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\CustomersAPIServices\\CustomersAPIServices.csproj",
+        "projectUniqueName": "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\CustomersAPIServices\\CustomersAPIServices.csproj",
         "projectName": "CustomersAPIServices",
-        "projectPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\CustomersAPIServices\\CustomersAPIServices.csproj",
-        "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-        "outputPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\CustomersAPIServices\\obj\\",
+        "projectPath": "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\CustomersAPIServices\\CustomersAPIServices.csproj",
+        "packagesPath": "C:\\Users\\HieuNTSE62694\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\CustomersAPIServices\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\HieuNTSE62694\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -74,13 +74,17 @@
               "target": "Package",
               "version": "[2.2.4, )"
             },
+            "NSwag.AspNetCore": {
+              "target": "Package",
+              "version": "[13.2.5, )"
+            },
+            "NSwag.Core": {
+              "target": "Package",
+              "version": "[13.2.5, )"
+            },
             "Steeltoe.Discovery.ClientCore": {
               "target": "Package",
               "version": "[2.4.2, )"
-            },
-            "Swashbuckle.AspNetCore": {
-              "target": "Package",
-              "version": "[5.0.0, )"
             }
           },
           "imports": [
@@ -93,7 +97,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

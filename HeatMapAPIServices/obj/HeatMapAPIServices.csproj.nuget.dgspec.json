@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\HeatMapAPIServices.csproj": {}
+    "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\HeatMapAPIServices\\HeatMapAPIServices.csproj": {}
   },
   "projects": {
-    "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\HeatMapAPIServices.csproj": {
+    "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\HeatMapAPIServices\\HeatMapAPIServices.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\HeatMapAPIServices.csproj",
+        "projectUniqueName": "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\HeatMapAPIServices\\HeatMapAPIServices.csproj",
         "projectName": "HeatMapAPIServices",
-        "projectPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\HeatMapAPIServices.csproj",
-        "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-        "outputPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\obj\\",
+        "projectPath": "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\HeatMapAPIServices\\HeatMapAPIServices.csproj",
+        "packagesPath": "C:\\Users\\HieuNTSE62694\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\HieuNTSE62694\\Desktop\\Capstone\\HeatMapAPIServices\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\HieuNTSE62694\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -93,7 +93,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.100\\RuntimeIdentifierGraph.json"
         }
       }
     }
