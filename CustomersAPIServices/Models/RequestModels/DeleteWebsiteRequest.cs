@@ -7,7 +7,7 @@ namespace CustomersAPIServices.Models.RequestModels
 {
     public class DeleteWebsiteRequest
     {
-        public int web_owner_id { get; set; }
-        public int web_id { get; set; }
+        public int webOwnerId { get; set; }
+        public int webId { get; set; }
     }
 }

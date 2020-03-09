@@ -16,8 +16,8 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 TrackingInfor trackingInfo = context.TrackingInfor
-                    .Where(s => s.WebId == request.web_id)
-                    .Where(s => s.TrackingUrl == request.tracking_url)
+                    .Where(s => s.WebId == request.webId)
+                    .Where(s => s.TrackingUrl == request.trackingUrl)
                     .Where(s => s.IsRemoved == false)
                     .FirstOrDefault();
 
@@ -35,7 +35,7 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 TrackedData trackedData = new TrackedData();
-                trackedData.TrackingId = data.tracking_id;
+                trackedData.TrackingId = data.trackingId;
                 trackedData.Data = data.data;
                 context.TrackedData.Add(trackedData);
                 context.SaveChanges();
@@ -51,9 +51,9 @@ namespace HeatMapAPIServices.Repository
         public bool createTrackingInfor(CreateTrackingInforRequest request)
         {
             TrackingInfor info = new TrackingInfor();
-            info.WebId = request.web_id;
-            info.TrackingUrl = request.tracking_url;
-            info.TrackingType = request.tracking_type;
+            info.WebId = request.webId;
+            info.TrackingUrl = request.trackingUrl;
+            info.TrackingType = request.trackingType;
             info.IsRemoved = false;
             try
             {
@@ -73,7 +73,7 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 IEnumerable<TrackedData> datas = context.TrackedData
-                    .Where(s => s.TrackingId == request.tracking_id)
+                    .Where(s => s.TrackingId == request.trackingId)
                     .ToList();
                 foreach (var data in datas)
                 {
@@ -116,7 +116,7 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 IEnumerable<TrackedData> data = context.TrackedData
-                    .Where(s => s.TrackingId == request.tracking_id)
+                    .Where(s => s.TrackingId == request.trackingId)
                     .ToList();
                 List<TrackingDataResponse> response = new List<TrackingDataResponse>();
                 foreach (var data1 in data)
@@ -138,12 +138,12 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 TrackingInfor info = context.TrackingInfor
-                    .Where(s => s.TrackingId == request.tracking_id).FirstOrDefault();
+                    .Where(s => s.TrackingId == request.trackingId).FirstOrDefault();
                 if (info != null)
                 {
-                    info.WebId = request.web_id;
-                    info.TrackingUrl = request.tracking_url;
-                    info.TrackingType = request.tracking_type;
+                    info.WebId = request.webId;
+                    info.TrackingUrl = request.trackingUrl;
+                    info.TrackingType = request.trackingType;
                     context.SaveChangesAsync();
                     return true;
                 }

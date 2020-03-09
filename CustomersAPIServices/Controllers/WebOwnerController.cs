@@ -47,10 +47,10 @@ namespace CustomersAPIServices.Controllers
 
         [HttpDelete("api/web-owner")]
         [Authorize]
-        public IActionResult deleteWebOwner(int web_owner_id)
+        public IActionResult deleteWebOwner(int webOwnerId)
         {
             repository = new WebOwnerRepositoryImpl();
-            bool result = repository.deleteWebOwner(web_owner_id);
+            bool result = repository.deleteWebOwner(webOwnerId);
             if (result) return Ok();
             return BadRequest();
         }
@@ -102,7 +102,7 @@ namespace CustomersAPIServices.Controllers
         public IActionResult deleteWebsite([FromBody] DeleteWebsiteRequest request)
         {
             repository = new WebOwnerRepositoryImpl();
-            bool result = repository.deleteWebsite(request.web_owner_id,request.web_id);
+            bool result = repository.deleteWebsite(request.webOwnerId,request.webId);
             if (result) return Ok();
             return BadRequest();
         }

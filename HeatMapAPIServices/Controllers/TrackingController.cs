@@ -81,11 +81,11 @@ namespace HeatMapAPIServices.Controllers
 
         [HttpDelete("info")]
         [Authorize]
-        public IActionResult deleteTrackingInfo(int tracking_id)
+        public IActionResult deleteTrackingInfo(int trackingId)
         {
             repository = new HeatmapRepositoryImpl();
 
-            bool result = repository.deleteTrackingInfor(tracking_id);
+            bool result = repository.deleteTrackingInfor(trackingId);
             if (result)
             {
                 return Ok();
