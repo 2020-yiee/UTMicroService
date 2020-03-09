@@ -69,12 +69,12 @@ namespace CustomersAPIServices.Repository
             return result;
         }
 
-        public WebOwnerResponse getWebOwner(GetWebOwnerRequest request)
+        public WebOwnerResponse getWebOwner(int webOwnerId)
         {
-            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == request.webOwnerId)
-                .Where(s => s.Email == request.email).Where(s => s.IsRemoved == false).FirstOrDefault();
-
+            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == webOwnerId).FirstOrDefault();
+            if(webOwner!=null)
             return new WebOwnerResponse(webOwner.WebOwnerId, webOwner.Username, webOwner.FullName, webOwner.Email, webOwner.Role);
+            return null;
         }
 
         public bool updateWebOwner(UpdateWebOwnerRequest request)

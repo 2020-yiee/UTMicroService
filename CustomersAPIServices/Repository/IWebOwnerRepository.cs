@@ -12,7 +12,7 @@ namespace CustomersAPIServices.Repository
     {
         Object createWebOwner(CreateWebOwnerRequest webOwner);
         IEnumerable<WebOwnerResponse> getAllWebOwners();
-        WebOwnerResponse getWebOwner(GetWebOwnerRequest request);
+        WebOwnerResponse getWebOwner(int webOwnerId);
 
         Boolean deleteWebOwner(int WebOwnerId);
         Boolean updateWebOwner(UpdateWebOwnerRequest request);

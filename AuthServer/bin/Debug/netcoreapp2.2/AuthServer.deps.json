@@ -37,6 +37,8 @@
           "Microsoft.NETCore.App": "2.2.0",
           "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": "1.9.10",
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "2.2.4",
+          "NSwag.AspNetCore": "13.2.5",
+          "NSwag.Core": "13.2.5",
           "Steeltoe.Discovery.ClientCore": "2.4.2",
           "Swashbuckle.AspNetCore": "5.0.0"
         },
@@ -387,6 +389,119 @@
           "Microsoft.NETCore.Platforms": "2.2.0",
           "Microsoft.NETCore.Targets": "2.0.0",
           "System.Runtime": "4.3.0"
+        }
+      },
+      "Namotion.Reflection/1.0.10": {
+        "dependencies": {
+          "Microsoft.CSharp": "4.5.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Namotion.Reflection.dll": {
+            "assemblyVersion": "1.0.10.0",
+            "fileVersion": "1.0.10.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/Namotion.Reflection.dll": {}
+        }
+      },
+      "NJsonSchema/10.1.7": {
+        "dependencies": {
+          "Namotion.Reflection": "1.0.10",
+          "Newtonsoft.Json": "11.0.2"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NJsonSchema.dll": {
+            "assemblyVersion": "10.1.7.0",
+            "fileVersion": "10.1.7.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/NJsonSchema.dll": {}
+        }
+      },
+      "NSwag.Annotations/13.2.5": {
+        "runtime": {
+          "lib/netstandard2.0/NSwag.Annotations.dll": {
+            "assemblyVersion": "13.2.5.0",
+            "fileVersion": "13.2.5.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/NSwag.Annotations.dll": {}
+        }
+      },
+      "NSwag.AspNetCore/13.2.5": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.Core": "2.2.0",
+          "Microsoft.AspNetCore.Mvc.Formatters.Json": "2.2.0",
+          "Microsoft.AspNetCore.StaticFiles": "2.2.0",
+          "Microsoft.Extensions.ApiDescription.Server": "3.0.0",
+          "Microsoft.Extensions.FileProviders.Embedded": "2.2.0",
+          "NSwag.Annotations": "13.2.5",
+          "NSwag.Core": "13.2.5",
+          "NSwag.Generation": "13.2.5",
+          "NSwag.Generation.AspNetCore": "13.2.5",
+          "System.IO.FileSystem": "4.3.0",
+          "System.Xml.XPath.XDocument": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NSwag.AspNetCore.dll": {
+            "assemblyVersion": "13.2.5.0",
+            "fileVersion": "13.2.5.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/NSwag.AspNetCore.dll": {}
+        }
+      },
+      "NSwag.Core/13.2.5": {
+        "dependencies": {
+          "NJsonSchema": "10.1.7",
+          "Newtonsoft.Json": "11.0.2"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NSwag.Core.dll": {
+            "assemblyVersion": "13.2.5.0",
+            "fileVersion": "13.2.5.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/NSwag.Core.dll": {}
+        }
+      },
+      "NSwag.Generation/13.2.5": {
+        "dependencies": {
+          "NJsonSchema": "10.1.7",
+          "NSwag.Core": "13.2.5",
+          "Newtonsoft.Json": "11.0.2"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NSwag.Generation.dll": {
+            "assemblyVersion": "13.2.5.0",
+            "fileVersion": "13.2.5.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/NSwag.Generation.dll": {}
+        }
+      },
+      "NSwag.Generation.AspNetCore/13.2.5": {
+        "dependencies": {
+          "Microsoft.AspNetCore.Mvc.ApiExplorer": "2.2.0",
+          "Microsoft.AspNetCore.Mvc.Core": "2.2.0",
+          "Microsoft.AspNetCore.Mvc.Formatters.Json": "2.2.0",
+          "NJsonSchema": "10.1.7",
+          "NSwag.Generation": "13.2.5"
+        },
+        "runtime": {
+          "lib/netstandard2.0/NSwag.Generation.AspNetCore.dll": {
+            "assemblyVersion": "13.2.5.0",
+            "fileVersion": "13.2.5.0"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/NSwag.Generation.AspNetCore.dll": {}
         }
       },
       "NuGet.Frameworks/4.7.0": {
@@ -4135,6 +4250,55 @@
       "path": "microsoft.win32.primitives/4.0.1",
       "hashPath": "microsoft.win32.primitives.4.0.1.nupkg.sha512"
     },
+    "Namotion.Reflection/1.0.10": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-IOhgWlgPoMKR5OOemIS/6Wox2kCJecXve0sJ/+leVGLoh83MNDQu490Hcnh2ky9N04GyrvHNlEDQsEZTGWSUaA==",
+      "path": "namotion.reflection/1.0.10",
+      "hashPath": "namotion.reflection.1.0.10.nupkg.sha512"
+    },
+    "NJsonSchema/10.1.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-G/71LPY1LuMygDl34sQlILnL/ti1hYQ7nKYF+F5zFX0NAX0ul/k+dzJa5e78WxbO0NqhkfPpNvxRHZsUjTmoHw==",
+      "path": "njsonschema/10.1.7",
+      "hashPath": "njsonschema.10.1.7.nupkg.sha512"
+    },
+    "NSwag.Annotations/13.2.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-iXegQWOW/F0C/C47Y3O3OlT7iHipJ8zpRCESr39LQvKcadB4jmi2lwtEKVcYhJpP/dcvWYAYal/6VTjD7N5H7g==",
+      "path": "nswag.annotations/13.2.5",
+      "hashPath": "nswag.annotations.13.2.5.nupkg.sha512"
+    },
+    "NSwag.AspNetCore/13.2.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jDKacc9TegbSHMaZe/mUTfbBlS6ZEKh0iCUWtGCDhZxUveeJybb9xt2/EGNflxds3P6Qsj45uWFWYNhRxSiA4w==",
+      "path": "nswag.aspnetcore/13.2.5",
+      "hashPath": "nswag.aspnetcore.13.2.5.nupkg.sha512"
+    },
+    "NSwag.Core/13.2.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-JOu0alC4WUeInEtWnPJLBtVjZivF2axWhm9N74a7sNItYbO1GlQw7X5eu+A4q3akeL/yOZQ7kEVSTaXKC9GFLw==",
+      "path": "nswag.core/13.2.5",
+      "hashPath": "nswag.core.13.2.5.nupkg.sha512"
+    },
+    "NSwag.Generation/13.2.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-t++IxaOa/zdhhEyCK6gWCuZpuNdRWoc2/vsx6O+HKgmTG9TrcuvB99clOZJSo9xs5rbW9dYDcatoBh7j/EpDXQ==",
+      "path": "nswag.generation/13.2.5",
+      "hashPath": "nswag.generation.13.2.5.nupkg.sha512"
+    },
+    "NSwag.Generation.AspNetCore/13.2.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9KkGHdl//tgBtubuPJoqmOt+Kk76G0Fze1Hu4BVa3wH81mknxHhM5RzdCenFY0GrE0xJNUuJzaS4/iq+Y+oRkA==",
+      "path": "nswag.generation.aspnetcore/13.2.5",
+      "hashPath": "nswag.generation.aspnetcore.13.2.5.nupkg.sha512"
+    },
     "NuGet.Frameworks/4.7.0": {
       "type": "package",
       "serviceable": true,
@@ -4320,7 +4484,7 @@
     "System.ComponentModel.Primitives/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-KMVuoQ+8bMQ/Z59M3s64num5AD74X5YSqVc7ibwGkPTfmmkl2W8VuSxLRJtpw4KzQrSKUgR0BLbF0adPfcTSGQ==",
+      "sha512": "sha512-j8GUkCpM8V4d4vhLIIoBLGey2Z5bCkMVNjEZseyAlm4n5arcsJOeI3zkUP+zvZgzsbLTYh4lYeP/ZD/gdIAPrw==",
       "path": "system.componentmodel.primitives/4.3.0",
       "hashPath": "system.componentmodel.primitives.4.3.0.nupkg.sha512"
     },
@@ -5650,7 +5814,7 @@
     "runtime.native.System.IO.Compression/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-b+V9JC/Ii3sR659flBeaBJww111425tgjcDS1k+hqV4sGh9FALRDBvJnDtQ895gAzpPTUOFDHdqaZ2Et7BpZMg==",
+      "sha512": "sha512-INBPonS5QPEgn7naufQFXJEp3zX6L4bwHgJ/ZH78aBTpeNfQMtf7C6VrAFhlq2xxWBveIOWyFzQjJ8XzHMhdOQ==",
       "path": "runtime.native.system.io.compression/4.3.0",
       "hashPath": "runtime.native.system.io.compression.4.3.0.nupkg.sha512"
     },
@@ -5671,7 +5835,7 @@
     "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.Apple/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Kh9W4agE0r/hK8AX1LvyQI2NrKHBL8pO0gRoDTdDb0LL6Ta1Z2OtFx3lOaAE0ZpCUc/dt9Wzs3rA7a3IsKdOVA==",
+      "sha512": "sha512-kVXCuMTrTlxq4XOOMAysuNwsXWpYeboGddNGpIgNSZmv1b6r/s/DPk0fYMB7Q5Qo4bY68o48jt4T4y5BVecbCQ==",
       "path": "runtime.osx.10.10-x64.runtime.native.system.security.cryptography.apple/4.3.0",
       "hashPath": "runtime.osx.10.10-x64.runtime.native.system.security.cryptography.apple.4.3.0.nupkg.sha512"
     },
@@ -5734,7 +5898,7 @@
     "System.Collections.Specialized/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-NoPBj0ykejqAWW4p4gGtrrL+3c84ZLSvGnHgq422ew1Rj4WKj1FA8/BCybqC111EtgcqUl6ZJNFYYS22HLgbjA==",
+      "sha512": "sha512-Epx8PoVZR0iuOnJJDzp7pWvdfMMOAvpUo95pC4ScH2mJuXkKA2Y4aR3cG9qt2klHgSons1WFh4kcGW7cSXvrxg==",
       "path": "system.collections.specialized/4.3.0",
       "hashPath": "system.collections.specialized.4.3.0.nupkg.sha512"
     },
@@ -6028,7 +6192,7 @@
     "System.Runtime.Serialization.Primitives/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-2Z5t70a2SwMsfQDp9KOclaZNyQhfIga2gppq9lIUDM1A4ohTshn4JqT7ir8bvIhXgorWKYDAr6rPzEbi/nTGKg==",
+      "sha512": "sha512-Wz+0KOukJGAlXjtKr+5Xpuxf8+c8739RI1C+A2BoQZT+wMCCoMDDdO8/4IRHfaVINqL78GO8dW8G2lW/e45Mcw==",
       "path": "system.runtime.serialization.primitives/4.3.0",
       "hashPath": "system.runtime.serialization.primitives.4.3.0.nupkg.sha512"
     },
@@ -6070,7 +6234,7 @@
     "System.Security.Cryptography.Csp/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-yO2k5o+Z+DiFRBvvB9vdRRAGHi6bm02M9OWXfCqQ8K0UxD3Woc3svQheZfb7PoTEFs0kGacO0IzzMWsb6Mkeow==",
+      "sha512": "sha512-X4s/FCkEUnRGnwR3aSfVIkldBmtURMhmexALNTwpjklzxWU7yjMk7GHLKOZTNkgnWnE0q7+BCf9N2LVRWxewaA==",
       "path": "system.security.cryptography.csp/4.3.0",
       "hashPath": "system.security.cryptography.csp.4.3.0.nupkg.sha512"
     },
@@ -6084,7 +6248,7 @@
     "System.Security.Cryptography.OpenSsl/4.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-vOYy7Jv9KsG3ld2hLt0GoERd82SZi4BelrbXLwI9yFBYX7kpbvUCWYo4eyevk47cuJXZ9ZLVAryANcc7iY71aA==",
+      "sha512": "sha512-h4CEgOgv5PKVF/HwaHzJRiVboL2THYCou97zpmhjghx5frc7fIvlkY1jL+lnIQyChrJDMNEXS6r7byGif8Cy4w==",
       "path": "system.security.cryptography.openssl/4.3.0",
       "hashPath": "system.security.cryptography.openssl.4.3.0.nupkg.sha512"
     },

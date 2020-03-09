@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace HeatMapAPIServices.Repository
 {
-    interface IHeatmapRepository
+    public interface IHeatmapRepository
     {
         Boolean createDataStore(SaveDataRequest data);
-        IEnumerable<TrackingDataResponse> getData(GetDataRequest request);
+        IEnumerable<TrackingDataResponse> getData(int trackingId);
         Boolean deleteData(DeleteDataRequest request);
         TrackingInforResponse checkTrackingType(checkingRequest request);
         bool createTrackingInfor(CreateTrackingInforRequest request);

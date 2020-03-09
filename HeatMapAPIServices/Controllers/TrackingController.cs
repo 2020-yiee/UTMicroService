@@ -16,35 +16,36 @@ namespace HeatMapAPIServices.Controllers
     [EnableCors]
     public class TrackingController : ControllerBase
     {
-        private IHeatmapRepository repository;
+        private IHeatmapRepository iRepository;
+
         [HttpPost("data")]
         public IActionResult saveData([FromBody] SaveDataRequest data)
         {
-            repository = new HeatmapRepositoryImpl();
-            Boolean result = repository.createDataStore(data);
+            iRepository = new HeatmapRepositoryImpl();
+            Boolean result = iRepository.createDataStore(data);
             return Ok(result);
         }
 
         [HttpGet("data")]
-        public IActionResult getData([FromBody]GetDataRequest request)
+        public IActionResult getData(int trackingId)
         {
-            repository = new HeatmapRepositoryImpl();
-            return Ok(repository.getData(request));
+            iRepository = new HeatmapRepositoryImpl();
+            return Ok(iRepository.getData(trackingId));
         }
 
         [HttpDelete("data")]
         [Authorize(Roles ="admin")]
         public IActionResult deleteData([FromBody]DeleteDataRequest request)
         {
-            repository = new HeatmapRepositoryImpl();
-            return Ok(repository.deleteData(request));
+            iRepository = new HeatmapRepositoryImpl();
+            return Ok(iRepository.deleteData(request));
         }
 
         [HttpPost("check")]
         public IActionResult checkTrackingType([FromBody] checkingRequest request)
         {
-            repository = new HeatmapRepositoryImpl();
-            TrackingInforResponse infor = repository.checkTrackingType(request);
+            iRepository = new HeatmapRepositoryImpl();
+            TrackingInforResponse infor = iRepository.checkTrackingType(request);
             if (infor != null) return Ok(infor);
             return NotFound();
         }
@@ -55,9 +56,9 @@ namespace HeatMapAPIServices.Controllers
         [Authorize]
         public IActionResult createTrackingInfo([FromBody]CreateTrackingInforRequest request)
         {
-            repository = new HeatmapRepositoryImpl();
+            iRepository = new HeatmapRepositoryImpl();
 
-            bool result = repository.createTrackingInfor(request);
+            bool result = iRepository.createTrackingInfor(request);
             if (result)
             {
                 return Ok();
@@ -69,9 +70,9 @@ namespace HeatMapAPIServices.Controllers
         [Authorize]
         public IActionResult updateTrackingInfo([FromBody]UpdateTrackingInforRequest request)
         {
-            repository = new HeatmapRepositoryImpl();
+            iRepository = new HeatmapRepositoryImpl();
 
-            bool result = repository.updateTrackingInfor(request);
+            bool result = iRepository.updateTrackingInfor(request);
             if (result)
             {
                 return Ok();
@@ -83,9 +84,9 @@ namespace HeatMapAPIServices.Controllers
         [Authorize]
         public IActionResult deleteTrackingInfo(int trackingId)
         {
-            repository = new HeatmapRepositoryImpl();
+            iRepository = new HeatmapRepositoryImpl();
 
-            bool result = repository.deleteTrackingInfor(trackingId);
+            bool result = iRepository.deleteTrackingInfor(trackingId);
             if (result)
             {
                 return Ok();

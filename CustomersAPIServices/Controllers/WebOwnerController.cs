@@ -28,10 +28,10 @@ namespace CustomersAPIServices.Controllers
 
         [Authorize]
         [HttpGet("api/web-owner")]   
-        public IActionResult getWebOwner([FromBody] GetWebOwnerRequest request)
+        public IActionResult getWebOwner( int webOwnerId)
         {
             repository = new WebOwnerRepositoryImpl();
-            WebOwnerResponse result = repository.getWebOwner(request);
+            WebOwnerResponse result = repository.getWebOwner(webOwnerId);
             if (result!=null) return Ok(result);
             return NotFound();
         }

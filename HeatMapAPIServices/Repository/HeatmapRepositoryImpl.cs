@@ -111,12 +111,12 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public IEnumerable<TrackingDataResponse> getData(GetDataRequest request)
+        public IEnumerable<TrackingDataResponse> getData(int trackingId)
         {
             try
             {
                 IEnumerable<TrackedData> data = context.TrackedData
-                    .Where(s => s.TrackingId == request.trackingId)
+                    .Where(s => s.TrackingId == trackingId)
                     .ToList();
                 List<TrackingDataResponse> response = new List<TrackingDataResponse>();
                 foreach (var data1 in data)
