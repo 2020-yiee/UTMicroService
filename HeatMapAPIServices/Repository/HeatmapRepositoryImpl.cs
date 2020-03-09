@@ -72,14 +72,15 @@ namespace HeatMapAPIServices.Repository
         {
             try
             {
-                IEnumerable<TrackedData> datas = context.TrackedData
+                List<TrackedData> datas = context.TrackedData
                     .Where(s => s.TrackingId == request.trackingId)
                     .ToList();
+                if (datas == null || datas.Count == 0) return false;
                 foreach (var data in datas)
                 {
                     context.TrackedData.Remove(data);
                 }
-                context.SaveChangesAsync();
+                context.SaveChanges();
                 return true;
             }
             catch (Exception ex)
@@ -145,7 +146,7 @@ namespace HeatMapAPIServices.Repository
                     info.WebId = request.webId;
                     info.TrackingUrl = request.trackingUrl;
                     info.TrackingType = request.trackingType;
-                    context.SaveChangesAsync();
+                    context.SaveChanges();
                     return true;
                 }
                 else return false;

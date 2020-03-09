@@ -38,7 +38,9 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult deleteData([FromBody]DeleteDataRequest request)
         {
             iRepository = new HeatmapRepositoryImpl();
-            return Ok(iRepository.deleteData(request));
+            bool  result = iRepository.deleteData(request);
+            if(result) return Ok();
+            return NotFound();
         }
 
         [HttpPost("check")]
