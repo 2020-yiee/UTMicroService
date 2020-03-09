@@ -15,6 +15,12 @@ namespace CustomersAPIServices.Controllers
     [EnableCors]
     public class WebOwnerController : Controller
     {
+
+        protected int GetUserId()
+        {
+            return int.Parse(this.User.Claims.First(i => i.Type == "UserId").Value);
+        }
+
         IWebOwnerRepository repository;
         [Authorize(Roles ="admin")]
         [HttpGet("api/web-owners")]
@@ -28,10 +34,10 @@ namespace CustomersAPIServices.Controllers
 
         [Authorize]
         [HttpGet("api/web-owner")]   
-        public IActionResult getWebOwner( int webOwnerId)
+        public IActionResult getWebOwner()
         {
             repository = new WebOwnerRepositoryImpl();
-            WebOwnerResponse result = repository.getWebOwner(webOwnerId);
+            Object result = repository.getWebOwner(GetUserId());
             if (result!=null) return Ok(result);
             return NotFound();
         }
@@ -78,10 +84,10 @@ namespace CustomersAPIServices.Controllers
 
         [HttpGet("api/web-owner/websites")]
         [Authorize]
-        public IActionResult getWebSites(int webOwnerId)
+        public IActionResult getWebSites()
         {
             repository = new WebOwnerRepositoryImpl();
-            IEnumerable<WebsiteResponse> result = repository.getWebsites(webOwnerId);
+            IEnumerable<WebsiteResponse> result = repository.getWebsites(GetUserId());
             if (result != null) return Ok(result);
             return NotFound();
         }

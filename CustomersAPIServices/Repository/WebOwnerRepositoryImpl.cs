@@ -1,15 +1,21 @@
 ﻿using CustomersAPIServices.EFModels;
 using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CustomersAPIServices.Repository
 {
     public class WebOwnerRepositoryImpl : IWebOwnerRepository
     {
+       
         private DBUTContext context = new DBUTContext();
         public Object createWebOwner(CreateWebOwnerRequest webOwner)
         {
@@ -26,11 +32,13 @@ namespace CustomersAPIServices.Repository
                 WebOwner temp = context.WebOwner
                     .Where(s => s.Username == addWebOwner.Username)
                     .FirstOrDefault();
-                WebsiteResponse website = createWebsite(new CreateWebsiteRequest(temp.WebOwnerId, webOwner.webUrl));
+                List<WebsiteResponse> website = new List<WebsiteResponse>();
+                    website.Add(createWebsite(new CreateWebsiteRequest(temp.WebOwnerId, webOwner.webUrl)));
                 return new
                 {
                     webOwner = new WebOwnerResponse(temp.WebOwnerId, temp.Username, temp.FullName, temp.Email, temp.Role),
-                    website = website
+                    token = GenerateJwtToken(temp.Username, temp, temp.Role),
+                    websites = website
                 };
             }
             catch (Exception ex)
@@ -38,6 +46,30 @@ namespace CustomersAPIServices.Repository
                 Console.WriteLine(ex.Message);
                 return null;
             }
+        }
+        public object GenerateJwtToken(string email, WebOwner user, string Role)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("UserId", user.WebOwnerId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, Role)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("LgS9RPkJ0bf9PgdkzzHZM7hJdGCdW_gfGVHDNT1P3FvDdDpAWzan2JOzDtAuYHoP"));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.UtcNow.AddDays(Convert.ToDouble(7));
+
+            var token = new JwtSecurityToken(
+                "https://dev-tkt68df2.auth0.com/",
+                "fHkCJ1ingY7v9zWpbrKwDqeGlr3zIIlm",
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
 
@@ -69,12 +101,29 @@ namespace CustomersAPIServices.Repository
             return result;
         }
 
-        public WebOwnerResponse getWebOwner(int webOwnerId)
+        public Object getWebOwner(int webOwnerId)
         {
-            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == webOwnerId).FirstOrDefault();
-            if (webOwner != null)
-                return new WebOwnerResponse(webOwner.WebOwnerId, webOwner.Username, webOwner.FullName, webOwner.Email, webOwner.Role);
-            return null;
+            WebOwner temp = context.WebOwner
+                    .Where(s => s.WebOwnerId == webOwnerId)
+                    .FirstOrDefault();
+            if(temp != null)
+            {
+                var website = context.Website
+                            .Where(x => x.WebOwnerId == webOwnerId)
+                            .ToList()
+                            .Select(x => new WebsiteResponse(x.WebId, x.WebOwnerId, x.WebUrl, x.IsRemoved))
+                            .ToList();
+                return new
+                {
+                    webOwner = new WebOwnerResponse(temp.WebOwnerId, temp.Username, temp.FullName, temp.Email, temp.Role),
+                    token = GenerateJwtToken(temp.Username, temp, temp.Role),
+                    websites = website
+                };
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public bool updateWebOwner(UpdateWebOwnerRequest request)

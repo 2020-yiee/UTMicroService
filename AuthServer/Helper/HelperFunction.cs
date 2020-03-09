@@ -23,6 +23,7 @@ namespace AuthServer.Helper
         {
             var claims = new List<Claim>
             {
+                new Claim("UserId", user.WebOwnerId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Email, user.Email),

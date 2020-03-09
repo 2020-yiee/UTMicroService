@@ -29,7 +29,9 @@ namespace AuthServer.Controllers
         public async Task<object> Get([FromBody] LoginRequestModel model)
         {
             var webOwner = await _repository.getCustomerByUsernameAndPassword(model);
-            return webOwner;
+            if (Object.Equals(webOwner,false)) return StatusCode(401);
+            if (webOwner == null) return StatusCode(403);
+            return Ok(webOwner);
     //        //just hard code here.    
     //        if (webOwner != null)
     //        {
