@@ -72,28 +72,30 @@ namespace CustomersAPIServices.Repository
         public WebOwnerResponse getWebOwner(int webOwnerId)
         {
             WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == webOwnerId).FirstOrDefault();
-            if(webOwner!=null)
-            return new WebOwnerResponse(webOwner.WebOwnerId, webOwner.Username, webOwner.FullName, webOwner.Email, webOwner.Role);
+            if (webOwner != null)
+                return new WebOwnerResponse(webOwner.WebOwnerId, webOwner.Username, webOwner.FullName, webOwner.Email, webOwner.Role);
             return null;
         }
 
         public bool updateWebOwner(UpdateWebOwnerRequest request)
         {
-            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == request.webOwnerId)
+            var webOwner = context.WebOwner.Where(s => s.WebOwnerId == request.webOwnerId)
                 .FirstOrDefault();
-            webOwner.FullName = request.fullName;
-            webOwner.Email = request.email;
-            webOwner.Role = request.role;
-            try
-            {
-                context.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return false;
-            }
+            if (webOwner != null)
+                try
+                {
+                    webOwner.FullName = request.fullName;
+                    webOwner.Email = request.email;
+                    webOwner.Role = request.role;
+                    context.SaveChanges();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    return false;
+                }
+            return false;
         }
 
         public IEnumerable<WebsiteResponse> getWebsites(int webOwnerId)
@@ -101,7 +103,7 @@ namespace CustomersAPIServices.Repository
             try
             {
                 var websites = context.Website
-                    .Where(s => s.WebOwnerId == webOwnerId).Select(x=> new  WebsiteResponse(x.WebId, x.WebOwnerId, x.WebUrl, x.IsRemoved)).ToList();
+                    .Where(s => s.WebOwnerId == webOwnerId).Select(x => new WebsiteResponse(x.WebId, x.WebOwnerId, x.WebUrl, x.IsRemoved)).ToList();
                 return websites;
                 //List<WebsiteResponse> results = new List<WebsiteResponse>();
                 //foreach (Website website in websites)
@@ -124,7 +126,7 @@ namespace CustomersAPIServices.Repository
                 Website website = context.Website
                     //.Where(s => s.WebOwnerId == webOwnerId)
                     //.Where(s => s.WebId == webId)
-                    .FirstOrDefault(x=>x.WebOwnerId == webOwnerId && x.WebId == webId);
+                    .FirstOrDefault(x => x.WebOwnerId == webOwnerId && x.WebId == webId);
                 if (website != null)
                 {
                     website.IsRemoved = true;
@@ -176,8 +178,8 @@ namespace CustomersAPIServices.Repository
                 type = "ERROR",
                 emailMessage = "Email has been existed"
             };
-            return new { type = "SUCCESS"};
-            
+            return new { type = "SUCCESS" };
+
         }
     }
 }

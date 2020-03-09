@@ -93,15 +93,16 @@ namespace HeatMapAPIServices.Repository
         {
             try
             {
-                IEnumerable<TrackingInfor> datas = context.TrackingInfor
+                List<TrackingInfor> datas = context.TrackingInfor
                     .Where(s => s.TrackingId == trackingId)
                     .Where(s => s.IsRemoved == false)
                     .ToList();
+                if (datas == null || datas.Count == 0) return false;
                 foreach (var data in datas)
                 {
                     data.IsRemoved = true;
                 }
-                context.SaveChangesAsync();
+                context.SaveChanges();
                 return true;
             }
             catch (Exception ex)
