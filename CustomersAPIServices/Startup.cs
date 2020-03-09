@@ -48,29 +48,53 @@ namespace CustomersAPIServices
                 });
             });
 
-            //authorize
-            var signingKey = new SymmetricSecurityKey(Encoding.Default.GetBytes("SecretKeyForUserTrackingSystems"));
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = signingKey,
-                ValidateIssuer = true,
-                ValidIssuer = "Iss",
-                ValidateAudience = true,
-                ValidAudience = "Aud",
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
-                RequireExpirationTime = true,
-            };
+            ////authorize
+            //var signingKey = new SymmetricSecurityKey(Encoding.Default.GetBytes("SecretKeyForUserTrackingSystems"));
+            //var tokenValidationParameters = new TokenValidationParameters
+            //{
+            //    ValidateIssuerSigningKey = true,
+            //    IssuerSigningKey = signingKey,
+            //    ValidateIssuer = true,
+            //    ValidIssuer = "Iss",
+            //    ValidateAudience = true,
+            //    ValidAudience = "Aud",
+            //    ValidateLifetime = true,
+            //    ClockSkew = TimeSpan.Zero,
+            //    RequireExpirationTime = true,
+            //};
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(x =>
-                    {
-                        x.RequireHttpsMetadata = false;
-                        x.TokenValidationParameters = tokenValidationParameters;
-                    });
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //        .AddJwtBearer(x =>
+            //        {
+            //            x.RequireHttpsMetadata = false;
+            //            x.TokenValidationParameters = tokenValidationParameters;
+            //        });
 
             //services.AddAuthentication(IISDefaults.AuthenticationScheme);
+
+            //====== Add AddAuthentication =====
+            string domain = $"https://{Configuration["Auth0:Domain"]}/";
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+               .AddJwtBearer(x =>
+               {
+                   x.RequireHttpsMetadata = false;
+                   x.SaveToken = true;
+                   x.Authority = domain;
+                   x.Audience = Configuration["Auth0:ApiIdentifier"];
+                   x.TokenValidationParameters = new TokenValidationParameters
+                   {
+                       //NameClaimType = ClaimTypes.NameIdentifier
+                       ValidIssuer = Configuration["JwtIssuer"],
+                       ValidAudience = Configuration["Auth0:ApiIdentifier"],
+                       IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtKey"])),
+                       ClockSkew = TimeSpan.Zero, // remove delay of token when expire
+                       RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+                   };
+               });
 
             services.AddDiscoveryClient(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -109,6 +133,7 @@ namespace CustomersAPIServices
                 config.OperationProcessors.Add(
                         new AspNetCoreOperationSecurityScopeProcessor("JWT"));
             });
+            services.AddAuthorization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

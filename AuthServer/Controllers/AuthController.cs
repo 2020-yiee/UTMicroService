@@ -6,6 +6,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AuthServer.EFModels;
 using AuthServer.Models;
 using AuthServer.Repository;
 using Microsoft.AspNetCore.Cors;
@@ -18,58 +19,63 @@ namespace AuthServer.Controllers
     [EnableCors]
     public class AuthController : ControllerBase
     {
-        IWebOwnerRepository repository;
-        [HttpPost("login")]
-        public IActionResult Get([FromBody] LoginRequestModel model)
+        private readonly IWebOwnerRepository _repository;
+        public AuthController(IWebOwnerRepository repository)
         {
-            repository = new WebOwnerRepositoryImpl();
-            var webOwner = repository.getCustomerByUsernameAndPassword(model);
-            //just hard code here.  
-            if (webOwner != null)
-            {
-
-                var now = DateTime.UtcNow;
-
-                var claims = new Claim[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, model.username),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64),
-                    new Claim(ClaimTypes.Role, webOwner.Role)
-                };
-
-                var signingKey = new SymmetricSecurityKey(Encoding.Default.GetBytes("SecretKeyForUserTrackingSystems"));
-                var jwt = new JwtSecurityToken(
-                    issuer: "Iss",
-                    audience: "Aud",
-                    claims: claims,
-                    notBefore: now,
-                    expires: now.Add(TimeSpan.FromDays(30)),
-                    signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
-                );
-
-                var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-                var customerresponse = new
-                {
-                    id = webOwner.WebOwnerId,
-                    full_name = webOwner.FullName,
-                    email = webOwner.Email,
-                    role = webOwner.Role
-                };
-                var responseJson = new
-                {
-                    access_token = encodedJwt,
-                    expires_in = (int)TimeSpan.FromDays(30).TotalSeconds,
-                    web_owner = customerresponse
-            };
-
-            return Ok(responseJson);
+            _repository = repository;
         }
-            else
-            {
-                return StatusCode(401);
-    }
+        
+        [HttpPost("login")]
+        public async Task<object> Get([FromBody] LoginRequestModel model)
+        {
+            var webOwner = await _repository.getCustomerByUsernameAndPassword(model);
+            return webOwner;
+    //        //just hard code here.    
+    //        if (webOwner != null)
+    //        {
 
-}
+            //            var now = DateTime.UtcNow;
+
+            //            var claims = new Claim[]
+            //            {
+            //                new Claim(JwtRegisteredClaimNames.Sub, model.username),
+            //                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            //                new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64),
+            //                new Claim(ClaimTypes.Role, webOwner.Role)
+            //            };
+
+            //            var signingKey = new SymmetricSecurityKey(Encoding.Default.GetBytes("SecretKeyForUserTrackingSystems"));
+            //            var jwt = new JwtSecurityToken(
+            //                issuer: "Iss",
+            //                audience: "Aud",
+            //                claims: claims,
+            //                notBefore: now,
+            //                expires: now.Add(TimeSpan.FromDays(30)),
+            //                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
+            //            );
+
+            //            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
+            //            var customerresponse = new
+            //            {
+            //                id = webOwner.WebOwnerId,
+            //                full_name = webOwner.FullName,
+            //                email = webOwner.Email,
+            //                role = webOwner.Role
+            //            };
+            //            var responseJson = new
+            //            {
+            //                access_token = encodedJwt,
+            //                expires_in = (int)TimeSpan.FromDays(30).TotalSeconds,
+            //                web_owner = customerresponse
+            //        };
+
+            //        return Ok(responseJson);
+            //    }
+            //        else
+            //        {
+            //            return StatusCode(401);
+            //}
+
+        }
     }
 }

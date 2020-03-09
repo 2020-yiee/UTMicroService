@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AuthServer.EFModels;
+using AuthServer.Helper;
 using AuthServer.Models;
+using AuthServer.Repository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -45,10 +47,14 @@ namespace AuthServer
                 });
             });
 
-
+            services.AddScoped<IHelperFunction, HelperFunction>();
+            services.AddScoped<IWebOwnerRepository, WebOwnerRepositoryImpl>();
 
             services.AddDiscoveryClient(Configuration);
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options => {
+                options.SerializerSettings.ReferenceLoopHandling =
+                    Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
 
             services.AddDbContext<DBUTContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DbConnection"),
                 b => b.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
