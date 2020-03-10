@@ -50,7 +50,7 @@ namespace AuthServer
             });
 
             services.AddScoped<IHelperFunction, HelperFunction>();
-            services.AddScoped<IWebOwnerRepository, WebOwnerRepositoryImpl>();
+            services.AddScoped<IAuthUserRepository, AuthUserRepositoryImpl>();
 
             services.AddDiscoveryClient(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options => {

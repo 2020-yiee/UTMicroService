@@ -16,6 +16,7 @@ namespace HeatMapAPIServices.EFModels
         }
 
         public virtual DbSet<Access> Access { get; set; }
+        public virtual DbSet<Admin> Admin { get; set; }
         public virtual DbSet<Organization> Organization { get; set; }
         public virtual DbSet<StatisticFunnel> StatisticFunnel { get; set; }
         public virtual DbSet<StatisticHeatmap> StatisticHeatmap { get; set; }
@@ -48,6 +49,35 @@ namespace HeatMapAPIServices.EFModels
                 entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
 
                 entity.Property(e => e.Role).HasColumnName("role");
+            });
+
+            modelBuilder.Entity<Admin>(entity =>
+            {
+                entity.Property(e => e.AdminId)
+                    .HasColumnName("adminID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Actived).HasColumnName("actived");
+
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasColumnName("email")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.FullName)
+                    .IsRequired()
+                    .HasColumnName("fullName")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasColumnName("password")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasColumnName("username")
+                    .HasMaxLength(50);
             });
 
             modelBuilder.Entity<Organization>(entity =>
@@ -117,8 +147,7 @@ namespace HeatMapAPIServices.EFModels
 
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
-                    .HasColumnName("trackingUrl")
-                    .HasMaxLength(10);
+                    .HasColumnName("trackingUrl");
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
             });
@@ -188,7 +217,7 @@ namespace HeatMapAPIServices.EFModels
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
-                entity.Property(e => e.WebOwnerId).HasColumnName("webOwnerID");
+                entity.Property(e => e.UserId).HasColumnName("userID");
             });
         }
     }

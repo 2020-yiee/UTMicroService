@@ -19,8 +19,8 @@ namespace AuthServer.Controllers
     [EnableCors]
     public class AuthController : ControllerBase
     {
-        private readonly IWebOwnerRepository _repository;
-        public AuthController(IWebOwnerRepository repository)
+        private readonly IAuthUserRepository _repository;
+        public AuthController(IAuthUserRepository repository)
         {
             _repository = repository;
         }

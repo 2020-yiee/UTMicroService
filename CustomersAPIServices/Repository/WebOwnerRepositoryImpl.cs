@@ -13,32 +13,35 @@ using System.Threading.Tasks;
 
 namespace CustomersAPIServices.Repository
 {
-    public class WebOwnerRepositoryImpl : IWebOwnerRepository
+    public class UserRepositoryImpl : IWebOwnerRepository
     {
        
         private DBUTContext context = new DBUTContext();
-        public Object createWebOwner(CreateWebOwnerRequest webOwner)
+        public Object createUser(CreateUserRequest request)
         {
-            WebOwner addWebOwner = new WebOwner();
-            addWebOwner.Email = webOwner.email;
-            addWebOwner.FullName = webOwner.fullName;
-            addWebOwner.Username = webOwner.username;
-            addWebOwner.Password = Hashing.HashPassword(webOwner.password);
-            addWebOwner.Role = "WebOwner";
+            User addUser = new User();
+            addUser.Email = request.email;
+            addUser.FullName = request.fullName;
+            addUser.Password = Hashing.HashPassword(request.password);
+            addUser.Actived = true;
             try
             {
-                context.WebOwner.Add(addWebOwner);
+                context.User.Add(addUser);
                 context.SaveChanges();
-                WebOwner temp = context.WebOwner
-                    .Where(s => s.Username == addWebOwner.Username)
-                    .FirstOrDefault();
-                List<WebsiteResponse> website = new List<WebsiteResponse>();
-                    website.Add(createWebsite(new CreateWebsiteRequest(temp.WebOwnerId, webOwner.webUrl)));
+
+                Organization organization = (Organization)createOrganization(new OrganizationRequest(request.organizationName), addUser.UserId);
+
+                List<WebsiteResponse> websites = new List<WebsiteResponse>();
+                    websites.Add(createWebsite(new CreateWebsiteRequest(organization.OrganizationId,request.domainUrl), addUser.UserId));
+
+                List<OrganizationResponse> organizationResponses = new List<OrganizationResponse>();
+                organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name,websites));
                 return new
                 {
-                    webOwner = new WebOwnerResponse(temp.WebOwnerId, temp.Username, temp.FullName, temp.Email, temp.Role),
-                    token = GenerateJwtToken(temp.Username, temp, temp.Role),
-                    websites = website
+                    
+                    token = GenerateJwtToken(addUser.Email, addUser, "user"),
+                    organizations = organizationResponses,
+                    user = new UserResponse(addUser.UserId, addUser.FullName, addUser.Email)
                 };
             }
             catch (Exception ex)
@@ -47,11 +50,11 @@ namespace CustomersAPIServices.Repository
                 return null;
             }
         }
-        public object GenerateJwtToken(string email, WebOwner user, string Role)
+        public object GenerateJwtToken(string email, User user, string Role)
         {
             var claims = new List<Claim>
             {
-                new Claim("UserId", user.WebOwnerId.ToString()),
+                new Claim("UserId", user.UserId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
@@ -73,13 +76,13 @@ namespace CustomersAPIServices.Repository
         }
 
 
-        public bool deleteWebOwner(int webOwnerId)
+        public bool deleteUser(int webId)
         {
-            WebOwner webOwner = context.WebOwner.Where(s => s.WebOwnerId == webOwnerId)
+            User webOwner = context.User.Where(s => s.UserId == webId)
                 .FirstOrDefault();
             try
             {
-                webOwner.IsRemoved = true;
+                webOwner.Actived = false;
                 context.SaveChanges();
                 return true;
             }
@@ -90,34 +93,58 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public IEnumerable<WebOwnerResponse> getAllWebOwners()
+        public IEnumerable<UserResponse> getAllWebOwners()
         {
-            List<WebOwnerResponse> result = new List<WebOwnerResponse>();
-            List<WebOwner> webOwners = context.WebOwner.Where(s => s.IsRemoved == false).ToList();
+            List<UserResponse> result = new List<UserResponse>();
+            List<User> webOwners = context.User.Where(s => s.Actived == true).ToList();
             foreach (var webOwner in webOwners)
             {
-                result.Add(new WebOwnerResponse(webOwner.WebOwnerId, webOwner.Username, webOwner.FullName, webOwner.Email, webOwner.Role));
+                result.Add(new UserResponse(webOwner.UserId, webOwner.FullName, webOwner.Email));
             }
             return result;
         }
 
-        public Object getWebOwner(int webOwnerId)
+        public Object getUser(int userId)
         {
-            WebOwner temp = context.WebOwner
-                    .Where(s => s.WebOwnerId == webOwnerId)
+            User temp = context.User
+                    .Where(s => s.UserId == userId)
+                    .Where(s => s.Actived ==true)
                     .FirstOrDefault();
             if(temp != null)
             {
-                var website = context.Website
-                            .Where(x => x.WebOwnerId == webOwnerId)
+                List<int> organizationIds = context.Access.Where(s => s.UserId == temp.UserId).Select(s => s.OrganizationId).ToList();
+                if(organizationIds==null || organizationIds.Count == 0)
+                {
+                    return new
+                    {
+                        organizations = new List<Object>(),
+                        user = new UserResponse(temp.UserId, temp.FullName, temp.Email)
+                       
+                    };
+                }
+                List<Organization> organizations = context.Organization
+                    .Where(s => organizationIds.Contains(s.OrganizationId) == true)
+                    .Where(s => s.Removed == false)
+                    .ToList();
+
+                List<OrganizationResponse> organizationResponses = new List<OrganizationResponse>();
+                foreach (var organization in organizations)
+                {
+                    var websites = context.Website
+                            .Where(x => x.OrganizationId == organization.OrganizationId)
+                            .Where(x => x.Removed == false)
                             .ToList()
-                            .Select(x => new WebsiteResponse(x.WebId, x.WebOwnerId, x.WebUrl, x.IsRemoved))
+                            .Select(x => new WebsiteResponse(x.WebId, x.UserId, x.DomainUrl, x.Removed, x.OrganizationId))
                             .ToList();
+
+                    organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name, websites));
+                }
+
                 return new
                 {
-                    webOwner = new WebOwnerResponse(temp.WebOwnerId, temp.Username, temp.FullName, temp.Email, temp.Role),
-                    token = GenerateJwtToken(temp.Username, temp, temp.Role),
-                    websites = website
+                    organizations = organizationResponses,
+                    user = new UserResponse(temp.UserId, temp.FullName, temp.Email)
+
                 };
             }
             else
@@ -126,16 +153,15 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public bool updateWebOwner(UpdateWebOwnerRequest request)
+        public bool updateUser(UpdateUserRequest request)
         {
-            var webOwner = context.WebOwner.Where(s => s.WebOwnerId == request.webOwnerId)
+            var webOwner = context.User.Where(s => s.UserId == request.userID)
                 .FirstOrDefault();
             if (webOwner != null)
                 try
                 {
                     webOwner.FullName = request.fullName;
                     webOwner.Email = request.email;
-                    webOwner.Role = request.role;
                     context.SaveChanges();
                     return true;
                 }
@@ -147,19 +173,20 @@ namespace CustomersAPIServices.Repository
             return false;
         }
 
-        public IEnumerable<WebsiteResponse> getWebsites(int webOwnerId)
+        public IEnumerable<WebsiteResponse> getWebsites(int userId)
         {
             try
             {
+                User user = context.User
+                    .Where(s => s.UserId ==userId)
+                    .Where(s => s.Actived == true).FirstOrDefault();
+                if (user == null) return null;
                 var websites = context.Website
-                    .Where(s => s.WebOwnerId == webOwnerId).Select(x => new WebsiteResponse(x.WebId, x.WebOwnerId, x.WebUrl, x.IsRemoved)).ToList();
+                    .Where(s => s.UserId == userId)
+                    .Where(s => s.Removed == false)
+                    .Select(x => new WebsiteResponse(x.WebId, x.UserId, x.DomainUrl, x.Removed,x.OrganizationId)).ToList();
                 return websites;
-                //List<WebsiteResponse> results = new List<WebsiteResponse>();
-                //foreach (Website website in websites)
-                //{
-                //    results.Add(new WebsiteResponse(website.WebId, website.WebOwnerId, website.WebUrl, website.IsRemoved));
-                //}
-                //return results;
+                
             }
             catch (Exception ex)
             {
@@ -168,17 +195,21 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public bool deleteWebsite(int webOwnerId, int webId)
+        public bool deleteWebsite(int userId, int webId)
         {
             try
             {
+                User user = context.User
+                    .Where(s => s.UserId == userId)
+                    .Where(s => s.Actived == true).FirstOrDefault();
+                if (user == null) return false;
                 Website website = context.Website
                     //.Where(s => s.WebOwnerId == webOwnerId)
                     //.Where(s => s.WebId == webId)
-                    .FirstOrDefault(x => x.WebOwnerId == webOwnerId && x.WebId == webId);
+                    .FirstOrDefault(x => x.UserId == userId && x.WebId == webId);
                 if (website != null)
                 {
-                    website.IsRemoved = true;
+                    website.Removed = true;
                     context.SaveChanges();
                     return true;
                 }
@@ -192,19 +223,24 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public WebsiteResponse createWebsite(CreateWebsiteRequest request)
+        public WebsiteResponse createWebsite(CreateWebsiteRequest request,int userId)
         {
+            User user = context.User
+                    .Where(s => s.UserId == userId)
+                    .Where(s => s.Actived == true).FirstOrDefault();
+            if (user == null) return null;
             Website website = new Website();
-            website.WebOwnerId = request.webOwnerId;
-            website.WebUrl = request.webUrl;
-            website.IsRemoved = false;
+            website.UserId = userId;
+            website.DomainUrl = request.domainUrl;
+            website.Removed = false;
+            website.OrganizationId = request.organizationID;
             try
             {
                 context.Website.Add(website);
                 context.SaveChanges();
                 //Website temp = context.Website.Where(s => s.WebOwnerId == website.WebOwnerId)
                 //    .Where(s => s.WebUrl == website.WebUrl).FirstOrDefault();
-                return new WebsiteResponse(website.WebId, website.WebOwnerId, website.WebUrl, website.IsRemoved);
+                return new WebsiteResponse(website.WebId, website.UserId, website.DomainUrl, website.Removed,website.OrganizationId);
             }
             catch (Exception ex)
             {
@@ -213,22 +249,72 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public object checkUsernnameOrEmail(string username, string email)
+        public object checkUserEmail( string email)
         {
-            WebOwner owner = context.WebOwner.Where(s => s.Username == username).FirstOrDefault();
-            if (owner != null) return new
-            {
-                type = "ERROR",
-                nameMessage = "Username has been existed"
-            };
-            owner = context.WebOwner.Where(s => s.Email == email).FirstOrDefault();
-            if (owner != null) return new
+            User user = context.User.Where(s => s.Email == email).FirstOrDefault();
+            if (user != null) return new
             {
                 type = "ERROR",
                 emailMessage = "Email has been existed"
             };
             return new { type = "SUCCESS" };
 
+        }
+
+        public object createOrganization(OrganizationRequest request, int userId)
+        {
+            try
+            {
+                Organization organization = new Organization();
+                organization.Name = request.organirzationName;
+                organization.Removed = false;
+                context.Organization.Add(organization);
+                context.SaveChanges();
+
+                Access access = new Access();
+                access.OrganizationId = organization.OrganizationId;
+                access.UserId = userId;
+                access.Role = 1;
+                context.Access.Add(access);
+                context.SaveChanges();
+
+                return organization;
+            }
+            catch (Exception)
+            {
+                return null;
+                throw;
+            }
+        }
+
+        public object updateOrganization(UpdateOrganizationRequest request, int userId)
+        {
+            List<int> organizationIds = context.Access
+                .Where(s => s.UserId == userId).Select(s => s.OrganizationId).ToList();
+
+            Organization organization = context.Organization
+                .FirstOrDefault(s => s.OrganizationId == request.organizationID
+                && organizationIds.Contains(s.OrganizationId) == true
+                && s.Removed == false);
+            if (organization == null) return null;
+            organization.Name = request.organizationName;
+            context.SaveChanges();
+            return organization;
+        }
+
+        public object DeleteOrganization(int organizationID, int userId)
+        {
+            List<int> organizationIds = context.Access
+                .Where(s => s.UserId == userId).Select(s => s.OrganizationId).ToList();
+
+            Organization organization = context.Organization
+                .FirstOrDefault(s => s.OrganizationId == organizationID
+                && organizationIds.Contains(s.OrganizationId) == true
+                && s.Removed == false);
+            if (organization == null) return null;
+            organization.Removed = true; ;
+            context.SaveChanges();
+            return organization;
         }
     }
 }

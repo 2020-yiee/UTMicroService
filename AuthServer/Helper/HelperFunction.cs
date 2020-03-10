@@ -19,11 +19,11 @@ namespace AuthServer.Helper
         {
             _configuration = configuration;
         }
-        public object GenerateJwtToken(string email, WebOwner user, string Role)
+        public object GenerateJwtToken(string email, User user, string Role)
         {
             var claims = new List<Claim>
             {
-                new Claim("UserId", user.WebOwnerId.ToString()),
+                new Claim("UserId", user.UserId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Email, user.Email),

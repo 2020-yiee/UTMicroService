@@ -29,3 +29,4 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\HeatMapAPIServices\obj\Debug\n
 D:\learningData\CN9\SWP49X\Service\UTMicroService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.RazorTargetAssemblyInfo.cache
 D:\learningData\CN9\SWP49X\Service\UTMicroService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.pdb
+D:\learningData\CN9\SWP49X\Service\UTMicroService\HeatMapAPIServices\obj\Debug\netcoreapp2.2\HeatMapAPIServices.csprojAssemblyReference.cache

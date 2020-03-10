@@ -7,17 +7,19 @@ namespace AuthServer.Models.ResponseModels
 {
     public class WebsiteResponse
     {
-        public int websiteId { get; set; }
-        public int webOwnerId { get; set; }
+        public int webID { get; set; }
+        public int userID { get; set; }
         public string webUrl { get; set; }
-        public bool isRemoved { get; set; }
+        public bool removed { get; set; }
+        public int organizationID { get; set; }
 
-        public WebsiteResponse(int websiteId, int webOwnerId, string webUrl, bool isRemoved)
+        public WebsiteResponse(int websiteId, int userId, string webUrl, bool isRemoved, int organizationID)
         {
-            this.websiteId = websiteId;
-            this.webOwnerId = webOwnerId;
+            this.webID = websiteId;
+            this.userID = userId;
             this.webUrl = webUrl;
-            this.isRemoved = isRemoved;
+            this.removed = isRemoved;
+            this.organizationID = organizationID;
         }
     }
 }

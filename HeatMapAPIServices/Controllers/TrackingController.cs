@@ -11,37 +11,37 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeatMapAPIServices.Controllers
 {
-    [Route("api/tracking")]
     [ApiController]
     [EnableCors]
     public class TrackingController : ControllerBase
     {
         private IHeatmapRepository iRepository;
 
-        [HttpPost("data")]
+        [HttpPost("api/tracked-data")]
         public IActionResult createTrackedHeatmapData([FromBody] SaveDataRequest data)
         {
             iRepository = new HeatmapRepositoryImpl();
             Boolean result = iRepository.createTrackedHeatmapData(data);
-            return Ok(result);
+            if (result) return Ok();
+            return BadRequest();
         }
 
-        [HttpGet("data")]
-        public IActionResult getTrackedHeatmapData(string trackingUrl, int type)
+        [HttpGet("api/tracked-data")]
+        public IActionResult getTrackedHeatmapData(string trackingUrl, int eventType)
         {
             iRepository = new HeatmapRepositoryImpl();
-            List<TrackedHeatmapData> result =(List<TrackedHeatmapData>) iRepository.getTrackedHeatmapData(trackingUrl, type);
-            if (result == null || result.Count == 0) return NotFound();
+            List<TrackedHeatmapData> result =(List<TrackedHeatmapData>) iRepository.getTrackedHeatmapData(trackingUrl, eventType);
+            if (result == null || result.Count == 0) return BadRequest();
             return Ok(result);
         }
 
-        [HttpDelete("data")]
+        [HttpDelete("api/tracked-data")]
         public IActionResult deleteTrackedHeatmapData([FromBody]DeleteDataRequest request)
         {
             iRepository = new HeatmapRepositoryImpl();
             bool  result = iRepository.deleteTrackedHeatmapData(request);
             if(result) return Ok();
-            return NotFound();
+            return BadRequest();
         }
 
 
@@ -49,16 +49,16 @@ namespace HeatMapAPIServices.Controllers
         //==================================================================================
 
 
-        [HttpGet("info")]
-        public IActionResult getChekingHeatmapInfo( int websiteId)
+        [HttpGet("api/tracking-info")]
+        public IActionResult getChekingHeatmapInfo( int webID)
         {
             iRepository = new HeatmapRepositoryImpl();
-            List<TrackingInforResponse> infor = iRepository.getCheckingHeatmapInfo( websiteId).ToList();
+            List<TrackingInforResponse> infor = iRepository.getCheckingHeatmapInfo( webID).ToList();
             if (infor != null && infor.Count >0) return Ok(infor);
-            return NotFound();
+            return BadRequest();
         }
 
-        [HttpPost("info")]
+        [HttpPost("api/tracking-info")]
         public IActionResult createTrackingInfo([FromBody]CreateTrackingInforRequest request)
         {
             iRepository = new HeatmapRepositoryImpl();
@@ -71,7 +71,7 @@ namespace HeatMapAPIServices.Controllers
             else return BadRequest();
         }
 
-        [HttpPut("info")]
+        [HttpPut("api/tracking-info")]
         public IActionResult updateTrackingInfo([FromBody]UpdateTrackingHeatmapInforRequest request)
         {
             iRepository = new HeatmapRepositoryImpl();
@@ -84,7 +84,7 @@ namespace HeatMapAPIServices.Controllers
             else return BadRequest();
         }
 
-        [HttpDelete("info")]
+        [HttpDelete("api/tracking-info")]
         public IActionResult deleteTrackingInfo(int trackingHeatmapInfoID)
         {
             iRepository = new HeatmapRepositoryImpl();

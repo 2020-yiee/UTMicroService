@@ -35,9 +35,9 @@ namespace HeatMapAPIServices.Repository
             {
                 TrackedHeatmapData trackedData = new TrackedHeatmapData();
                 trackedData.TrackingUrl = data.trackingUrl;
-                trackedData.WebId = data.webId;
+                trackedData.WebId = data.webID;
                 trackedData.Data = data.data;
-                trackedData.EventType = data.type;
+                trackedData.EventType = data.eventType;
                 context.TrackedHeatmapData.Add(trackedData);
                 context.SaveChanges();
                 return true;
@@ -97,7 +97,7 @@ namespace HeatMapAPIServices.Repository
         public TrackingHeatmapInfo createHeatmapTrackingInfor(CreateTrackingInforRequest request)
         {
             TrackingHeatmapInfo info = new TrackingHeatmapInfo();
-            info.WebId = request.webId;
+            info.WebId = request.webID;
             info.TrackingUrl = request.trackingUrl;
             info.Removed = false;
             try
@@ -122,7 +122,7 @@ namespace HeatMapAPIServices.Repository
                     .Where(s => s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID).FirstOrDefault();
                 if (info != null)
                 {
-                    info.WebId = request.webId;
+                    info.WebId = request.webID;
                     info.TrackingUrl = request.trackingUrl;
                     context.SaveChanges();
                     return info;
