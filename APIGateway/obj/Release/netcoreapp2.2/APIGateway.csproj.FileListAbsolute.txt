@@ -1,0 +1,17 @@
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\appsettings.Development.json
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\appsettings.json
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\configuration.json
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\Properties\launchSettings.json
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\APIGateway.deps.json
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\APIGateway.runtimeconfig.json
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\APIGateway.runtimeconfig.dev.json
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\APIGateway.dll
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\bin\Release\netcoreapp2.2\APIGateway.pdb
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Release\netcoreapp2.2\APIGateway.csprojAssemblyReference.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Release\netcoreapp2.2\APIGateway.RazorAssemblyInfo.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Release\netcoreapp2.2\APIGateway.RazorAssemblyInfo.cs
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Release\netcoreapp2.2\APIGateway.AssemblyInfoInputs.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Release\netcoreapp2.2\APIGateway.AssemblyInfo.cs
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Release\netcoreapp2.2\APIGateway.RazorTargetAssemblyInfo.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Release\netcoreapp2.2\APIGateway.dll
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Release\netcoreapp2.2\APIGateway.pdb

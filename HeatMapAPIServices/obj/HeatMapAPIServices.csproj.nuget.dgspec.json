@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\HeatMapAPIServices.csproj": {}
+    "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\HeatMapAPIServices\\HeatMapAPIServices.csproj": {}
   },
   "projects": {
-    "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\HeatMapAPIServices.csproj": {
+    "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\HeatMapAPIServices\\HeatMapAPIServices.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\HeatMapAPIServices.csproj",
+        "projectUniqueName": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\HeatMapAPIServices\\HeatMapAPIServices.csproj",
         "projectName": "HeatMapAPIServices",
-        "projectPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\HeatMapAPIServices.csproj",
+        "projectPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\HeatMapAPIServices\\HeatMapAPIServices.csproj",
         "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-        "outputPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\HeatMapAPIServices\\obj\\",
+        "outputPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\HeatMapAPIServices\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

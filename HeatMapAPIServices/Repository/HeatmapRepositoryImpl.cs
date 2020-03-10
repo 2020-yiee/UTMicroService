@@ -11,33 +11,34 @@ namespace HeatMapAPIServices.Repository
     {
         private readonly DBUTContext context = new DBUTContext();
 
-        public TrackingInforResponse checkTrackingType(checkingRequest request)
+        public IEnumerable<TrackedHeatmapData> getTrackedHeatmapData(string trackingUrl, int type)
         {
             try
             {
-                TrackingInfor trackingInfo = context.TrackingInfor
-                    .Where(s => s.WebId == request.webId)
-                    .Where(s => s.TrackingUrl == request.trackingUrl)
-                    .Where(s => s.IsRemoved == false)
-                    .FirstOrDefault();
+                IEnumerable<TrackedHeatmapData> data = context.TrackedHeatmapData
+                    .Where(s => s.TrackingUrl == trackingUrl)
+                    .Where(s => s.EventType == type)
+                    .ToList();
 
-                return trackingInfo != null ? new TrackingInforResponse(trackingInfo.TrackingId, trackingInfo.WebId, trackingInfo.TrackingUrl, trackingInfo.TrackingType, trackingInfo.IsRemoved) : null;
+                return data;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("ERROR: "+ex.Message);
+                Console.WriteLine("ERROR: " + ex.Message);
                 return null;
             }
         }
 
-        public bool createDataStore(SaveDataRequest data)
+        public bool createTrackedHeatmapData(SaveDataRequest data)
         {
             try
             {
-                TrackedData trackedData = new TrackedData();
-                trackedData.TrackingId = data.trackingId;
+                TrackedHeatmapData trackedData = new TrackedHeatmapData();
+                trackedData.TrackingUrl = data.trackingUrl;
+                trackedData.WebId = data.webId;
                 trackedData.Data = data.data;
-                context.TrackedData.Add(trackedData);
+                trackedData.EventType = data.type;
+                context.TrackedHeatmapData.Add(trackedData);
                 context.SaveChanges();
                 return true;
             }
@@ -48,37 +49,19 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public bool createTrackingInfor(CreateTrackingInforRequest request)
-        {
-            TrackingInfor info = new TrackingInfor();
-            info.WebId = request.webId;
-            info.TrackingUrl = request.trackingUrl;
-            info.TrackingType = request.trackingType;
-            info.IsRemoved = false;
-            try
-            {
-                context.TrackingInfor.Add(info);
-                context.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR: " + ex.Message);
-                return false;
-            }
-        }
+        
 
-        public bool deleteData(DeleteDataRequest request)
+        public bool deleteTrackedHeatmapData(DeleteDataRequest request)
         {
             try
             {
-                List<TrackedData> datas = context.TrackedData
-                    .Where(s => s.TrackingId == request.trackingId)
+                List<TrackedHeatmapData> datas = context.TrackedHeatmapData
+                    .Where(s => s.TrackingUrl == request.trackingUrl)
                     .ToList();
                 if (datas == null || datas.Count == 0) return false;
                 foreach (var data in datas)
                 {
-                    context.TrackedData.Remove(data);
+                    context.TrackedHeatmapData.Remove(data);
                 }
                 context.SaveChanges();
                 return true;
@@ -90,42 +73,19 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public bool deleteTrackingInfor(int trackingId)
-        {
-            try
-            {
-                List<TrackingInfor> datas = context.TrackingInfor
-                    .Where(s => s.TrackingId == trackingId)
-                    .Where(s => s.IsRemoved == false)
-                    .ToList();
-                if (datas == null || datas.Count == 0) return false;
-                foreach (var data in datas)
-                {
-                    data.IsRemoved = true;
-                }
-                context.SaveChanges();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR: " + ex.Message);
-                return false;
-            }
-        }
+        
+       //------------------------------------------------------------------
 
-        public IEnumerable<TrackingDataResponse> getData(int trackingId)
+        public IEnumerable<TrackingInforResponse> getCheckingHeatmapInfo( int websiteId)
         {
             try
             {
-                IEnumerable<TrackedData> data = context.TrackedData
-                    .Where(s => s.TrackingId == trackingId)
-                    .ToList();
-                List<TrackingDataResponse> response = new List<TrackingDataResponse>();
-                foreach (var data1 in data)
-                {
-                    response.Add(new TrackingDataResponse(data1.TrackedDataId, data1.TrackingId, data1.Data));
-                }
-                return response;
+                IEnumerable<TrackingInforResponse> trackingInfo = context.TrackingHeatmapInfo
+                    .Where(s => s.WebId == websiteId)
+                    .Where(s => s.Removed == false)
+                    .ToList().Select(x => new TrackingInforResponse(x.TrackingHeatmapInfoId,x.WebId,x.TrackingUrl,x.Removed));
+
+                return trackingInfo;
             }
             catch (Exception ex)
             {
@@ -134,22 +94,62 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public bool updateTrackingInfor(UpdateTrackingInforRequest request)
+        public TrackingHeatmapInfo createHeatmapTrackingInfor(CreateTrackingInforRequest request)
+        {
+            TrackingHeatmapInfo info = new TrackingHeatmapInfo();
+            info.WebId = request.webId;
+            info.TrackingUrl = request.trackingUrl;
+            info.Removed = false;
+            try
+            {
+                context.TrackingHeatmapInfo.Add(info);
+                context.SaveChanges();
+                return info;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+                return null;
+            }
+        }
+
+        public TrackingHeatmapInfo updateTrackingHeatmapInfor(UpdateTrackingHeatmapInforRequest request)
         {
             
             try
             {
-                TrackingInfor info = context.TrackingInfor
-                    .Where(s => s.TrackingId == request.trackingId).FirstOrDefault();
+                TrackingHeatmapInfo info = context.TrackingHeatmapInfo
+                    .Where(s => s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID).FirstOrDefault();
                 if (info != null)
                 {
                     info.WebId = request.webId;
                     info.TrackingUrl = request.trackingUrl;
-                    info.TrackingType = request.trackingType;
                     context.SaveChanges();
-                    return true;
+                    return info;
                 }
-                else return false;
+                else return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+                return null;
+            }
+        }
+        public bool deleteTrackingHeatmapInfor(int trackingHeatmapInfoId)
+        {
+            try
+            {
+                List<TrackingHeatmapInfo> datas = context.TrackingHeatmapInfo
+                    .Where(s => s.TrackingHeatmapInfoId == trackingHeatmapInfoId)
+                    .Where(s => s.Removed == false)
+                    .ToList();
+                if (datas == null || datas.Count == 0) return false;
+                foreach (var data in datas)
+                {
+                    data.Removed = true;
+                }
+                context.SaveChanges();
+                return true;
             }
             catch (Exception ex)
             {

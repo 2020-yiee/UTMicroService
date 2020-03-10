@@ -15,9 +15,15 @@ namespace HeatMapAPIServices.EFModels
         {
         }
 
-        public virtual DbSet<TrackedData> TrackedData { get; set; }
-        public virtual DbSet<TrackingInfor> TrackingInfor { get; set; }
-        public virtual DbSet<WebOwner> WebOwner { get; set; }
+        public virtual DbSet<Access> Access { get; set; }
+        public virtual DbSet<Organization> Organization { get; set; }
+        public virtual DbSet<StatisticFunnel> StatisticFunnel { get; set; }
+        public virtual DbSet<StatisticHeatmap> StatisticHeatmap { get; set; }
+        public virtual DbSet<TrackedFunnelData> TrackedFunnelData { get; set; }
+        public virtual DbSet<TrackedHeatmapData> TrackedHeatmapData { get; set; }
+        public virtual DbSet<TrackingFunnelInfo> TrackingFunnelInfo { get; set; }
+        public virtual DbSet<TrackingHeatmapInfo> TrackingHeatmapInfo { get; set; }
+        public virtual DbSet<User> User { get; set; }
         public virtual DbSet<Website> Website { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -33,52 +39,128 @@ namespace HeatMapAPIServices.EFModels
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
-            modelBuilder.Entity<TrackedData>(entity =>
+            modelBuilder.Entity<Access>(entity =>
             {
-                entity.Property(e => e.TrackedDataId).HasColumnName("trackedDataID");
+                entity.HasKey(e => new { e.UserId, e.OrganizationId });
+
+                entity.Property(e => e.UserId).HasColumnName("userID");
+
+                entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
+
+                entity.Property(e => e.Role).HasColumnName("role");
+            });
+
+            modelBuilder.Entity<Organization>(entity =>
+            {
+                entity.Property(e => e.OrganizationId)
+                    .HasColumnName("organizationID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasColumnName("name")
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<StatisticFunnel>(entity =>
+            {
+                entity.HasKey(e => e.TrackingFunnelInfoId);
+
+                entity.Property(e => e.TrackingFunnelInfoId)
+                    .HasColumnName("trackingFunnelInfoID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.StatisticData)
+                    .IsRequired()
+                    .HasColumnName("statisticData");
+            });
+
+            modelBuilder.Entity<StatisticHeatmap>(entity =>
+            {
+                entity.HasKey(e => e.TrackingHeatmapInfoId);
+
+                entity.Property(e => e.TrackingHeatmapInfoId)
+                    .HasColumnName("trackingHeatmapInfoID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.StatisticData)
+                    .IsRequired()
+                    .HasColumnName("statisticData");
+            });
+
+            modelBuilder.Entity<TrackedFunnelData>(entity =>
+            {
+                entity.Property(e => e.TrackedFunnelDataId)
+                    .HasColumnName("trackedFunnelDataID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.SessionId)
+                    .IsRequired()
+                    .HasColumnName("sessionID");
+
+                entity.Property(e => e.TrackedSteps)
+                    .IsRequired()
+                    .HasColumnName("trackedSteps");
+
+                entity.Property(e => e.WebId).HasColumnName("webID");
+            });
+
+            modelBuilder.Entity<TrackedHeatmapData>(entity =>
+            {
+                entity.Property(e => e.TrackedHeatmapDataId).HasColumnName("trackedHeatmapDataID");
 
                 entity.Property(e => e.Data)
                     .IsRequired()
                     .HasColumnName("data");
 
-                entity.Property(e => e.TrackingId).HasColumnName("trackingID");
+                entity.Property(e => e.EventType).HasColumnName("eventType");
 
-                entity.HasOne(d => d.Tracking)
-                    .WithMany(p => p.TrackedData)
-                    .HasForeignKey(d => d.TrackingId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_TrackedData_TrackingInfor");
+                entity.Property(e => e.TrackingUrl)
+                    .IsRequired()
+                    .HasColumnName("trackingUrl")
+                    .HasMaxLength(10);
+
+                entity.Property(e => e.WebId).HasColumnName("webID");
             });
 
-            modelBuilder.Entity<TrackingInfor>(entity =>
+            modelBuilder.Entity<TrackingFunnelInfo>(entity =>
             {
-                entity.HasKey(e => e.TrackingId);
+                entity.Property(e => e.TrackingFunnelInfoId)
+                    .HasColumnName("trackingFunnelInfoID")
+                    .ValueGeneratedNever();
 
-                entity.Property(e => e.TrackingId).HasColumnName("trackingID");
-
-                entity.Property(e => e.IsRemoved).HasColumnName("isRemoved");
-
-                entity.Property(e => e.TrackingType)
+                entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasColumnName("trackingType")
+                    .HasColumnName("name")
                     .HasMaxLength(50);
+
+                entity.Property(e => e.Removed).HasColumnName("removed");
+
+                entity.Property(e => e.Steps)
+                    .IsRequired()
+                    .HasColumnName("steps");
+
+                entity.Property(e => e.WebId).HasColumnName("webID");
+            });
+
+            modelBuilder.Entity<TrackingHeatmapInfo>(entity =>
+            {
+                entity.Property(e => e.TrackingHeatmapInfoId).HasColumnName("trackingHeatmapInfoID");
+
+                entity.Property(e => e.Removed).HasColumnName("removed");
 
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
                     .HasColumnName("trackingUrl");
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
-
-                entity.HasOne(d => d.Web)
-                    .WithMany(p => p.TrackingInfor)
-                    .HasForeignKey(d => d.WebId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_TrackingInfor_Website");
             });
 
-            modelBuilder.Entity<WebOwner>(entity =>
+            modelBuilder.Entity<User>(entity =>
             {
-                entity.Property(e => e.WebOwnerId).HasColumnName("webOwnerID");
+                entity.Property(e => e.UserId).HasColumnName("userID");
+
+                entity.Property(e => e.Actived).HasColumnName("actived");
 
                 entity.Property(e => e.Email)
                     .IsRequired()
@@ -88,20 +170,9 @@ namespace HeatMapAPIServices.EFModels
                     .IsRequired()
                     .HasColumnName("fullName");
 
-                entity.Property(e => e.IsRemoved).HasColumnName("isRemoved");
-
                 entity.Property(e => e.Password)
                     .IsRequired()
                     .HasColumnName("password");
-
-                entity.Property(e => e.Role)
-                    .IsRequired()
-                    .HasColumnName("role")
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.Username)
-                    .IsRequired()
-                    .HasColumnName("username");
             });
 
             modelBuilder.Entity<Website>(entity =>
@@ -110,20 +181,14 @@ namespace HeatMapAPIServices.EFModels
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
 
-                entity.Property(e => e.IsRemoved).HasColumnName("isRemoved");
-
-                entity.Property(e => e.WebOwnerId).HasColumnName("webOwnerID");
-
-                entity.Property(e => e.WebUrl)
+                entity.Property(e => e.DomainUrl)
                     .IsRequired()
-                    .HasColumnName("webUrl")
+                    .HasColumnName("domainUrl")
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.WebOwner)
-                    .WithMany(p => p.Website)
-                    .HasForeignKey(d => d.WebOwnerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Website_Customer");
+                entity.Property(e => e.Removed).HasColumnName("removed");
+
+                entity.Property(e => e.WebOwnerId).HasColumnName("webOwnerID");
             });
         }
     }

@@ -19,76 +19,77 @@ namespace HeatMapAPIServices.Controllers
         private IHeatmapRepository iRepository;
 
         [HttpPost("data")]
-        public IActionResult saveData([FromBody] SaveDataRequest data)
+        public IActionResult createTrackedHeatmapData([FromBody] SaveDataRequest data)
         {
             iRepository = new HeatmapRepositoryImpl();
-            Boolean result = iRepository.createDataStore(data);
+            Boolean result = iRepository.createTrackedHeatmapData(data);
             return Ok(result);
         }
 
         [HttpGet("data")]
-        public IActionResult getData(int trackingId)
+        public IActionResult getTrackedHeatmapData(string trackingUrl, int type)
         {
             iRepository = new HeatmapRepositoryImpl();
-            return Ok(iRepository.getData(trackingId));
+            List<TrackedHeatmapData> result =(List<TrackedHeatmapData>) iRepository.getTrackedHeatmapData(trackingUrl, type);
+            if (result == null || result.Count == 0) return NotFound();
+            return Ok(result);
         }
 
         [HttpDelete("data")]
-        [Authorize(Roles ="admin")]
-        public IActionResult deleteData([FromBody]DeleteDataRequest request)
+        public IActionResult deleteTrackedHeatmapData([FromBody]DeleteDataRequest request)
         {
             iRepository = new HeatmapRepositoryImpl();
-            bool  result = iRepository.deleteData(request);
+            bool  result = iRepository.deleteTrackedHeatmapData(request);
             if(result) return Ok();
             return NotFound();
         }
 
-        [HttpPost("check")]
-        public IActionResult checkTrackingType([FromBody] checkingRequest request)
-        {
-            iRepository = new HeatmapRepositoryImpl();
-            TrackingInforResponse infor = iRepository.checkTrackingType(request);
-            if (infor != null) return Ok(infor);
-            return NotFound();
-        }
+
 
         //==================================================================================
 
+
+        [HttpGet("info")]
+        public IActionResult getChekingHeatmapInfo( int websiteId)
+        {
+            iRepository = new HeatmapRepositoryImpl();
+            List<TrackingInforResponse> infor = iRepository.getCheckingHeatmapInfo( websiteId).ToList();
+            if (infor != null && infor.Count >0) return Ok(infor);
+            return NotFound();
+        }
+
         [HttpPost("info")]
-        [Authorize]
         public IActionResult createTrackingInfo([FromBody]CreateTrackingInforRequest request)
         {
             iRepository = new HeatmapRepositoryImpl();
 
-            bool result = iRepository.createTrackingInfor(request);
-            if (result)
+            var result = iRepository.createHeatmapTrackingInfor(request);
+            if (result!=null)
             {
-                return Ok();
+                return Ok(result);
             }
             else return BadRequest();
         }
 
         [HttpPut("info")]
-        [Authorize]
-        public IActionResult updateTrackingInfo([FromBody]UpdateTrackingInforRequest request)
+        public IActionResult updateTrackingInfo([FromBody]UpdateTrackingHeatmapInforRequest request)
         {
             iRepository = new HeatmapRepositoryImpl();
 
-            bool result = iRepository.updateTrackingInfor(request);
-            if (result)
+            var result = iRepository.updateTrackingHeatmapInfor(request);
+            if (result!=null)
             {
-                return Ok();
+                return Ok(result);
             }
             else return BadRequest();
         }
 
         [HttpDelete("info")]
-        [Authorize]
-        public IActionResult deleteTrackingInfo(int trackingId)
+        public IActionResult deleteTrackingInfo(int trackingHeatmapInfoID)
         {
             iRepository = new HeatmapRepositoryImpl();
 
-            bool result = iRepository.deleteTrackingInfor(trackingId);
+            bool result = iRepository.deleteTrackingHeatmapInfor(trackingHeatmapInfoID);
             if (result)
             {
                 return Ok();

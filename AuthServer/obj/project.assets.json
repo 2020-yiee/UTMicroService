@@ -14216,11 +14216,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\AuthServer\\AuthServer.csproj",
+      "projectUniqueName": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\AuthServer\\AuthServer.csproj",
       "projectName": "AuthServer",
-      "projectPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\AuthServer\\AuthServer.csproj",
+      "projectPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\AuthServer\\AuthServer.csproj",
       "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-      "outputPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\AuthServer\\obj\\",
+      "outputPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\AuthServer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

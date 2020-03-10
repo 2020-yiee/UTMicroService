@@ -10,16 +10,14 @@ namespace HeatMapAPIServices.Models
         public int trackingId { get; set; }
         public int webId { get; set; }
         public string trackingUrl { get; set; }
-        public string trackingType { get; set; }
-        public bool isRemoved { get; set; }
+        public bool removed { get; set; }
 
-        public TrackingInforResponse(int trackingId, int webId, string trackingUrl, string trackingType, bool isRemoved)
+        public TrackingInforResponse(int trackingId, int webId, string trackingUrl, bool isRemoved)
         {
             this.trackingId = trackingId;
             this.webId = webId;
             this.trackingUrl = trackingUrl;
-            this.trackingType = trackingType;
-            this.isRemoved = isRemoved;
+            this.removed = isRemoved;
         }
     }
 }

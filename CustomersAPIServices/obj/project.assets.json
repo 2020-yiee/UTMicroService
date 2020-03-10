@@ -13627,11 +13627,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\CustomersAPIServices\\CustomersAPIServices.csproj",
+      "projectUniqueName": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\CustomersAPIServices\\CustomersAPIServices.csproj",
       "projectName": "CustomersAPIServices",
-      "projectPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\CustomersAPIServices\\CustomersAPIServices.csproj",
+      "projectPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\CustomersAPIServices\\CustomersAPIServices.csproj",
       "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-      "outputPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTService\\CustomersAPIServices\\obj\\",
+      "outputPath": "D:\\learningData\\CN9\\SWP49X\\Service\\UTMicroService\\CustomersAPIServices\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
