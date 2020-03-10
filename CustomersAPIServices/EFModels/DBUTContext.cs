@@ -15,9 +15,8 @@ namespace CustomersAPIServices.EFModels
         {
         }
 
-        public virtual DbSet<TrackedData> TrackedData { get; set; }
-        public virtual DbSet<TrackingInfor> TrackingInfor { get; set; }
-        public virtual DbSet<WebOwner> WebOwner { get; set; }
+        public virtual DbSet<Customer> Customer { get; set; }
+        public virtual DbSet<DataStore> DataStore { get; set; }
         public virtual DbSet<Website> Website { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -33,95 +32,72 @@ namespace CustomersAPIServices.EFModels
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
-            modelBuilder.Entity<TrackedData>(entity =>
+            modelBuilder.Entity<Customer>(entity =>
             {
-                entity.Property(e => e.TrackedDataId).HasColumnName("trackedDataID");
-
-                entity.Property(e => e.Data)
-                    .IsRequired()
-                    .HasColumnName("data");
-
-                entity.Property(e => e.TrackingId).HasColumnName("trackingID");
-
-                entity.HasOne(d => d.Tracking)
-                    .WithMany(p => p.TrackedData)
-                    .HasForeignKey(d => d.TrackingId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_TrackedData_TrackingInfor");
-            });
-
-            modelBuilder.Entity<TrackingInfor>(entity =>
-            {
-                entity.HasKey(e => e.TrackingId);
-
-                entity.Property(e => e.TrackingId).HasColumnName("trackingID");
-
-                entity.Property(e => e.IsRemoved).HasColumnName("isRemoved");
-
-                entity.Property(e => e.TrackingType)
-                    .IsRequired()
-                    .HasColumnName("trackingType")
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.TrackingUrl)
-                    .IsRequired()
-                    .HasColumnName("trackingUrl");
-
-                entity.Property(e => e.WebId).HasColumnName("webID");
-
-                entity.HasOne(d => d.Web)
-                    .WithMany(p => p.TrackingInfor)
-                    .HasForeignKey(d => d.WebId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_TrackingInfor_Website");
-            });
-
-            modelBuilder.Entity<WebOwner>(entity =>
-            {
-                entity.Property(e => e.WebOwnerId).HasColumnName("webOwnerID");
+                entity.Property(e => e.CustomerId).HasColumnName("customerId");
 
                 entity.Property(e => e.Email)
                     .IsRequired()
-                    .HasColumnName("email");
+                    .HasColumnName("email")
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.FullName)
                     .IsRequired()
-                    .HasColumnName("fullName");
-
-                entity.Property(e => e.IsRemoved).HasColumnName("isRemoved");
+                    .HasColumnName("full_name")
+                    .HasMaxLength(100);
 
                 entity.Property(e => e.Password)
                     .IsRequired()
-                    .HasColumnName("password");
+                    .HasColumnName("password")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.Role)
                     .IsRequired()
                     .HasColumnName("role")
-                    .HasMaxLength(50);
+                    .HasMaxLength(10);
 
-                entity.Property(e => e.Username)
+                entity.Property(e => e.UserName)
                     .IsRequired()
-                    .HasColumnName("username");
+                    .HasColumnName("user_name")
+                    .HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<DataStore>(entity =>
+            {
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.Data).HasColumnName("data");
+
+                entity.Property(e => e.Type)
+                    .HasColumnName("type")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.WebId).HasColumnName("webId");
+
+                entity.HasOne(d => d.Web)
+                    .WithMany(p => p.DataStore)
+                    .HasForeignKey(d => d.WebId)
+                    .HasConstraintName("FK_DataStore_Website");
             });
 
             modelBuilder.Entity<Website>(entity =>
             {
                 entity.HasKey(e => e.WebId);
 
-                entity.Property(e => e.WebId).HasColumnName("webID");
+                entity.Property(e => e.WebId).HasColumnName("webId");
 
-                entity.Property(e => e.IsRemoved).HasColumnName("isRemoved");
-
-                entity.Property(e => e.WebOwnerId).HasColumnName("webOwnerID");
+                entity.Property(e => e.CustomerId).HasColumnName("customerId");
 
                 entity.Property(e => e.WebUrl)
                     .IsRequired()
                     .HasColumnName("webUrl")
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.WebOwner)
+                entity.HasOne(d => d.Customer)
                     .WithMany(p => p.Website)
-                    .HasForeignKey(d => d.WebOwnerId)
+                    .HasForeignKey(d => d.CustomerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Website_Customer");
             });

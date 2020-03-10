@@ -1,36 +1,19 @@
-#FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS base
-#WORKDIR /app
-#EXPOSE 9001
-#
-#FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
-#WORKDIR /src
-#COPY ["CustomersAPIServices.csproj", "./"]
-#RUN dotnet restore "./CustomersAPIServices.csproj"
-#COPY . .
-#WORKDIR "/src/."
-#RUN dotnet build "CustomersAPIServices.csproj" -c Release -o /app/build
-#
-#FROM build AS publish
-#RUN dotnet publish "CustomersAPIServices.csproj" -c Release -o /app/publish
-#
-#FROM base AS final
-#WORKDIR /app
-#COPY --from=publish /app/publish .
-#ENTRYPOINT ["dotnet", "CustomersAPIServices.dll"]
-
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build-env
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS base
 WORKDIR /app
+EXPOSE 9001
 
-# Copy csproj and restore as distinct layers
-COPY *.csproj ./
-RUN dotnet restore
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
+WORKDIR /src
+COPY ["CustomersAPIServices.csproj", "./"]
+RUN dotnet restore "./CustomersAPIServices.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build "CustomersAPIServices.csproj" -c Release -o /app/build
 
-# Copy everything else and build
-COPY . ./
-RUN dotnet publish -c Release -o out
+FROM build AS publish
+RUN dotnet publish "CustomersAPIServices.csproj" -c Release -o /app/publish
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
+FROM base AS final
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CustomersAPIServices.dll"]

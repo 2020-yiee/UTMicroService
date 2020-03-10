@@ -5,96 +5,16 @@
       "DownstreamScheme": "http",
       "UseServiceDiscovery": true,
       "ServiceName": "service-auth",
-      "UpstreamPathTemplate": "/api/login",
+      "UpstreamPathTemplate": "/api/auth/login",
       "UpstreamHttpMethod": [ "Post" ]
     },
     {
       "DownstreamPathTemplate": "/api/customers",
       "DownstreamScheme": "http",
       "UseServiceDiscovery": true,
-      "ServiceName": "service-customer",
+      "ServiceName": "service-webowner",
       "UpstreamPathTemplate": "/api/customers",
-      "UpstreamHttpMethod": [ "Get" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "CustomerKey",
-        "AllowedScopes": []
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/customers/customer",
-      "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,
-      "ServiceName": "service-customer",
-      "UpstreamPathTemplate": "/api/customers/customer",
-      "UpstreamHttpMethod": [ "Post" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "CustomerKey",
-        "AllowedScopes": []
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/customers/create",
-      "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,
-      "ServiceName": "service-customer",
-      "UpstreamPathTemplate": "/api/customers/create",
-      "UpstreamHttpMethod": [ "Post" ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/customers/update",
-      "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,
-      "ServiceName": "service-customer",
-      "UpstreamPathTemplate": "/api/customers/update",
-      "UpstreamHttpMethod": [ "Post" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "CustomerKey",
-        "AllowedScopes": []
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/customers/delete",
-      "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,
-      "ServiceName": "service-customer",
-      "UpstreamPathTemplate": "/api/customers/delete",
-      "UpstreamHttpMethod": [ "Post" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "CustomerKey",
-        "AllowedScopes": []
-      }
-    },
-    {
-      "DownstreamPathTemplate": "/api/values",
-      "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,
-      "ServiceName": "service-customer",
-      "UpstreamPathTemplate": "/api/customers/test",
       "UpstreamHttpMethod": [ "Get" ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/heatmap/data",
-      "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,
-      "ServiceName": "service-heatmap",
-      "UpstreamPathTemplate": "/api/heatmap/data",
-      "UpstreamHttpMethod": [ "Get" ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/heatmap/data",
-      "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,
-      "ServiceName": "service-heatmap",
-      "UpstreamPathTemplate": "/api/heatmap/data",
-      "UpstreamHttpMethod": [ "Post" ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/heatmap/delete",
-      "DownstreamScheme": "http",
-      "UseServiceDiscovery": true,
-      "ServiceName": "service-heatmap",
-      "UpstreamPathTemplate": "/api/heatmap/delete",
-      "UpstreamHttpMethod": [ "Post" ]
     }
 
   ],

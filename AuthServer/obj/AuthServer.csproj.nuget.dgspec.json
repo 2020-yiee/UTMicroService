@@ -98,14 +98,6 @@
               "target": "Package",
               "version": "[2.2.4, )"
             },
-            "NSwag.AspNetCore": {
-              "target": "Package",
-              "version": "[13.2.5, )"
-            },
-            "NSwag.Core": {
-              "target": "Package",
-              "version": "[13.2.5, )"
-            },
             "Steeltoe.Discovery.ClientCore": {
               "target": "Package",
               "version": "[2.4.2, )"
