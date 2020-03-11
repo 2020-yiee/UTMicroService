@@ -15,7 +15,7 @@ namespace CustomersAPIServices.Repository
         Object getUser(int webOwnerId);
 
         Boolean deleteUser(int WebOwnerId);
-        Boolean updateUser(UpdateUserRequest request);
+        Boolean updateUser(UpdateUserRequest request,int userId);
         IEnumerable<WebsiteResponse> getWebsites(int webOwnerId);
         bool deleteWebsite(int webOwnerId, int webId);
         WebsiteResponse createWebsite(CreateWebsiteRequest request,int userId);

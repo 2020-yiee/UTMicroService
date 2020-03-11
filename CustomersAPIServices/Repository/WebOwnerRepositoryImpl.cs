@@ -153,9 +153,9 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public bool updateUser(UpdateUserRequest request)
+        public bool updateUser(UpdateUserRequest request,int userId)
         {
-            var webOwner = context.User.Where(s => s.UserId == request.userID)
+            var webOwner = context.User.Where(s => s.UserId == userId)
                 .FirstOrDefault();
             if (webOwner != null)
                 try

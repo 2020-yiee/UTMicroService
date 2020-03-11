@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: service-user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: service-user
+  template:
+    metadata:
+      labels:
+        component: service-user
+    spec:
+      containers:
+        - env:
+            - name: SPRING_EUREKA
+              value: http://eureka-cluster-ip-service:8761/eureka
+          image: asia.gcr.io/keen-hangar-139914/service-user:1.6.1
+          name: service-user
+          ports:
+            - containerPort: 80
