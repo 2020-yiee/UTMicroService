@@ -63,7 +63,7 @@ namespace CustomersAPIServices.Controllers
         public IActionResult updateUser([FromBody] UpdateUserRequest request)
         {
             repository = new UserRepositoryImpl();
-            bool result = repository.updateUser(request);
+            bool result = repository.updateUser(request,GetUserId());
             if (result) return Ok();
             return BadRequest();
         }
