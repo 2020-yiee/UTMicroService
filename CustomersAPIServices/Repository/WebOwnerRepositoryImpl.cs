@@ -134,7 +134,7 @@ namespace CustomersAPIServices.Repository
                             .Where(x => x.OrganizationId == organization.OrganizationId)
                             .Where(x => x.Removed == false)
                             .ToList()
-                            .Select(x => new WebsiteResponse(x.WebId, x.UserId, x.DomainUrl, x.Removed, x.OrganizationId))
+                            .Select(x => new WebsiteResponse(x.WebId, x.DomainUrl, x.Removed, x.OrganizationId,x.Verified))
                             .ToList();
 
                     organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name, websites));
@@ -182,9 +182,8 @@ namespace CustomersAPIServices.Repository
                     .Where(s => s.Actived == true).FirstOrDefault();
                 if (user == null) return null;
                 var websites = context.Website
-                    .Where(s => s.UserId == userId)
                     .Where(s => s.Removed == false)
-                    .Select(x => new WebsiteResponse(x.WebId, x.UserId, x.DomainUrl, x.Removed,x.OrganizationId)).ToList();
+                    .Select(x => new WebsiteResponse(x.WebId, x.DomainUrl, x.Removed,x.OrganizationId,x.Verified)).ToList();
                 return websites;
                 
             }
@@ -199,6 +198,7 @@ namespace CustomersAPIServices.Repository
         {
             try
             {
+                
                 User user = context.User
                     .Where(s => s.UserId == userId)
                     .Where(s => s.Actived == true).FirstOrDefault();
@@ -206,7 +206,7 @@ namespace CustomersAPIServices.Repository
                 Website website = context.Website
                     //.Where(s => s.WebOwnerId == webOwnerId)
                     //.Where(s => s.WebId == webId)
-                    .FirstOrDefault(x => x.UserId == userId && x.WebId == webId);
+                    .FirstOrDefault(x => x.WebId == webId);
                 if (website != null)
                 {
                     website.Removed = true;
@@ -230,17 +230,17 @@ namespace CustomersAPIServices.Repository
                     .Where(s => s.Actived == true).FirstOrDefault();
             if (user == null) return null;
             Website website = new Website();
-            website.UserId = userId;
             website.DomainUrl = request.domainUrl;
             website.Removed = false;
             website.OrganizationId = request.organizationID;
+            website.Verified = false;
             try
             {
                 context.Website.Add(website);
                 context.SaveChanges();
                 //Website temp = context.Website.Where(s => s.WebOwnerId == website.WebOwnerId)
                 //    .Where(s => s.WebUrl == website.WebUrl).FirstOrDefault();
-                return new WebsiteResponse(website.WebId, website.UserId, website.DomainUrl, website.Removed,website.OrganizationId);
+                return new WebsiteResponse(website.WebId, website.DomainUrl, website.Removed,website.OrganizationId,website.Verified);
             }
             catch (Exception ex)
             {

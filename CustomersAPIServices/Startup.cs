@@ -44,7 +44,8 @@ namespace CustomersAPIServices
                     builder.WithOrigins("*")
                     .SetIsOriginAllowedToAllowWildcardSubdomains()
                     .AllowAnyHeader()
-                    .AllowAnyMethod();
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin();
                 });
             });
 

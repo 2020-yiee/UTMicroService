@@ -44,8 +44,17 @@ namespace CustomersAPIServices.Controllers
         public IActionResult getUser()
         {
             repository = new UserRepositoryImpl();
-            Object result = repository.getUser(GetUserId());
-            if (result!=null) return Ok(result);
+            try
+            {
+                Object result = repository.getUser(GetUserId());
+                if (result != null) return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+                throw;
+            }
+            
             return BadRequest();
         }
 
