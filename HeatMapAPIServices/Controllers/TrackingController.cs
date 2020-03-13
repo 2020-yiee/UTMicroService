@@ -15,56 +15,64 @@ namespace HeatMapAPIServices.Controllers
     [EnableCors]
     public class TrackingController : ControllerBase
     {
-        private IHeatmapRepository iRepository;
+        private ITrackingRepository iRepository;
+
+        public TrackingController(ITrackingRepository iRepository)
+        {
+            this.iRepository = iRepository;
+        }
+
+        protected int GetUserId()
+        {
+            try
+            {
+                return int.Parse(this.User.Claims.First(i => i.Type == "UserId").Value);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+        }
 
         [HttpPost("api/tracked-data")]
         public IActionResult createTrackedHeatmapData([FromBody] SaveDataRequest data)
         {
-            iRepository = new HeatmapRepositoryImpl();
             Boolean result = iRepository.createTrackedHeatmapData(data);
             if (result) return Ok();
             return BadRequest();
         }
 
-        [HttpGet("api/tracked-data")]
-        public IActionResult getTrackedHeatmapData(string trackingUrl, int eventType)
+
+        //=================================statistic heatmap=====================================================
+
+
+        [HttpGet("api/statistic-heatmap-data")]
+        public IActionResult getStatisticHeatmapData(int trackingHeatmapInfoID)
         {
-            iRepository = new HeatmapRepositoryImpl();
-            List<TrackedHeatmapData> result =(List<TrackedHeatmapData>) iRepository.getTrackedHeatmapData(trackingUrl, eventType);
+            List<StatisticHeatmap> result = iRepository.getstatisticHeatmapData(trackingHeatmapInfoID);
             if (result == null || result.Count == 0) return BadRequest();
             return Ok(result);
         }
 
-        [HttpDelete("api/tracked-data")]
-        public IActionResult deleteTrackedHeatmapData([FromBody]DeleteDataRequest request)
-        {
-            iRepository = new HeatmapRepositoryImpl();
-            bool  result = iRepository.deleteTrackedHeatmapData(request);
-            if(result) return Ok();
-            return BadRequest();
-        }
-
-
-
-        //==================================================================================
+        //=================================tracking heatmap info=================================================
 
 
         [HttpGet("api/tracking-info")]
-        public IActionResult getChekingHeatmapInfo( int webID)
+        [Authorize]
+        public IActionResult getTrackingHeatmapInfo(int webID)
         {
-            iRepository = new HeatmapRepositoryImpl();
-            List<TrackingInforResponse> infor = iRepository.getCheckingHeatmapInfo( webID).ToList();
-            if (infor != null && infor.Count >0) return Ok(infor);
+            List<TrackingHeatmapInfo> infor = iRepository.getCheckingHeatmapInfo(webID, GetUserId()).ToList();
+            if (infor != null && infor.Count > 0) return Ok(infor);
             return BadRequest();
         }
 
         [HttpPost("api/tracking-info")]
-        public IActionResult createTrackingInfo([FromBody]CreateTrackingInforRequest request)
+        [Authorize]
+        public IActionResult createTrackingInfo([FromBody]CreateTrackingHeatmapInforRequest request)
         {
-            iRepository = new HeatmapRepositoryImpl();
 
-            var result = iRepository.createHeatmapTrackingInfor(request);
-            if (result!=null)
+            var result = iRepository.createHeatmapTrackingInfor(request, GetUserId());
+            if (result != null)
             {
                 return Ok(result);
             }
@@ -72,12 +80,12 @@ namespace HeatMapAPIServices.Controllers
         }
 
         [HttpPut("api/tracking-info")]
+        [Authorize]
         public IActionResult updateTrackingInfo([FromBody]UpdateTrackingHeatmapInforRequest request)
         {
-            iRepository = new HeatmapRepositoryImpl();
 
-            var result = iRepository.updateTrackingHeatmapInfor(request);
-            if (result!=null)
+            var result = iRepository.updateTrackingHeatmapInfor(request, GetUserId());
+            if (result != null)
             {
                 return Ok(result);
             }
@@ -85,16 +93,86 @@ namespace HeatMapAPIServices.Controllers
         }
 
         [HttpDelete("api/tracking-info")]
+        [Authorize]
         public IActionResult deleteTrackingInfo(int trackingHeatmapInfoID)
         {
-            iRepository = new HeatmapRepositoryImpl();
 
-            bool result = iRepository.deleteTrackingHeatmapInfor(trackingHeatmapInfoID);
+            bool result = iRepository.deleteTrackingFunnelInfo(trackingHeatmapInfoID, GetUserId());
             if (result)
             {
                 return Ok();
             }
             else return BadRequest();
+        }
+
+        //=============================================tracking funnel info=========================================
+
+        [HttpGet("api/funnel-info")]
+        [Authorize]
+        public IActionResult getTrackingFunnelInfo(int webID)
+        {
+            List<TrackingFunnelInfo> infor = iRepository.getCheckingFunnelInfo(webID, GetUserId()).ToList();
+            if (infor != null && infor.Count > 0) return Ok(infor);
+            return BadRequest();
+        }
+
+        [HttpPost("api/funnel-info")]
+        [Authorize]
+        public IActionResult createTrackingFunnelInfo([FromBody]CreateTrackingFunnelInforRequest request)
+        {
+
+            var result = iRepository.createFunnelTrackingInfo(request, GetUserId());
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else return BadRequest();
+        }
+
+        [HttpPut("api/funnel-info")]
+        [Authorize]
+        public IActionResult updateNameStepsTrackingFunnelInfo([FromBody] udpateTrackingInfoRequest request)
+        {
+            var result = iRepository.udpateFunnelTrackingInfo(request, GetUserId());
+            if (result != null)
+            {
+                return Ok(result);
+            }
+            else return BadRequest();
+        }
+
+        
+        [HttpDelete("api/funnel-info")]
+        [Authorize]
+        public IActionResult deleteTrackingFunnelInfo(int trackingFunnelInfoID)
+        {
+            
+            bool result = iRepository.deleteTrackingFunnelInfo(trackingFunnelInfoID, GetUserId());
+            if (result)
+            {
+                return Ok();
+            }
+            else return BadRequest();
+        }
+
+        //========================tracked funnel data=========================================
+        [HttpPost("api/tracked-funnel-data")]
+        public IActionResult createTrackedFunnelData([FromBody] SaveFunnelDataRequest data)
+        {
+            Boolean result = iRepository.createTrackedFunnelData(data);
+            if (result) return Ok();
+            return BadRequest();
+        }
+
+        
+
+        //=================================statistic funnel=====================================================
+        [HttpGet("api/statistic-funnel-data")]
+        public IActionResult getStatisticFunnelData(int trackingFunnelInfoID)
+        {
+            List<StatisticFunnel> result = (List<StatisticFunnel>)iRepository.getstatisticFunnelData(trackingFunnelInfoID);
+            if (result == null || result.Count == 0) return BadRequest();
+            return Ok(result);
         }
     }
 }

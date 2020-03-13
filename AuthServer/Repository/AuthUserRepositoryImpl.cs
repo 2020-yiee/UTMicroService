@@ -55,7 +55,7 @@ namespace AuthServer.Repository
                                     .Where(x => x.OrganizationId == organization.OrganizationId)
                                     .Where(x => x.Removed == false)
                                     .ToList()
-                                    .Select(x => new WebsiteResponse(x.WebId, x.UserId, x.DomainUrl, x.Removed, x.OrganizationId))
+                                    .Select(x => new WebsiteResponse(x.WebId,x.DomainUrl, x.Removed, x.OrganizationId))
                                     .ToList();
 
                             organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name, websites));

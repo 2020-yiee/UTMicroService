@@ -7,5 +7,6 @@ namespace HeatMapAPIServices.EFModels
     {
         public int TrackingHeatmapInfoId { get; set; }
         public string StatisticData { get; set; }
+        public int? EventType { get; set; }
     }
 }

@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/3854782e-c1ba-42ac-9d16-4329e0f17e57/resourceGroups/CN9/providers/Microsoft.Web/sites/browser-service",
+    "appService.deploySubpath": ""
+}

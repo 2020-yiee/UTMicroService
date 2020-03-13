@@ -176,6 +176,10 @@ namespace CustomersAPIServices.EFModels
             {
                 entity.Property(e => e.TrackingHeatmapInfoId).HasColumnName("trackingHeatmapInfoID");
 
+                entity.Property(e => e.Name)
+                    .HasColumnName("name")
+                    .HasMaxLength(50);
+
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
                 entity.Property(e => e.TrackingUrl)

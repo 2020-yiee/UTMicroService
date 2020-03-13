@@ -28,7 +28,7 @@ namespace CustomersAPIServices.Controllers
             }
         }
 
-        IWebOwnerRepository repository;
+        IUserRepository repository;
         [Authorize(Roles ="admin")]
         [HttpGet("api/users")]
         public IActionResult GetAllUser()
@@ -97,6 +97,16 @@ namespace CustomersAPIServices.Controllers
         }
         
         //=======================================================================================
+
+        [HttpPost("api/website/verify")]
+        public IActionResult verifyWebsite([FromBody] verifiedRequest request)
+        {
+            repository = new UserRepositoryImpl();
+            bool result = repository.verifyWebsite(request);
+            if (result) return Ok();
+            return BadRequest();
+        }
+
 
         [HttpGet("api/user/websites")]
         [Authorize]

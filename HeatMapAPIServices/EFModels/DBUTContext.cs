@@ -82,14 +82,14 @@ namespace HeatMapAPIServices.EFModels
 
             modelBuilder.Entity<Organization>(entity =>
             {
-                entity.Property(e => e.OrganizationId)
-                    .HasColumnName("organizationID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasColumnName("name")
                     .HasMaxLength(50);
+
+                entity.Property(e => e.Removed).HasColumnName("removed");
             });
 
             modelBuilder.Entity<StatisticFunnel>(entity =>
@@ -113,6 +113,8 @@ namespace HeatMapAPIServices.EFModels
                     .HasColumnName("trackingHeatmapInfoID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.EventType).HasColumnName("eventType");
+
                 entity.Property(e => e.StatisticData)
                     .IsRequired()
                     .HasColumnName("statisticData");
@@ -123,6 +125,8 @@ namespace HeatMapAPIServices.EFModels
                 entity.Property(e => e.TrackedFunnelDataId)
                     .HasColumnName("trackedFunnelDataID")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
                 entity.Property(e => e.SessionId)
                     .IsRequired()
@@ -139,6 +143,8 @@ namespace HeatMapAPIServices.EFModels
             {
                 entity.Property(e => e.TrackedHeatmapDataId).HasColumnName("trackedHeatmapDataID");
 
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
+
                 entity.Property(e => e.Data)
                     .IsRequired()
                     .HasColumnName("data");
@@ -154,9 +160,9 @@ namespace HeatMapAPIServices.EFModels
 
             modelBuilder.Entity<TrackingFunnelInfo>(entity =>
             {
-                entity.Property(e => e.TrackingFunnelInfoId)
-                    .HasColumnName("trackingFunnelInfoID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.TrackingFunnelInfoId).HasColumnName("trackingFunnelInfoID");
+
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -175,6 +181,13 @@ namespace HeatMapAPIServices.EFModels
             modelBuilder.Entity<TrackingHeatmapInfo>(entity =>
             {
                 entity.Property(e => e.TrackingHeatmapInfoId).HasColumnName("trackingHeatmapInfoID");
+
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasColumnName("name")
+                    .HasMaxLength(50);
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
@@ -215,9 +228,11 @@ namespace HeatMapAPIServices.EFModels
                     .HasColumnName("domainUrl")
                     .IsUnicode(false);
 
+                entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
+
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
-                entity.Property(e => e.UserId).HasColumnName("userID");
+                entity.Property(e => e.Verified).HasColumnName("verified");
             });
         }
     }

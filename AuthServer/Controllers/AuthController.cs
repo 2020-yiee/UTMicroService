@@ -32,51 +32,6 @@ namespace AuthServer.Controllers
             if (Object.Equals(webOwner,false)) return StatusCode(401);
             if (webOwner == null) return StatusCode(403);
             return Ok(webOwner);
-    //        //just hard code here.    
-    //        if (webOwner != null)
-    //        {
-
-            //            var now = DateTime.UtcNow;
-
-            //            var claims = new Claim[]
-            //            {
-            //                new Claim(JwtRegisteredClaimNames.Sub, model.username),
-            //                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            //                new Claim(JwtRegisteredClaimNames.Iat, now.ToUniversalTime().ToString(), ClaimValueTypes.Integer64),
-            //                new Claim(ClaimTypes.Role, webOwner.Role)
-            //            };
-
-            //            var signingKey = new SymmetricSecurityKey(Encoding.Default.GetBytes("SecretKeyForUserTrackingSystems"));
-            //            var jwt = new JwtSecurityToken(
-            //                issuer: "Iss",
-            //                audience: "Aud",
-            //                claims: claims,
-            //                notBefore: now,
-            //                expires: now.Add(TimeSpan.FromDays(30)),
-            //                signingCredentials: new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256)
-            //            );
-
-            //            var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-            //            var customerresponse = new
-            //            {
-            //                id = webOwner.WebOwnerId,
-            //                full_name = webOwner.FullName,
-            //                email = webOwner.Email,
-            //                role = webOwner.Role
-            //            };
-            //            var responseJson = new
-            //            {
-            //                access_token = encodedJwt,
-            //                expires_in = (int)TimeSpan.FromDays(30).TotalSeconds,
-            //                web_owner = customerresponse
-            //        };
-
-            //        return Ok(responseJson);
-            //    }
-            //        else
-            //        {
-            //            return StatusCode(401);
-            //}
 
         }
     }

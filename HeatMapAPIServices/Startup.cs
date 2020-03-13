@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using NSwag.Generation.Processors.Security;
 using NSwag;
 using Steeltoe.Discovery.Client;
+using HeatMapAPIServices.Repository;
 
 namespace HeatMapAPIServices
 {
@@ -94,23 +95,14 @@ namespace HeatMapAPIServices
                    };
                });
 
+            services.AddScoped<ITrackingRepository, TrackingRepositoryImpl>();
+
             services.AddDiscoveryClient(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddDbContext<DBUTContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DbConnection"),
                 b => b.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
 
-
-            //services.AddSwaggerGen((option) =>
-            //{
-            //    option.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-            //    {
-            //        Title = "heatmap api for User tracking",
-            //        Version = "v1"
-            //    });
-            //});
-
-            //add swagger
             services.AddOpenApiDocument(config =>
             {
                 config.PostProcess = document =>
@@ -138,18 +130,6 @@ namespace HeatMapAPIServices
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
 
-            ////Enable middleware to serve generated swagger as a JSON endpoint.
-            //app.UseSwagger();
-
-            ////spercify the Swagger JSON endpoint
-            //app.UseSwaggerUI(c =>
-            //{
-            //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Heatmap api for User tracking v1");
-            //});
-            ////==========
-
-
-            //Enable middleware to serve generated swagger as a JSON endpoint.
             app.UseOpenApi();
             app.UseSwaggerUi3();
 

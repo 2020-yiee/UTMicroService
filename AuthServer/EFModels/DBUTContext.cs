@@ -219,7 +219,7 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
-                entity.Property(e => e.UserId).HasColumnName("userID");
+                entity.Property(e => e.Verified).HasColumnName("verified");
             });
         }
     }

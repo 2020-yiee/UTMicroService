@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace HeatMapAPIServices.Models
 {
-    public class CreateTrackingInforRequest
+    public class CreateTrackingHeatmapInforRequest
     {
         public int webID { get; set; }
+        public string name { get; set; }
         public string trackingUrl { get; set; }
     }
 }
