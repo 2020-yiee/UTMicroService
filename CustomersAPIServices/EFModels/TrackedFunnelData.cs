@@ -9,5 +9,6 @@ namespace CustomersAPIServices.EFModels
         public string SessionId { get; set; }
         public int WebId { get; set; }
         public string TrackedSteps { get; set; }
+        public long CreatedAt { get; set; }
     }
 }

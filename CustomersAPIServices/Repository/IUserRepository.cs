@@ -24,5 +24,6 @@ namespace CustomersAPIServices.Repository
         object updateOrganization(UpdateOrganizationRequest request, int userId);
         object DeleteOrganization(int organizationID, int v);
         bool verifyWebsite(verifiedRequest request);
+        object getStatisticData(int webID, int trackingInfoID, int from, int to, int userId);
     }
 }

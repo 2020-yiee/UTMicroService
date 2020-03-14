@@ -10,5 +10,6 @@ namespace CustomersAPIServices.EFModels
         public string TrackingUrl { get; set; }
         public bool Removed { get; set; }
         public string Name { get; set; }
+        public long CreatedAt { get; set; }
     }
 }

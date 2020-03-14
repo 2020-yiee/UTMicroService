@@ -332,5 +332,39 @@ namespace CustomersAPIServices.Repository
             }
             else return false;
         }
+
+        public object getStatisticData(int webID, int trackingInfoID, int from, int to, int userId)
+        {
+            try
+            {
+                if (!checkAuthencation(webID, userId)) return null;
+                string trackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == webID)
+                .Where(s => s.TrackingHeatmapInfoId == trackingInfoID)
+                .Select(s => s.TrackingUrl).FirstOrDefault();
+                List<int> trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                    .Where(s => s.TrackingUrl == trackingUrl)
+                    .Where(s => s.CreatedAt >= from)
+                    .Where(s => s.CreatedAt <= to)
+                    .Select(s => s.TrackedHeatmapDataId).ToList();
+                List<StatisticHeatmap> statisticData = context.StatisticHeatmap.Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
+                    .ToList();
+                return statisticData;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+                throw;
+            }
+        }
+
+        private Boolean checkAuthencation(int websiteId, int userId)
+        {
+            List<int> orgIds = context.Access.Where(s => s.UserId == userId).Select(s => s.OrganizationId).ToList();
+            if (orgIds == null || orgIds.Count == 0) return false;
+            Website website = context.Website.FirstOrDefault(s => s.WebId == websiteId);
+            if (website == null) return false;
+            return orgIds.Contains(website.OrganizationId);
+        }
     }
 }

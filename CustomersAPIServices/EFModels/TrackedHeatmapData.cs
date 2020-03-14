@@ -10,5 +10,6 @@ namespace CustomersAPIServices.EFModels
         public int WebId { get; set; }
         public string Data { get; set; }
         public int EventType { get; set; }
+        public long CreatedAt { get; set; }
     }
 }

@@ -4,6 +4,6 @@
     {
         public int webID { get; set; }
         public int trackingFunnelInfoID { get; set; }
-        public string steps { get; set; }
+        public object steps { get; set; }
     }
 }

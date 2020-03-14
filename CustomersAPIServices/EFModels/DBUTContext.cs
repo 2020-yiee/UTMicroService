@@ -94,10 +94,10 @@ namespace CustomersAPIServices.EFModels
 
             modelBuilder.Entity<StatisticFunnel>(entity =>
             {
-                entity.HasKey(e => e.TrackingFunnelInfoId);
+                entity.HasKey(e => e.TrackedFunnelDataId);
 
-                entity.Property(e => e.TrackingFunnelInfoId)
-                    .HasColumnName("trackingFunnelInfoID")
+                entity.Property(e => e.TrackedFunnelDataId)
+                    .HasColumnName("trackedFunnelDataID")
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.StatisticData)
@@ -107,10 +107,10 @@ namespace CustomersAPIServices.EFModels
 
             modelBuilder.Entity<StatisticHeatmap>(entity =>
             {
-                entity.HasKey(e => e.TrackingHeatmapInfoId);
+                entity.HasKey(e => e.TrackedHeatmapDataId);
 
-                entity.Property(e => e.TrackingHeatmapInfoId)
-                    .HasColumnName("trackingHeatmapInfoID")
+                entity.Property(e => e.TrackedHeatmapDataId)
+                    .HasColumnName("trackedHeatmapDataID")
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.StatisticData)
@@ -123,6 +123,8 @@ namespace CustomersAPIServices.EFModels
                 entity.Property(e => e.TrackedFunnelDataId)
                     .HasColumnName("trackedFunnelDataID")
                     .ValueGeneratedNever();
+
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
                 entity.Property(e => e.SessionId)
                     .IsRequired()
@@ -139,6 +141,8 @@ namespace CustomersAPIServices.EFModels
             {
                 entity.Property(e => e.TrackedHeatmapDataId).HasColumnName("trackedHeatmapDataID");
 
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
+
                 entity.Property(e => e.Data)
                     .IsRequired()
                     .HasColumnName("data");
@@ -154,9 +158,9 @@ namespace CustomersAPIServices.EFModels
 
             modelBuilder.Entity<TrackingFunnelInfo>(entity =>
             {
-                entity.Property(e => e.TrackingFunnelInfoId)
-                    .HasColumnName("trackingFunnelInfoID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.TrackingFunnelInfoId).HasColumnName("trackingFunnelInfoID");
+
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -176,7 +180,10 @@ namespace CustomersAPIServices.EFModels
             {
                 entity.Property(e => e.TrackingHeatmapInfoId).HasColumnName("trackingHeatmapInfoID");
 
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
+
                 entity.Property(e => e.Name)
+                    .IsRequired()
                     .HasColumnName("name")
                     .HasMaxLength(50);
 

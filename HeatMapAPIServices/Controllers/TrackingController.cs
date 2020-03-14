@@ -47,9 +47,9 @@ namespace HeatMapAPIServices.Controllers
 
 
         [HttpGet("api/statistic-heatmap-data")]
-        public IActionResult getStatisticHeatmapData(int trackingHeatmapInfoID)
+        public IActionResult getStatisticHeatmapData(int trackedHeatmapInfoID)
         {
-            List<StatisticHeatmap> result = iRepository.getstatisticHeatmapData(trackingHeatmapInfoID);
+            List<StatisticHeatmap> result = iRepository.getstatisticHeatmapData(trackedHeatmapInfoID);
             if (result == null || result.Count == 0) return BadRequest();
             return Ok(result);
         }
@@ -168,9 +168,9 @@ namespace HeatMapAPIServices.Controllers
 
         //=================================statistic funnel=====================================================
         [HttpGet("api/statistic-funnel-data")]
-        public IActionResult getStatisticFunnelData(int trackingFunnelInfoID)
+        public IActionResult getStatisticFunnelData(int trackedFunnelInfoID)
         {
-            List<StatisticFunnel> result = (List<StatisticFunnel>)iRepository.getstatisticFunnelData(trackingFunnelInfoID);
+            List<StatisticFunnel> result = (List<StatisticFunnel>)iRepository.getstatisticFunnelData(trackedFunnelInfoID);
             if (result == null || result.Count == 0) return BadRequest();
             return Ok(result);
         }
