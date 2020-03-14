@@ -13,7 +13,7 @@ namespace HeatMapAPIServices.Repository
         Boolean createTrackedHeatmapData(SaveDataRequest data);
         IEnumerable<TrackedHeatmapData> getTrackedHeatmapData(string trackingUrl, int type);
         IEnumerable<TrackingHeatmapInfo> getCheckingHeatmapInfo(int websiteId,int userId);
-        TrackingHeatmapInfo createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId);
+        Object createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId);
         TrackingHeatmapInfo updateTrackingHeatmapInfor(UpdateTrackingHeatmapInforRequest request, int userId);
         bool deleteTrackingFunnelInfo(int trackingId, int userId);
         IEnumerable<TrackingFunnelInfo> getCheckingFunnelInfo(int webID, int v);

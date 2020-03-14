@@ -1,8 +1,10 @@
 ﻿using CustomersAPIServices.EFModels;
+using CustomersAPIServices.Models;
 using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,7 +17,15 @@ namespace CustomersAPIServices.Repository
 {
     public class UserRepositoryImpl : IUserRepository
     {
-       
+
+        private List<int> EVENT_TYPE_LIST = new List<int>();
+
+        public UserRepositoryImpl()
+        {
+            EVENT_TYPE_LIST.Add(1);
+            EVENT_TYPE_LIST.Add(0);
+        }
+
         private DBUTContext context = new DBUTContext();
         public Object createUser(CreateUserRequest request)
         {
@@ -335,20 +345,37 @@ namespace CustomersAPIServices.Repository
 
         public object getStatisticData(int webID, int trackingInfoID, int from, int to, int userId)
         {
+            GetStatisicHeatMap response = new GetStatisicHeatMap();
             try
             {
                 if (!checkAuthencation(webID, userId)) return null;
-                string trackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == webID)
+                TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.WebId == webID)
                 .Where(s => s.TrackingHeatmapInfoId == trackingInfoID)
-                .Select(s => s.TrackingUrl).FirstOrDefault();
-                List<int> trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
-                    .Where(s => s.TrackingUrl == trackingUrl)
+                .FirstOrDefault();
+                response.imageUrl = trackingHeatmapInfo.ImageUrl;
+                foreach (var eventType in EVENT_TYPE_LIST)
+                {
+                    List<int> trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                    .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
                     .Where(s => s.CreatedAt >= from)
                     .Where(s => s.CreatedAt <= to)
+                    .Where(s => s.EventType == eventType)
                     .Select(s => s.TrackedHeatmapDataId).ToList();
-                List<StatisticHeatmap> statisticData = context.StatisticHeatmap.Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
+                    List<StatisticHeatmap> statisticHeatmaps = context.StatisticHeatmap
+                        .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
                     .ToList();
-                return statisticData;
+                    List<StatisticData> statisticDatas = new List<StatisticData>();
+                    foreach (var item in statisticHeatmaps)
+                    {
+                        statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
+                    }
+                    if(eventType == 0)response.click = JsonConvert.SerializeObject(statisticDatas);
+                    if(eventType == 1)response.hover = JsonConvert.SerializeObject(statisticDatas);
+                    
+
+                }
+                
+                return response;
             }
             catch (Exception ex)
             {

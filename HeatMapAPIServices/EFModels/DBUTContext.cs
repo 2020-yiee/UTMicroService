@@ -182,6 +182,8 @@ namespace HeatMapAPIServices.EFModels
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
+                entity.Property(e => e.ImageUrl).HasColumnName("imageUrl");
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasColumnName("name")

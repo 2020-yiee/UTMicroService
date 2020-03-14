@@ -48,3 +48,6 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\net
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.AssemblyInfoInputs.cache
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.AssemblyInfo.cs
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.csproj.CopyComplete
+D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\netcoreapp3.1\StatisticService.pdb
+D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.dll
+D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.pdb

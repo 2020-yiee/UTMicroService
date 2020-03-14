@@ -2,6 +2,7 @@
 using HeatMapAPIServices.EFModels;
 using HeatMapAPIServices.Models;
 using Newtonsoft.Json;
+using RestSharp;
 using StatisticAPIService.Models;
 using System;
 using System.Collections.Generic;
@@ -79,8 +80,8 @@ namespace HeatMapAPIServices.Repository
 
             if (listTrackingUrl.Contains(trackingUrl) == true || listName.Contains(name) == true) return false;
             Website web = context.Website.Where(s => s.WebId == webId).FirstOrDefault();
-            if (!trackingUrl.Contains(web.DomainUrl)) return false;
-            return true;
+            if (!trackingUrl.Contains(web.DomainUrl)) return true;
+            return false;
 
         }
 
@@ -112,10 +113,11 @@ namespace HeatMapAPIServices.Repository
             return orgIds.Contains(website.OrganizationId);
         }
 
-        public TrackingHeatmapInfo createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId)
+        public Object createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId)
         {
             if (!checkAuthencation(request.webID, userId)) return null;
             if (checkTrackingHeatmapInfoExisted(request.webID, request.trackingUrl, request.name)) return null;
+            if (!checkDomainUrl(request.webID, request.trackingUrl)) return null;
             TrackingHeatmapInfo info = new TrackingHeatmapInfo();
             info.WebId = request.webID;
             info.Name = request.name;
@@ -126,6 +128,15 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 context.TrackingHeatmapInfo.Add(info);
+                context.SaveChanges();
+                var client = new RestClient("https://browser-service.herokuapp.com/capture/" + info.WebId + "/" + info.TrackingHeatmapInfoId + "/" + info.TrackingUrl);
+                // client.Authenticator = new HttpBasicAuthenticator(username, password);
+                var requests = new RestRequest();
+                requests.AddHeader("Content-Type", "application/json");
+                var response = client.Post(requests);
+                var content = response.Content;
+                CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
+                info.ImageUrl = captureResponse.imageUrl;
                 context.SaveChanges();
                 return info;
             }
@@ -184,6 +195,22 @@ namespace HeatMapAPIServices.Repository
                 Console.WriteLine("ERROR: " + ex.Message);
                 return false;
             }
+        }
+
+        private bool checkDomainUrl(int webId, string url)
+        {
+            try
+            {
+                string domainUrl = context.Website.Where(s => s.WebId == webId).Select(s => s.DomainUrl).FirstOrDefault();
+                    if (!url.Contains(domainUrl)) return false;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR " + ex.Message);
+                return false;
+                throw;
+            }
+            return true;
         }
 
         //----------------------------tracking funnel info-----------------------------------

@@ -62,7 +62,7 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult getTrackingHeatmapInfo(int webID)
         {
             List<TrackingHeatmapInfo> infor = iRepository.getCheckingHeatmapInfo(webID, GetUserId()).ToList();
-            if (infor != null && infor.Count > 0) return Ok(infor);
+            if (infor != null) return Ok(infor);
             return BadRequest();
         }
 
@@ -112,7 +112,7 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult getTrackingFunnelInfo(int webID)
         {
             List<TrackingFunnelInfo> infor = iRepository.getCheckingFunnelInfo(webID, GetUserId()).ToList();
-            if (infor != null && infor.Count > 0) return Ok(infor);
+            if (infor != null) return Ok(infor);
             return BadRequest();
         }
 
