@@ -1,0 +1,1 @@
+dotnet StatisticService.dll %*

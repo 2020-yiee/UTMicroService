@@ -182,6 +182,10 @@ namespace CustomersAPIServices.EFModels
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
+                entity.Property(e => e.ImageUrl)
+                    .HasColumnName("imageUrl")
+                    .HasMaxLength(50);
+
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasColumnName("name")

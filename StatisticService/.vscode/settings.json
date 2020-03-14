@@ -1,0 +1,5 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "",
+    "appService.defaultWebAppToDeploy": "/subscriptions/3854782e-c1ba-42ac-9d16-4329e0f17e57/resourceGroups/appsvc_windows_centralus/providers/Microsoft.Web/sites/service-statistic"
+}
