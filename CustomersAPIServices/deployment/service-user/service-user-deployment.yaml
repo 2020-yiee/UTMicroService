@@ -16,7 +16,7 @@ spec:
         - env:
             - name: SPRING_EUREKA
               value: http://eureka-cluster-ip-service:8761/eureka
-          image: asia.gcr.io/keen-hangar-139914/service-user:1.6.3
+          image: asia.gcr.io/keen-hangar-139914/service-user:1.6.4
           name: service-user
           ports:
             - containerPort: 80

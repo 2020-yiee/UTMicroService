@@ -5,7 +5,7 @@ namespace AuthServer.EFModels
 {
     public partial class StatisticFunnel
     {
-        public int TrackingFunnelInfoId { get; set; }
+        public int TrackedFunnelDataId { get; set; }
         public string StatisticData { get; set; }
     }
 }

@@ -10,5 +10,6 @@ namespace AuthServer.EFModels
         public string Name { get; set; }
         public string Steps { get; set; }
         public bool Removed { get; set; }
+        public long CreatedAt { get; set; }
     }
 }
