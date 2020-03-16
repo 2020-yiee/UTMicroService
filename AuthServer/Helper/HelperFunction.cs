@@ -43,5 +43,30 @@ namespace AuthServer.Helper
             );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public object GenerateJwtToken(string email, Admin user, string Role)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("AdminID", user.AdminId.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, Role)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.UtcNow.AddDays(Convert.ToDouble(_configuration["JwtExpireDays"]));
+
+            var token = new JwtSecurityToken(
+                _configuration["JwtIssuer"],
+                _configuration["Auth0:ApiIdentifier"],
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
     }
 }

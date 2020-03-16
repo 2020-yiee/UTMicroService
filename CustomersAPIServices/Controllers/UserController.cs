@@ -29,21 +29,57 @@ namespace CustomersAPIServices.Controllers
         }
 
         IUserRepository repository;
+
+        public UserController(IUserRepository repository)
+        {
+            this.repository = repository;
+        }
+
+        //==========================================admin====================================================
+
         [Authorize(Roles ="admin")]
-        [HttpGet("api/users")]
+        [HttpGet("api/admin/users")]
         public IActionResult GetAllUser()
         {
-            repository = new UserRepositoryImpl();
-            IEnumerable<UserResponse> result = repository.getAllWebOwners();
+            IEnumerable<User> result = repository.getAllUsers();
             if (result != null) return Ok(result);
             return BadRequest();
         }
 
+        [Authorize(Roles = "admin")]
+        [HttpPut("api/admin/user/lock")]
+        public IActionResult lockUser(int userID)
+        {
+            User result = repository.lockUser(userID);
+            if (result != null) return Ok(result);
+            return BadRequest();
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpGet("api/admin/ors-and-webs")]
+        public IActionResult getUserOrganizationAndWebsites(int userID)
+        {
+            Object result = repository.getAllUserOrganizationAndWebsites(userID);
+            if (result != null) return Ok(result);
+            return BadRequest();
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("api/admin/website/lock")]
+        public IActionResult lockWebsites(int websiteID)
+        {
+            Website result = repository.lockWebsite(websiteID);
+            if (result != null) return Ok(result);
+            return BadRequest();
+        }
+
+
+
+        //====================================user crud======================================================
         [Authorize]
         [HttpGet("api/user")]   
         public IActionResult getUser()
         {
-            repository = new UserRepositoryImpl();
             try
             {
                 Object result = repository.getUser(GetUserId());
@@ -61,7 +97,6 @@ namespace CustomersAPIServices.Controllers
         [HttpPost("api/user")]
         public IActionResult CreateUser([FromBody] CreateUserRequest request)
         {
-            repository = new UserRepositoryImpl();
             var user = repository.createUser(request);
             if (user != null) return Ok(user);
             return BadRequest(user);
@@ -71,7 +106,6 @@ namespace CustomersAPIServices.Controllers
         [Authorize]
         public IActionResult updateUser([FromBody] UpdateUserRequest request)
         {
-            repository = new UserRepositoryImpl();
             bool result = repository.updateUser(request,GetUserId());
             if (result) return Ok();
             return BadRequest();
@@ -81,7 +115,6 @@ namespace CustomersAPIServices.Controllers
         [Authorize]
         public IActionResult deleteUser()
         {
-            repository = new UserRepositoryImpl();
             bool result = repository.deleteUser(GetUserId());
             if (result) return Ok();
             return BadRequest();
@@ -90,7 +123,6 @@ namespace CustomersAPIServices.Controllers
         [HttpGet("api/user/check")]
         public IActionResult checkUsernameOrEmail(string email)
         {
-            repository = new UserRepositoryImpl();
             var result = repository.checkUserEmail( email);
             if (result != null) return Ok(result);
             return BadRequest();
@@ -101,7 +133,6 @@ namespace CustomersAPIServices.Controllers
         [HttpPost("api/website/verify")]
         public IActionResult verifyWebsite([FromBody] verifiedRequest request)
         {
-            repository = new UserRepositoryImpl();
             bool result = repository.verifyWebsite(request);
             if (result) return Ok();
             return BadRequest();
@@ -112,7 +143,6 @@ namespace CustomersAPIServices.Controllers
         [Authorize]
         public IActionResult getWebSites()
         {
-            repository = new UserRepositoryImpl();
             IEnumerable<WebsiteResponse> result = repository.getWebsites(GetUserId());
             if (result != null) return Ok(result);
             return BadRequest();
@@ -122,7 +152,6 @@ namespace CustomersAPIServices.Controllers
         [Authorize]
         public IActionResult CreateWebSite([FromBody] CreateWebsiteRequest request)
         {
-            repository = new UserRepositoryImpl();
             var website = repository.createWebsite(request,GetUserId());
 
             if (website != null) return Ok(website);
@@ -133,7 +162,6 @@ namespace CustomersAPIServices.Controllers
         [Authorize]
         public IActionResult deleteWebsite([FromBody] DeleteWebsiteRequest request)
         {
-            repository = new UserRepositoryImpl();
             bool result = repository.deleteWebsite(GetUserId(),request.webID);
             if (result) return Ok();
             return BadRequest();
@@ -147,7 +175,6 @@ namespace CustomersAPIServices.Controllers
         [HttpPost("api/user/organization")]
         public IActionResult createOrganization([FromBody] OrganizationRequest request)
         {
-            repository = new UserRepositoryImpl();
             Object result = repository.createOrganization(request,GetUserId());
             if (result != null) return Ok(result);
             return BadRequest();
@@ -156,7 +183,6 @@ namespace CustomersAPIServices.Controllers
         [HttpPut("api/user/organization")]
         public IActionResult updateOrganization([FromBody] UpdateOrganizationRequest request)
         {
-            repository = new UserRepositoryImpl();
             Object result = repository.updateOrganization(request,GetUserId());
             if (result != null) return Ok(result);
             return BadRequest();
@@ -165,7 +191,6 @@ namespace CustomersAPIServices.Controllers
         [HttpDelete("api/user/organization")]
         public IActionResult DeleteOrganization(int organizationID)
         {
-            repository = new UserRepositoryImpl();
             Object result = repository.DeleteOrganization(organizationID,GetUserId());
             if (result != null) return Ok(result);
             return BadRequest();
@@ -176,7 +201,6 @@ namespace CustomersAPIServices.Controllers
         [HttpGet("api/user/statistic/{webID}/{trackingInfoID}")]
         public IActionResult getStatisticHeatmap([FromRoute] int webID,[FromRoute] int trackingInfoID,int from, int to)
         {
-            repository = new UserRepositoryImpl();
             Object result = repository.getStatisticData(webID, trackingInfoID, from, to,GetUserId());
             if (result != null) return Ok(result);
             return BadRequest();

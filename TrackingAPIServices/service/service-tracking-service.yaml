@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-tracking-ccb5fb99-6vl5k	
+spec:
+  type: ClusterIP
+  selector:
+    component: service-tracking
+  ports:
+  - port: 80
+    targetPort: 80

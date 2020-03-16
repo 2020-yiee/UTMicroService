@@ -9,5 +9,6 @@ namespace AuthServer.Helper
     public interface IHelperFunction
     {
         object GenerateJwtToken(string email, User user, string Role);
+        object GenerateJwtToken(string email, Admin user, string Role);
     }
 }

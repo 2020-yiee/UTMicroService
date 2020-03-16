@@ -103,17 +103,6 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public IEnumerable<UserResponse> getAllWebOwners()
-        {
-            List<UserResponse> result = new List<UserResponse>();
-            List<User> webOwners = context.User.Where(s => s.Actived == true).ToList();
-            foreach (var webOwner in webOwners)
-            {
-                result.Add(new UserResponse(webOwner.UserId, webOwner.FullName, webOwner.Email));
-            }
-            return result;
-        }
-
         public Object getUser(int userId)
         {
             User temp = context.User
@@ -392,6 +381,63 @@ namespace CustomersAPIServices.Repository
             Website website = context.Website.FirstOrDefault(s => s.WebId == websiteId);
             if (website == null) return false;
             return orgIds.Contains(website.OrganizationId);
+        }
+        //=============================================admin==================================================
+        public IEnumerable<User> getAllUsers()
+        {
+            try
+            {
+                return context.User.ToList();
+            }
+            catch (Exception)
+            {
+                return new List<User>();
+            }
+        }
+
+        public User lockUser(int userID)
+        {
+            try
+            {
+                User user = context.User.FirstOrDefault(s => s.UserId == userID);
+                if (user != null) user.Actived = false;
+                context.SaveChanges();
+                return user;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public Object getAllUserOrganizationAndWebsites(int userID)
+        {
+            try
+            {
+                return getUser(userID);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public Website lockWebsite(int websiteID)
+        {
+            try
+            {
+                Website website = context.Website.FirstOrDefault(s => s.WebId == websiteID);
+                if (website != null)
+                {
+                    website.Removed = true;
+                    context.SaveChanges();
+                }
+                return website;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }

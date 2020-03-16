@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: service-tracking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: service-tracking
+  template:
+    metadata:
+      labels:
+        component: service-tracking
+    spec:
+      containers:
+        - env:
+            - name: SPRING_EUREKA
+              value: http://eureka-cluster-ip-service:8761/eureka
+          image: asia.gcr.io/keen-hangar-139914/service-tracking:1.7.1
+          name: service-tracking
+          ports:
+            - containerPort: 80

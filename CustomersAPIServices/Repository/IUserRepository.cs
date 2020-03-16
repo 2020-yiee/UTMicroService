@@ -1,4 +1,5 @@
 ﻿//using CustomersAPIServices.EFModels;
+using CustomersAPIServices.EFModels;
 using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
 using System;
@@ -11,7 +12,7 @@ namespace CustomersAPIServices.Repository
     public interface IUserRepository
     {
         Object createUser(CreateUserRequest webOwner);
-        IEnumerable<UserResponse> getAllWebOwners();
+        IEnumerable<User> getAllUsers();
         Object getUser(int webOwnerId);
 
         Boolean deleteUser(int WebOwnerId);
@@ -25,5 +26,8 @@ namespace CustomersAPIServices.Repository
         object DeleteOrganization(int organizationID, int v);
         bool verifyWebsite(verifiedRequest request);
         object getStatisticData(int webID, int trackingInfoID, int from, int to, int userId);
+        User lockUser(int userID);
+        object getAllUserOrganizationAndWebsites(int userID);
+        Website lockWebsite(int websiteID);
     }
 }

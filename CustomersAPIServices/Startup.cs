@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using NSwag.Generation.Processors.Security;
 using NSwag;
 using Steeltoe.Discovery.Client;
+using CustomersAPIServices.Repository;
 
 namespace CustomersAPIServices
 {
@@ -96,6 +97,8 @@ namespace CustomersAPIServices
                        RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
                    };
                });
+
+            services.AddScoped<IUserRepository, UserRepositoryImpl>();
 
             services.AddDiscoveryClient(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

@@ -24,12 +24,21 @@ namespace AuthServer.Controllers
         {
             _repository = repository;
         }
-        
+
         [HttpPost("login")]
         public async Task<object> Get([FromBody] LoginRequestModel model)
         {
-            var webOwner = await _repository.getCustomerByUsernameAndPassword(model);
-            if (Object.Equals(webOwner,false)) return StatusCode(401);
+            var webOwner = await _repository.getUserByEmailAndPassword(model);
+            if (Object.Equals(webOwner, false)) return StatusCode(401);
+            if (webOwner == null) return StatusCode(403);
+            return Ok(webOwner);
+        }
+
+        [HttpPost("login/admin")]
+        public async Task<object> loginAdmin([FromBody] LoginRequestModel model)
+        {
+            var webOwner = await _repository.getAdminByEmailAndPassword(model);
+            if (Object.Equals(webOwner, false)) return StatusCode(401);
             if (webOwner == null) return StatusCode(403);
             return Ok(webOwner);
 

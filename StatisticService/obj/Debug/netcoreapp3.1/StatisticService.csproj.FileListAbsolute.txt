@@ -44,10 +44,10 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\net
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
-D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.csprojAssemblyReference.cache
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.AssemblyInfoInputs.cache
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.AssemblyInfo.cs
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.csproj.CopyComplete
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\netcoreapp3.1\StatisticService.pdb
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.pdb
+D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.csprojAssemblyReference.cache

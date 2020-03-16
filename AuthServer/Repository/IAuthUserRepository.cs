@@ -9,7 +9,7 @@ namespace AuthServer.Repository
 {
     public interface IAuthUserRepository
     {
-        Task<Object> getCustomerByUsernameAndPassword(LoginRequestModel model);
-
+        Task<Object> getUserByEmailAndPassword(LoginRequestModel model);
+        Task<Object> getAdminByEmailAndPassword(LoginRequestModel model);
     }
 }

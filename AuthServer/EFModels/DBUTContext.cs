@@ -32,7 +32,7 @@ namespace AuthServer.EFModels
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("server=34.87.174.35;Database=DBUT;Trusted_Connection=False;user Id=sqlserver;password=123");
+                optionsBuilder.UseSqlServer("server=swhdb.database.windows.net;Database=DBUT;Trusted_Connection=False;user Id=adminSWhDb;password=vuquanghuy123!");
             }
         }
 
@@ -53,9 +53,7 @@ namespace AuthServer.EFModels
 
             modelBuilder.Entity<Admin>(entity =>
             {
-                entity.Property(e => e.AdminId)
-                    .HasColumnName("adminID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.AdminId).HasColumnName("adminID");
 
                 entity.Property(e => e.Actived).HasColumnName("actived");
 
@@ -71,8 +69,7 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.Password)
                     .IsRequired()
-                    .HasColumnName("password")
-                    .HasMaxLength(50);
+                    .HasColumnName("password");
 
                 entity.Property(e => e.Username)
                     .IsRequired()
@@ -120,9 +117,7 @@ namespace AuthServer.EFModels
 
             modelBuilder.Entity<TrackedFunnelData>(entity =>
             {
-                entity.Property(e => e.TrackedFunnelDataId)
-                    .HasColumnName("trackedFunnelDataID")
-                    .ValueGeneratedNever();
+                entity.Property(e => e.TrackedFunnelDataId).HasColumnName("trackedFunnelDataID");
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 

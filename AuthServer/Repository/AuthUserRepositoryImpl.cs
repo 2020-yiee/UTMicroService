@@ -17,7 +17,45 @@ namespace AuthServer.Repository
         {
             _helper = helper;
         }
-        public async Task<Object> getCustomerByUsernameAndPassword(LoginRequestModel model)
+
+        public async Task<Object> getAdminByEmailAndPassword(LoginRequestModel model)
+        {
+            using (var context = new DBUTContext())
+            {
+                var admin = await context.Admin
+                    .Where(s => s.Email == model.email)
+                    .Where(s => s.Actived == true)
+                    .FirstOrDefaultAsync();
+                bool checkPassword = false;
+                if (admin != null)
+                {
+                    //LoginSuccessModel resultReturn = new LoginSuccessModel();
+                    checkPassword = BCrypt.Net.BCrypt.Verify(model.password, admin.Password);
+                    if (checkPassword)
+                    {
+                        int totalUsers = context.User.Count();
+                        int totalWebsites = context.Website.Count();
+                        
+                            return new
+                            {
+                                admin = admin,
+                                token = _helper.GenerateJwtToken(model.email, admin, "admin"),
+                                totalUsers = totalUsers,
+                                totalWebsites = totalWebsites
+
+                            };
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                }
+                return null;
+            }
+        }
+
+        public async Task<Object> getUserByEmailAndPassword(LoginRequestModel model)
         {
             using (var context = new DBUTContext())
             {
