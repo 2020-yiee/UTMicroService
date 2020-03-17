@@ -108,14 +108,7 @@ namespace CustomersAPIServices
                 b => b.MigrationsAssembly(typeof(Startup).Assembly.FullName)));
 
 
-            //services.AddSwaggerGen((option) =>
-            //{
-            //    option.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-            //    {
-            //        Title = "Customer api for User tracking",
-            //        Version = "v1"
-            //    });
-            //});
+           
             //add swagger
             services.AddOpenApiDocument(config =>
             {
