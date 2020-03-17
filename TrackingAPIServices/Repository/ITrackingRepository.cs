@@ -23,6 +23,6 @@ namespace HeatMapAPIServices.Repository
         List<StatisticHeatmap> getstatisticHeatmapData(int trackingHeatmapInfoID);
         List<StatisticFunnel> getstatisticFunnelData(int trackingFunnelInfoID);
         object udpateFunnelTrackingInfo(udpateTrackingInfoRequest request, int v);
-        object getStatisticHeatMap(int webID, int trackingInfoID, int from, int to, int v);
+        object getStatisticHeatMap(int webID, int trackingInfoID, int from, int to,int device, int v);
     }
 }

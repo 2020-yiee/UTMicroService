@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TrackingAPIServices.EFModels;
+using TrackingAPIServices.Models;
 
 namespace HeatMapAPIServices.Repository
 {
@@ -19,6 +20,7 @@ namespace HeatMapAPIServices.Repository
 
         public TrackingRepositoryImpl()
         {
+            EVENT_TYPE_LIST.Add(2);
             EVENT_TYPE_LIST.Add(1);
             EVENT_TYPE_LIST.Add(0);
         }
@@ -79,7 +81,7 @@ namespace HeatMapAPIServices.Repository
 
         //----------------------------------tracking heatmap info--------------------------------
 
-        private bool checkTrackingHeatmapInfoExisted(int webId,string trackingUrl, string name)
+        private bool checkTrackingHeatmapInfoExisted(int webId, string trackingUrl, string name)
         {
             List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == webId)
                 .ToList().Select(s => s.TrackingUrl).ToList();
@@ -132,7 +134,7 @@ namespace HeatMapAPIServices.Repository
             info.TrackingUrl = request.trackingUrl;
             info.Removed = false;
             var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-            info.CreatedAt =(long) timeSpan.TotalSeconds;
+            info.CreatedAt = (long)timeSpan.TotalSeconds;
             try
             {
                 context.TrackingHeatmapInfo.Add(info);
@@ -144,7 +146,9 @@ namespace HeatMapAPIServices.Repository
                 var response = client.Post(requests);
                 var content = response.Content;
                 CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
-                info.ImageUrl = captureResponse.imageUrl;
+                info.SmImageUrl = captureResponse.smImageUrl;
+                info.MdImageUrl = captureResponse.mdImageUrl;
+                info.LgImageUrl = captureResponse.lgImageUrl;
                 context.SaveChanges();
                 return info;
             }
@@ -210,7 +214,7 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 string domainUrl = context.Website.Where(s => s.WebId == webId).Select(s => s.DomainUrl).FirstOrDefault();
-                    if (!url.Contains(domainUrl)) return false;
+                if (!url.Contains(domainUrl)) return false;
             }
             catch (Exception ex)
             {
@@ -275,7 +279,7 @@ namespace HeatMapAPIServices.Repository
         public object createFunnelTrackingInfo(CreateTrackingFunnelInforRequest request, int userId)
         {
             if (!checkAuthencation(request.webID, userId)) return null;
-            if (checkTrackingFunnelInfoExisted(request.webID,request.steps.ToString(),request.name)) return null;
+            if (checkTrackingFunnelInfoExisted(request.webID, request.steps.ToString(), request.name)) return null;
             if (!checkStepDomainUrl(request.webID, request.steps.ToString())) return null;
             TrackingFunnelInfo info = new TrackingFunnelInfo();
             info.WebId = request.webID;
@@ -346,7 +350,7 @@ namespace HeatMapAPIServices.Repository
 
 
         //===========================tracked funnel data ==============================
-        
+
         private TrackedFunnelData checkTrackedFunnelDataExisted(string sessionId)
         {
             return context.TrackedFunnelData.Where(s => s.SessionId == sessionId).FirstOrDefault();
@@ -417,7 +421,7 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public object getStatisticHeatMap(int webID, int trackingInfoID, int from, int to, int userId)
+        public object getStatisticHeatMap(int webID, int trackingInfoID, int from, int to, int device, int userId)
         {
             GetStatisicHeatMap response = new GetStatisicHeatMap();
             try
@@ -426,28 +430,158 @@ namespace HeatMapAPIServices.Repository
                 TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.WebId == webID)
                 .Where(s => s.TrackingHeatmapInfoId == trackingInfoID)
                 .FirstOrDefault();
-                response.imageUrl = trackingHeatmapInfo.ImageUrl;
+                switch (device)
+                {
+                    case 0: response.imageUrl = trackingHeatmapInfo.SmImageUrl; break;
+                    case 1: response.imageUrl = trackingHeatmapInfo.MdImageUrl; break;
+                    case 2: response.imageUrl = trackingHeatmapInfo.LgImageUrl; break;
+                }
                 foreach (var eventType in EVENT_TYPE_LIST)
                 {
-                    List<int> trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
-                    .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
-                    .Where(s => s.CreatedAt >= from)
-                    .Where(s => s.CreatedAt <= to)
-                    .Where(s => s.EventType == eventType)
-                    .Select(s => s.TrackedHeatmapDataId).ToList();
-                    List<StatisticHeatmap> statisticHeatmaps = context.StatisticHeatmap
-                        .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
-                    .ToList();
-                    List<StatisticData> statisticDatas = new List<StatisticData>();
-                    foreach (var item in statisticHeatmaps)
+                    switch (device)
                     {
-                        statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
+                        case 0:
+                            List<int> trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                                .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
+                                .Where(s => s.CreatedAt >= from)
+                                .Where(s => s.CreatedAt <= to)
+                                .Where(s => s.EventType == eventType)
+                                .Where(s => s.ScreenWidth < 540)
+                                .Select(s => s.TrackedHeatmapDataId).ToList();
+                            List<StatisticHeatmap> statisticHeatmaps = context.StatisticHeatmap
+                                .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
+                            .ToList();
+                            List<StatisticData> statisticDatas = new List<StatisticData>();
+                            foreach (var item in statisticHeatmaps)
+                            {
+                                statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
+                            }
+                            if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
+                            if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas); break;
+                        case 1:
+                            trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                           .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
+                           .Where(s => s.CreatedAt >= from)
+                           .Where(s => s.CreatedAt <= to)
+                           .Where(s => s.EventType == eventType)
+                           .Where(s => s.ScreenWidth < 768 && s.ScreenWidth >= 540)
+                           .Select(s => s.TrackedHeatmapDataId).ToList();
+                            statisticHeatmaps = context.StatisticHeatmap
+                                .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
+                            .ToList();
+                            statisticDatas = new List<StatisticData>();
+                            foreach (var item in statisticHeatmaps)
+                            {
+                                statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
+                            }
+                            if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
+                            if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas); break;
+                        case 2:
+                            trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                        .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
+                        .Where(s => s.CreatedAt >= from)
+                        .Where(s => s.CreatedAt <= to)
+                        .Where(s => s.EventType == eventType)
+                        .Where(s => s.ScreenWidth >= 768)
+                        .Select(s => s.TrackedHeatmapDataId).ToList();
+                            statisticHeatmaps = context.StatisticHeatmap
+                                .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
+                            .ToList();
+                            statisticDatas = new List<StatisticData>();
+                            foreach (var item in statisticHeatmaps)
+                            {
+                                statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
+                            }
+                            if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
+                            if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas); break;
                     }
-                    if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
-                    if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas);
-
-
                 }
+
+                List<long> listScreenHeight = context.TrackedHeatmapData.Select(s => s.ScreenHeight).Distinct().ToList();
+                List<ScrollResponse> scrolls = new List<ScrollResponse>();
+
+                foreach (var item in listScreenHeight)
+                {
+                    List<double> scrollData = new List<double>();
+                    List<int> trackedDataIDs = new List<int>();
+                    switch (device)
+                    {
+                        case 0: trackedDataIDs = context.TrackedHeatmapData.Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth < 540).Select(s => s.TrackedHeatmapDataId).ToList(); break;
+                        case 1: trackedDataIDs = context.TrackedHeatmapData.Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth < 768 && s.ScreenWidth >= 540).Select(s => s.TrackedHeatmapDataId).ToList(); break;
+                        case 2: trackedDataIDs = context.TrackedHeatmapData.Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth >= 768).Select(s => s.TrackedHeatmapDataId).ToList(); break;
+                    }
+                    foreach (var id in trackedDataIDs)
+                    {
+                        StatisticHeatmap statisticHeatmap = context.StatisticHeatmap.Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
+                        scrollData.AddRange(JsonConvert.DeserializeObject<List<double>>(statisticHeatmap.StatisticData));
+                    }
+
+                    if (trackedDataIDs.Count != 0)
+                    {
+                        ScrollResponse scrollResponse = new ScrollResponse();
+                        scrollResponse.height = item;
+                        scrollResponse.positions = JsonConvert.SerializeObject(scrollData);
+                        scrolls.Add(scrollResponse);
+                    }
+                }
+
+                response.scroll = JsonConvert.SerializeObject(scrolls);
+
+
+
+
+                List<TrackedHeatmapData> datas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                        .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
+                        .Where(s => s.CreatedAt >= from)
+                        .Where(s => s.CreatedAt <= to)
+                        .ToList();
+
+                List<DateTime> times = new List<DateTime>();
+                foreach (var item in datas)
+                {
+                    DateTime time = convertTimeStamp(item.CreatedAt);
+                    int day = time.Day;
+                    int month = time.Month;
+                    int year = time.Year;
+                    DateTime timetemp = new DateTime(year, month, day);
+                    times.Add(timetemp);
+                }
+                times = times.Distinct().ToList();
+
+                List<VisitResponse> visitResponses = new List<VisitResponse>();
+                foreach (DateTime time in times)
+                {
+                    VisitResponse visit = new VisitResponse();
+                    Console.WriteLine(time);
+                    visit.x = ((DateTimeOffset)time).ToUnixTimeSeconds();
+                    var timeList = new List<TrackedHeatmapData>();
+
+
+                    int currentDay = time.Day;
+                    int currentMonth = time.Month;
+                    int currentYear = time.Year;
+                    foreach (var item in datas)
+                    {
+                        DateTime t = convertTimeStamp(item.CreatedAt);
+                        int day = t.Day;
+                        int month = t.Month;
+                        int year = t.Year;
+
+                        if (day == currentDay && currentMonth == month && currentYear == year)
+                        {
+                            timeList.Add(item);
+                        }
+                    }
+
+                    visit.y = timeList.Select(item => item.SessionId).Distinct().ToList().Count;
+
+                    visitResponses.Add(visit);
+                }
+                response.visit = JsonConvert.SerializeObject(visitResponses);
+
+
+
+
 
                 return response;
             }
@@ -455,8 +589,15 @@ namespace HeatMapAPIServices.Repository
             {
                 Console.WriteLine(ex.Message);
                 return null;
-                
+
             }
         }
+
+        private DateTime convertTimeStamp(double timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+            return origin.AddSeconds(timestamp);
+        }
+
     }
 }

@@ -34,7 +34,58 @@ namespace StatisticService
 
             int updateStatisticData()
             {
-                List<TrackedHeatmapData> trackedList = context.TrackedHeatmapData.Where(s => s.TrackedHeatmapDataId > currentID).Where(s => EVENT_TYPE_LIST.Contains(s.EventType)).ToList();
+                List<TrackedHeatmapData> trackedList = context.TrackedHeatmapData.Where(s => s.TrackedHeatmapDataId > currentID)
+                .Where(s => EVENT_TYPE_LIST.Contains(s.EventType)).ToList();
+                List<TrackedHeatmapData> trackedScrollData = trackedList.Where(s => s.EventType == 2).ToList();
+                Console.WriteLine(trackedScrollData.Count);
+                foreach (var item in trackedScrollData)
+                {
+                    List<ScrollData> scrollDatas = JsonConvert.DeserializeObject<List<ScrollData>>(item.Data);
+
+                    List<double> positions = scrollDatas.Select(s => s.position).Distinct().ToList();
+                    List<ScrollData> maps = new List<ScrollData>();
+                    foreach (var position in positions)
+                    {
+                        List<double> durations = scrollDatas.Where(s => s.position == position).Select(s => s.duration).ToList();
+                        double sum = durations.Sum();
+                        maps.Add(new ScrollData(position, sum));
+                    }
+
+                    List<double> statisticScrollData = new List<double>();
+                    foreach (var map in maps)
+                    {
+                        for (int i = 0; i < map.duration; i++)
+                        {
+                            statisticScrollData.Add(map.position);
+                        }
+                    }
+
+
+                    Console.WriteLine("add scroll data for id " + item.TrackedHeatmapDataId+"\ndata : "+statisticScrollData.Count);
+                    StatisticHeatmap statisticHeatmap = context.StatisticHeatmap
+                        .Where(s => s.TrackedHeatmapDataId == item.TrackedHeatmapDataId).FirstOrDefault();
+                    if (statisticHeatmap == null)
+                    {
+                        statisticHeatmap = new StatisticHeatmap();
+                        statisticHeatmap.TrackedHeatmapDataId = item.TrackedHeatmapDataId;
+                        statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
+                        try
+                        {
+                            context.StatisticHeatmap.Add(statisticHeatmap);
+                            context.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }else{
+                        try
+                        {
+                            statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
+                            context.SaveChanges();
+                        }
+                        catch (Exception){}
+                    }
+                }
 
                 int max = currentID;
 
@@ -50,11 +101,10 @@ namespace StatisticService
                     try
                     {
                         List<TrackedHeatmapData> subTrackedList = trackedList.Where(s => s.TrackingUrl == url).ToList();
-                        //comment
-                        //List<RequestData> requestData = new List<RequestData>();
+                        List<RequestData> requestData = new List<RequestData>();
                         foreach (var subItem in subTrackedList)
                         {
-                            List<RequestData> requestData = new List<RequestData>();
+                            //List<RequestData> requestData = new List<RequestData>();
 
                             List<TempData> data = new List<TempData>();
                             try
@@ -69,117 +119,54 @@ namespace StatisticService
                                 {
                                     requestData.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
                                 }
-                            var client = new RestClient("http://localhost:7777/dom/coordinates/" + url);
-                            Console.WriteLine("\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
 
-                            // client.Authenticator = new HttpBasicAuthenticator(username, password);
-                            var request = new RestRequest();
-                            request.AddParameter("url", url);
-                            request.AddHeader("Content-Type", "application/json");
-                            request.AddJsonBody(requestData);
-                            var response = client.Post(request);
-                            var content = response.Content;
+                        }
 
-                            Console.WriteLine(" done call api\n" + "\n===================================================================================\n" + "Response:\n");
-                            Console.WriteLine(content.ToString() + "\n===================================================================================\n");
+                        var client = new RestClient("http://localhost:7777/dom/coordinates/" + url);
+                        Console.WriteLine("\n\n\n\n\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
+                        Console.WriteLine("request body:"+ requestData);
+                        // client.Authenticator = new HttpBasicAuthenticator(username, password);
+                        var request = new RestRequest();
+                        request.AddParameter("url", url);
+                        request.AddHeader("Content-Type", "application/json");
+                        request.AddJsonBody(requestData);
+                        var response = client.Post(request);
+                        var content = response.Content;
 
+                        Console.WriteLine(" done call api\n" + "\n===================================================================================\n" + "Response:\n");
+                        Console.WriteLine(content.ToString());
 
+                        List<ResponseData> responseData = new List<ResponseData>();
+                        var settings = new JsonSerializerSettings
+                        {
+                            NullValueHandling = NullValueHandling.Include,
+                            MissingMemberHandling = MissingMemberHandling.Ignore
+                        };
+                        responseData = JsonConvert.DeserializeObject<List<ResponseData>>(content);
 
-                            List<ResponseDataTemp> responseDataTemp = new List<ResponseDataTemp>();
+                        List<int> uniqueTrackedHeatmapDataID = responseData.Select(s => s.trackedHeatmapDataID).Distinct().ToList();
 
+                        foreach (var id in uniqueTrackedHeatmapDataID)
+                        {
+                            List<ResponseData> subData = responseData.Where(s => s.trackedHeatmapDataID == id).ToList();
+                            StatisticHeatmap statisticHeatmap = new StatisticHeatmap();
+                            statisticHeatmap.TrackedHeatmapDataId = id;
+                            List<StatisticData> statisticDatas = new List<StatisticData>();
+                            foreach (var item in subData)
+                            {
+                                statisticDatas.Add(new StatisticData(item.x, item.y));
+                            }
+                            statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticDatas);
                             try
                             {
-                                responseDataTemp = JsonConvert.DeserializeObject<List<ResponseDataTemp>>(content);
+                                context.StatisticHeatmap.Add(statisticHeatmap);
+                                context.SaveChanges();
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine("ERROR IN ID " + subItem.TrackedHeatmapDataId + ": " + ex.Message);
                             }
 
-                            List<ResponseData> responseData = new List<ResponseData>();
-                            foreach (var item in responseDataTemp)
-                            {
-                                if (item.x != null && item.y != null)
-                                {
-                                    responseData.Add(new ResponseData(item.trackedHeatmapDataID, Double.Parse(item.x), Double.Parse(item.y)));
-                                }
-                            }
-
-                            List<int> uniqueTrackedHeatmapDataID = responseData.Select(s => s.trackedHeatmapDataID).Distinct().ToList();
-
-                            foreach (var id in uniqueTrackedHeatmapDataID)
-                            {
-                                List<ResponseData> subData = responseData.Where(s => s.trackedHeatmapDataID == id).ToList();
-                                StatisticHeatmap statisticHeatmapTest = context.StatisticHeatmap
-                                    .Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
-                                if (statisticHeatmapTest == null)
-                                {
-                                    StatisticHeatmap statisticHeatmap = new StatisticHeatmap();
-                                    statisticHeatmap.TrackedHeatmapDataId = id;
-                                    List<StatisticData> statisticDatas = new List<StatisticData>();
-                                    foreach (var item in subData)
-                                    {
-                                        statisticDatas.Add(new StatisticData(item.x, item.y));
-                                    }
-                                    statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticDatas);
-                                    context.StatisticHeatmap.Add(statisticHeatmap);
-
-                                    context.SaveChanges();
-                                }
-                                else
-                                {
-                                    List<StatisticData> statisticDatas = new List<StatisticData>();
-                                    foreach (var item in subData)
-                                    {
-                                        statisticDatas.Add(new StatisticData(item.x, item.y));
-                                    }
-                                    statisticHeatmapTest.StatisticData = JsonConvert.SerializeObject(statisticDatas);
-                                    context.SaveChanges();
-                                }
-
-                            }
                         }
-
-                        //var client = new RestClient("http://localhost:7777/dom/coordinates/" + url);
-                        //Console.WriteLine("\n\n\n\n\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
-
-                        //// client.Authenticator = new HttpBasicAuthenticator(username, password);
-                        //var request = new RestRequest();
-                        //request.AddParameter("url", url);
-                        //request.AddHeader("Content-Type", "application/json");
-                        //request.AddJsonBody(requestData);
-                        //var response = client.Post(request);
-                        //var content = response.Content;
-
-                        //Console.WriteLine(" done call api\n" + "\n===================================================================================\n" + "Response:\n");
-                        //Console.WriteLine(content.ToString());
-
-                        //List<ResponseData> responseData = new List<ResponseData>();
-                        //var settings = new JsonSerializerSettings
-                        //{
-                        //    NullValueHandling = NullValueHandling.Include,
-                        //    MissingMemberHandling = MissingMemberHandling.Ignore
-                        //};
-                        //responseData = JsonConvert.DeserializeObject<List<ResponseData>>(content);
-
-                        //List<int> uniqueTrackedHeatmapDataID = responseData.Select(s => s.trackedHeatmapDataID).Distinct().ToList();
-
-                        //foreach (var id in uniqueTrackedHeatmapDataID)
-                        //{
-                        //    List<ResponseData> subData = responseData.Where(s => s.trackedHeatmapDataID == id).ToList();
-                        //    StatisticHeatmap statisticHeatmap = new StatisticHeatmap();
-                        //    statisticHeatmap.TrackedHeatmapDataId = id;
-                        //    List<StatisticData> statisticDatas = new List<StatisticData>();
-                        //    foreach (var item in subData)
-                        //    {
-                        //        statisticDatas.Add(new StatisticData(item.x, item.y));
-                        //    }
-                        //    statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticDatas);
-                        //    context.StatisticHeatmap.Add(statisticHeatmap);
-
-                        //    context.SaveChanges();
-
-                        //}
                     }
                     catch (Exception ex)
                     {

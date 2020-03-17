@@ -6,6 +6,8 @@ namespace HeatMapAPIServices.Models
 {
     class CaptureResponse
     {
-        public string imageUrl { get; set; }
+        public string smImageUrl { get; set; }
+        public string mdImageUrl { get; set; }
+        public string lgImageUrl { get; set; }
     }
 }

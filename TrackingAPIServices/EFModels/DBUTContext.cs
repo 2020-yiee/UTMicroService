@@ -144,6 +144,14 @@ namespace TrackingAPIServices.EFModels
 
                 entity.Property(e => e.EventType).HasColumnName("eventType");
 
+                entity.Property(e => e.ScreenHeight).HasColumnName("screenHeight");
+
+                entity.Property(e => e.ScreenWidth).HasColumnName("screenWidth");
+
+                entity.Property(e => e.SessionId)
+                    .IsRequired()
+                    .HasColumnName("sessionID");
+
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
                     .HasColumnName("trackingUrl");
@@ -177,7 +185,9 @@ namespace TrackingAPIServices.EFModels
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
-                entity.Property(e => e.ImageUrl).HasColumnName("imageUrl");
+                entity.Property(e => e.LgImageUrl).HasColumnName("lgImageUrl");
+
+                entity.Property(e => e.MdImageUrl).HasColumnName("mdImageUrl");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -185,6 +195,8 @@ namespace TrackingAPIServices.EFModels
                     .HasMaxLength(50);
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
+
+                entity.Property(e => e.SmImageUrl).HasColumnName("smImageUrl");
 
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()

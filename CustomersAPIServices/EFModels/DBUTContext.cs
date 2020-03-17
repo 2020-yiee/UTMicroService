@@ -144,6 +144,12 @@ namespace CustomersAPIServices.EFModels
 
                 entity.Property(e => e.EventType).HasColumnName("eventType");
 
+                entity.Property(e => e.ScreenHeight).HasColumnName("screenHeight");
+
+                entity.Property(e => e.ScreenWidth).HasColumnName("screenWidth");
+
+                entity.Property(e => e.SessionId).HasColumnName("sessionID");
+
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
                     .HasColumnName("trackingUrl");

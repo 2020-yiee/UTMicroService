@@ -11,5 +11,8 @@ namespace CustomersAPIServices.EFModels
         public string Data { get; set; }
         public int EventType { get; set; }
         public long CreatedAt { get; set; }
+        public string SessionId { get; set; }
+        public string ScreenWidth { get; set; }
+        public string ScreenHeight { get; set; }
     }
 }

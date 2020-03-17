@@ -56,9 +56,9 @@ namespace HeatMapAPIServices.Controllers
 
         [Authorize]
         [HttpGet("api/user/statistic/{webID}/{trackingInfoID}")]
-        public IActionResult getStatisticHeatmap([FromRoute] int webID, [FromRoute] int trackingInfoID, int from, int to)
+        public IActionResult getStatisticHeatmap([FromRoute] int webID, [FromRoute] int trackingInfoID, int from, int to, int device)
         {
-            Object result = iRepository.getStatisticHeatMap(webID, trackingInfoID, from, to, GetUserId());
+            Object result = iRepository.getStatisticHeatMap(webID, trackingInfoID, from, to,device, GetUserId());
             if (result != null) return Ok(result);
             return BadRequest();
         }

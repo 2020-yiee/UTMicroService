@@ -197,13 +197,13 @@ namespace CustomersAPIServices.Controllers
         }
 
         //========================================================================================
-        [Authorize]
-        [HttpGet("api/user/statistic/{webID}/{trackingInfoID}")]
-        public IActionResult getStatisticHeatmap([FromRoute] int webID,[FromRoute] int trackingInfoID,int from, int to)
-        {
-            Object result = repository.getStatisticData(webID, trackingInfoID, from, to,GetUserId());
-            if (result != null) return Ok(result);
-            return BadRequest();
-        }
+        // [Authorize]
+        // [HttpGet("api/user/statistic/{webID}/{trackingInfoID}")]
+        // public IActionResult getStatisticHeatmap([FromRoute] int webID,[FromRoute] int trackingInfoID,int from, int to)
+        // {
+        //     Object result = repository.getStatisticData(webID, trackingInfoID, from, to,GetUserId());
+        //     if (result != null) return Ok(result);
+        //     return BadRequest();
+        // }
     }
 }
