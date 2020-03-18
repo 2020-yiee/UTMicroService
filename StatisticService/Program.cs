@@ -81,8 +81,10 @@ namespace StatisticService
                         statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
                         try
                         {
+                            
                             context.StatisticHeatmap.Add(statisticHeatmap);
                             context.SaveChanges();
+                            Console.WriteLine("STATISTIC SCROLL DATA FOR ID " + statisticHeatmap.TrackedHeatmapDataId);
                         }
                         catch (Exception ex)
                         {
@@ -93,6 +95,8 @@ namespace StatisticService
                     {
                         try
                         {
+
+                            Console.WriteLine("STATISTIC SCROLL DATA FOR ID " + statisticHeatmap.TrackedHeatmapDataId);
                             statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
                             context.SaveChanges();
                         }
@@ -141,7 +145,7 @@ namespace StatisticService
                         }
 
                         var client = new RestClient("http://localhost:7777/dom/coordinates/" + url);
-                        Console.WriteLine("\n\n\n\n\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
+                        Console.WriteLine("\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
                         Console.WriteLine("request body:" + requestData);
                         // client.Authenticator = new HttpBasicAuthenticator(username, password);
                         var request = new RestRequest();
@@ -151,7 +155,7 @@ namespace StatisticService
                         var response = client.Post(request);
                         var content = response.Content;
 
-                        Console.WriteLine(" done call api\n" + "\n===================================================================================\n" + "Response:\n");
+                        Console.WriteLine(" done call api" + "\n===================================================================================\n" + "Response:\n");
                         Console.WriteLine(content.ToString());
 
                         List<ResponseData> responseData = new List<ResponseData>();
@@ -203,11 +207,13 @@ namespace StatisticService
                     StatisticFunnel statisticFunnel = context.StatisticFunnel.Where(s => s.TrackedFunnelDataId == trackedFunnelData.TrackedFunnelDataId).FirstOrDefault();
                     if (statisticFunnel != null)
                     {
+                        Console.WriteLine("ADD STATISTIC FUNNEL FOR ID " + trackedFunnelData.TrackedFunnelDataId);
                         statisticFunnel.StatisticData = JsonConvert.SerializeObject(distinctData);
                         context.SaveChanges();
                     }
                     else
                     {
+                        Console.WriteLine("ADD STATISTIC FUNNEL FOR ID " + trackedFunnelData.TrackedFunnelDataId);
                         statisticFunnel = new StatisticFunnel();
                         statisticFunnel.TrackedFunnelDataId = trackedFunnelData.TrackedFunnelDataId;
                         statisticFunnel.StatisticData = JsonConvert.SerializeObject(distinctData);
@@ -216,6 +222,7 @@ namespace StatisticService
                     }
                 }
 
+                Console.WriteLine("Statistic done .");
                 return max;
 
             }

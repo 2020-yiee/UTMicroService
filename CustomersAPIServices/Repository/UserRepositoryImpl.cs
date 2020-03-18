@@ -395,13 +395,16 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public User lockUser(int userID)
+        public User lockUser(LockRequest request)
         {
             try
             {
-                User user = context.User.FirstOrDefault(s => s.UserId == userID);
-                if (user != null) user.Actived = false;
-                context.SaveChanges();
+                User user = context.User.FirstOrDefault(s => s.UserId == request.ID);
+                if (user != null)
+                {
+                    user.Actived = request.locked;
+                    context.SaveChanges();
+                }
                 return user;
             }
             catch (Exception)
@@ -422,14 +425,14 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public Website lockWebsite(int websiteID)
+        public Website lockWebsite(LockRequest request)
         {
             try
             {
-                Website website = context.Website.FirstOrDefault(s => s.WebId == websiteID);
+                Website website = context.Website.FirstOrDefault(s => s.WebId == request.ID);
                 if (website != null)
                 {
-                    website.Removed = true;
+                    website.Removed = request.locked;
                     context.SaveChanges();
                 }
                 return website;
@@ -438,6 +441,11 @@ namespace CustomersAPIServices.Repository
             {
                 return null;
             }
+        }
+
+        public object getAllWebSite()
+        {
+            return context.Website.ToList();
         }
     }
 }

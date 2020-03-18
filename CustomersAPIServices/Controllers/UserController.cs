@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CustomersAPIServices.EFModels;
+using CustomersAPIServices.Models;
 using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
 using CustomersAPIServices.Repository;
@@ -37,7 +38,7 @@ namespace CustomersAPIServices.Controllers
 
         //==========================================admin====================================================
 
-        [Authorize(Roles ="admin")]
+        [Authorize(Roles = "admin")]
         [HttpGet("api/admin/users")]
         public IActionResult GetAllUser()
         {
@@ -48,9 +49,9 @@ namespace CustomersAPIServices.Controllers
 
         [Authorize(Roles = "admin")]
         [HttpPut("api/admin/user/lock")]
-        public IActionResult lockUser(int userID)
+        public IActionResult lockUser([FromBody] LockRequest request)
         {
-            User result = repository.lockUser(userID);
+            User result = repository.lockUser(request);
             if (result != null) return Ok(result);
             return BadRequest();
         }
@@ -65,10 +66,19 @@ namespace CustomersAPIServices.Controllers
         }
 
         [Authorize(Roles = "admin")]
-        [HttpPut("api/admin/website/lock")]
-        public IActionResult lockWebsites(int websiteID)
+        [HttpGet("api/admin/websites")]
+        public IActionResult getAllWebsites()
         {
-            Website result = repository.lockWebsite(websiteID);
+            Object result = repository.getAllWebSite();
+            if (result != null) return Ok(result);
+            return BadRequest();
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPut("api/admin/website/lock")]
+        public IActionResult lockWebsites([FromBody] LockRequest request)
+        {
+            Website result = repository.lockWebsite(request);
             if (result != null) return Ok(result);
             return BadRequest();
         }

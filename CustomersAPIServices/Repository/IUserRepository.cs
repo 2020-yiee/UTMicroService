@@ -1,5 +1,6 @@
 ﻿//using CustomersAPIServices.EFModels;
 using CustomersAPIServices.EFModels;
+using CustomersAPIServices.Models;
 using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
 using System;
@@ -26,8 +27,9 @@ namespace CustomersAPIServices.Repository
         object DeleteOrganization(int organizationID, int v);
         bool verifyWebsite(verifiedRequest request);
         object getStatisticData(int webID, int trackingInfoID, int from, int to, int userId);
-        User lockUser(int userID);
+        User lockUser(LockRequest request);
         object getAllUserOrganizationAndWebsites(int userID);
-        Website lockWebsite(int websiteID);
+        Object getAllWebSite();
+        Website lockWebsite(LockRequest request);
     }
 }
