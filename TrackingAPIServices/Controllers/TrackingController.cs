@@ -184,13 +184,13 @@ namespace HeatMapAPIServices.Controllers
             return Ok(result);
         }
 
-        //[Authorize]
-        //[HttpGet("api/funnel/statistic/{webID}/{trackingInfoID}")]
-        //public IActionResult getStatisticFunnel([FromRoute] int webID, [FromRoute] int trackingInfoID, int from, int to)
-        //{
-        //    Object result = iRepository.getStatisticData(webID, trackingInfoID, from, to, GetUserId());
-        //    if (result != null) return Ok(result);
-        //    return BadRequest();
-        //}
+        [Authorize]
+        [HttpGet("api/funnel/statistic/{webID}/{trackingInfoID}")]
+        public IActionResult getStatisticFunnel([FromRoute] int webID, [FromRoute] int trackingInfoID, int from, int to)
+        {
+            Object result = iRepository.getStatisticFunnel(webID, trackingInfoID, from, to, GetUserId());
+            if (result != null) return Ok(result);
+            return BadRequest();
+        }
     }
 }

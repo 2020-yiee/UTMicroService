@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace TrackingAPIServices.Models
 {
-    public class ScrollResponse
+    public class StatisticScrollData
     {
-        public long height { get; set; }
         public long documentHeight { get; set; }
-        public string positions { get; set; }
+        public List<double> scroll { get; set; }
     }
 }

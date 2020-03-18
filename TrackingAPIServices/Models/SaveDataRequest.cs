@@ -11,6 +11,9 @@ namespace HeatMapAPIServices.Models
         public int webID { get; set; }
         public string data { get; set; }
         public int eventType { get; set; }
+        public string sessionID { get; set; }
+        public long screenWidth { get; set; }
+        public long screenHeight { get; set; }
 
     }
 }

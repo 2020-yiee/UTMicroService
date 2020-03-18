@@ -36,32 +36,42 @@ namespace StatisticService
             {
                 List<TrackedHeatmapData> trackedList = context.TrackedHeatmapData.Where(s => s.TrackedHeatmapDataId > currentID)
                 .Where(s => EVENT_TYPE_LIST.Contains(s.EventType)).ToList();
-                List<TrackedHeatmapData> trackedScrollData = trackedList.Where(s => s.EventType == 2).ToList();
-                Console.WriteLine(trackedScrollData.Count);
+
+                //scroll data
+                List<TrackedHeatmapData> trackedScrollData = context.TrackedHeatmapData.Where(s => s.EventType == 2 && s.TrackedHeatmapDataId > currentID).ToList();
                 foreach (var item in trackedScrollData)
                 {
-                    List<ScrollData> scrollDatas = JsonConvert.DeserializeObject<List<ScrollData>>(item.Data);
+                    ScrollDatas scrollData = JsonConvert.DeserializeObject<ScrollDatas>(item.Data);
+                    List<ScrollData> scrolls = scrollData.scroll;
 
-                    List<double> positions = scrollDatas.Select(s => s.position).Distinct().ToList();
+                    List<double> positions = scrolls.Select(s => s.position).Distinct().ToList();
+
                     List<ScrollData> maps = new List<ScrollData>();
                     foreach (var position in positions)
                     {
-                        List<double> durations = scrollDatas.Where(s => s.position == position).Select(s => s.duration).ToList();
+                        List<double> durations = scrolls.Where(s => s.position == position).Select(s => s.duration).ToList();
                         double sum = durations.Sum();
                         maps.Add(new ScrollData(position, sum));
                     }
 
-                    List<double> statisticScrollData = new List<double>();
+
+                    List<double> statisticScroll = new List<double>();
                     foreach (var map in maps)
                     {
-                        for (int i = 0; i < map.duration; i++)
-                        {
-                            statisticScrollData.Add(map.position);
-                        }
+
+                        double top = map.duration < 10 ? map.duration : 10;
+                        if (map.duration >= 1)
+                            for (int i = 1; i <= top; i++)
+                            {
+                                statisticScroll.Add(map.position);
+                            }
                     }
 
+                    StatisticScrollData statisticScrollData = new StatisticScrollData();
+                    statisticScrollData.documentHeight = scrollData.documentHeight;
+                    statisticScrollData.scroll = statisticScroll;
 
-                    Console.WriteLine("add scroll data for id " + item.TrackedHeatmapDataId+"\ndata : "+statisticScrollData.Count);
+
                     StatisticHeatmap statisticHeatmap = context.StatisticHeatmap
                         .Where(s => s.TrackedHeatmapDataId == item.TrackedHeatmapDataId).FirstOrDefault();
                     if (statisticHeatmap == null)
@@ -76,17 +86,25 @@ namespace StatisticService
                         }
                         catch (Exception ex)
                         {
+                            Console.WriteLine("ERROR ADD STATISTIC SCROLL DATA");
                         }
-                    }else{
+                    }
+                    else
+                    {
                         try
                         {
                             statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
                             context.SaveChanges();
                         }
-                        catch (Exception){}
+                        catch (Exception)
+                        {
+                            Console.WriteLine("ERROR UPDATE STATISTIC SCROLL DATA ID " + statisticHeatmap.TrackedHeatmapDataId);
+                        }
                     }
                 }
 
+
+                //click and hover
                 int max = currentID;
 
                 foreach (var item in trackedList)
@@ -124,7 +142,7 @@ namespace StatisticService
 
                         var client = new RestClient("http://localhost:7777/dom/coordinates/" + url);
                         Console.WriteLine("\n\n\n\n\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
-                        Console.WriteLine("request body:"+ requestData);
+                        Console.WriteLine("request body:" + requestData);
                         // client.Authenticator = new HttpBasicAuthenticator(username, password);
                         var request = new RestRequest();
                         request.AddParameter("url", url);
@@ -176,6 +194,26 @@ namespace StatisticService
                         continue;
                     }
 
+                }
+
+                //funnel
+                foreach (var trackedFunnelData in context.TrackedFunnelData.ToList())
+                {
+                    List<string> distinctData = JsonConvert.DeserializeObject<List<string>>(trackedFunnelData.TrackedSteps).Distinct().ToList();
+                    StatisticFunnel statisticFunnel = context.StatisticFunnel.Where(s => s.TrackedFunnelDataId == trackedFunnelData.TrackedFunnelDataId).FirstOrDefault();
+                    if (statisticFunnel != null)
+                    {
+                        statisticFunnel.StatisticData = JsonConvert.SerializeObject(distinctData);
+                        context.SaveChanges();
+                    }
+                    else
+                    {
+                        statisticFunnel = new StatisticFunnel();
+                        statisticFunnel.TrackedFunnelDataId = trackedFunnelData.TrackedFunnelDataId;
+                        statisticFunnel.StatisticData = JsonConvert.SerializeObject(distinctData);
+                        context.StatisticFunnel.Add(statisticFunnel);
+                        context.SaveChanges();
+                    }
                 }
 
                 return max;

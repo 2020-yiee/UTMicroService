@@ -24,5 +24,6 @@ namespace HeatMapAPIServices.Repository
         List<StatisticFunnel> getstatisticFunnelData(int trackingFunnelInfoID);
         object udpateFunnelTrackingInfo(udpateTrackingInfoRequest request, int v);
         object getStatisticHeatMap(int webID, int trackingInfoID, int from, int to,int device, int v);
+        Object getStatisticFunnel(int webID, int trackingFunnelInfoID, int from, int to, int userId);
     }
 }

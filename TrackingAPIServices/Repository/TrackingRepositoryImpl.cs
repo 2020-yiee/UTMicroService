@@ -54,6 +54,10 @@ namespace HeatMapAPIServices.Repository
                 trackedData.EventType = data.eventType;
                 var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
                 trackedData.CreatedAt = (long)timeSpan.TotalSeconds;
+                trackedData.SessionId = data.sessionID;
+                trackedData.ScreenWidth = data.screenWidth;
+                trackedData.ScreenHeight = data.screenHeight;
+
                 context.TrackedHeatmapData.Add(trackedData);
                 context.SaveChanges();
                 return true;
@@ -438,14 +442,15 @@ namespace HeatMapAPIServices.Repository
                 }
                 foreach (var eventType in EVENT_TYPE_LIST)
                 {
-                    switch (device)
-                    {
-                        case 0:
-                            List<int> trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                    List<TrackedHeatmapData> trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
                                 .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
                                 .Where(s => s.CreatedAt >= from)
                                 .Where(s => s.CreatedAt <= to)
-                                .Where(s => s.EventType == eventType)
+                                .Where(s => s.EventType == eventType).ToList();
+                    switch (device)
+                    {
+                        case 0:
+                            List<int> trackedHeatmapDataIds = trackedHeatmapDatas
                                 .Where(s => s.ScreenWidth < 540)
                                 .Select(s => s.TrackedHeatmapDataId).ToList();
                             List<StatisticHeatmap> statisticHeatmaps = context.StatisticHeatmap
@@ -459,11 +464,7 @@ namespace HeatMapAPIServices.Repository
                             if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
                             if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas); break;
                         case 1:
-                            trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
-                           .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
-                           .Where(s => s.CreatedAt >= from)
-                           .Where(s => s.CreatedAt <= to)
-                           .Where(s => s.EventType == eventType)
+                            trackedHeatmapDataIds = trackedHeatmapDatas
                            .Where(s => s.ScreenWidth < 768 && s.ScreenWidth >= 540)
                            .Select(s => s.TrackedHeatmapDataId).ToList();
                             statisticHeatmaps = context.StatisticHeatmap
@@ -477,11 +478,7 @@ namespace HeatMapAPIServices.Repository
                             if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
                             if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas); break;
                         case 2:
-                            trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
-                        .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
-                        .Where(s => s.CreatedAt >= from)
-                        .Where(s => s.CreatedAt <= to)
-                        .Where(s => s.EventType == eventType)
+                            trackedHeatmapDataIds = trackedHeatmapDatas
                         .Where(s => s.ScreenWidth >= 768)
                         .Select(s => s.TrackedHeatmapDataId).ToList();
                             statisticHeatmaps = context.StatisticHeatmap
@@ -497,29 +494,46 @@ namespace HeatMapAPIServices.Repository
                     }
                 }
 
+                //scroll
                 List<long> listScreenHeight = context.TrackedHeatmapData.Select(s => s.ScreenHeight).Distinct().ToList();
                 List<ScrollResponse> scrolls = new List<ScrollResponse>();
 
                 foreach (var item in listScreenHeight)
                 {
+                    long documentHeight = 0;
                     List<double> scrollData = new List<double>();
                     List<int> trackedDataIDs = new List<int>();
                     switch (device)
                     {
-                        case 0: trackedDataIDs = context.TrackedHeatmapData.Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth < 540).Select(s => s.TrackedHeatmapDataId).ToList(); break;
-                        case 1: trackedDataIDs = context.TrackedHeatmapData.Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth < 768 && s.ScreenWidth >= 540).Select(s => s.TrackedHeatmapDataId).ToList(); break;
-                        case 2: trackedDataIDs = context.TrackedHeatmapData.Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth >= 768).Select(s => s.TrackedHeatmapDataId).ToList(); break;
+                        case 0:
+                            trackedDataIDs = context.TrackedHeatmapData
+                            .Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth < 540)
+                            .Select(s => s.TrackedHeatmapDataId).ToList();
+                            break;
+                        case 1:
+                            trackedDataIDs = context.TrackedHeatmapData
+                                .Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth < 768 && s.ScreenWidth >= 540)
+                                .Select(s => s.TrackedHeatmapDataId).ToList();
+                            break;
+                        case 2:
+                            trackedDataIDs = context.TrackedHeatmapData
+                            .Where(s => s.ScreenHeight == item && s.EventType == 2 && s.ScreenWidth >= 768)
+                            .Select(s => s.TrackedHeatmapDataId).ToList();
+                            break;
                     }
                     foreach (var id in trackedDataIDs)
                     {
                         StatisticHeatmap statisticHeatmap = context.StatisticHeatmap.Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
-                        scrollData.AddRange(JsonConvert.DeserializeObject<List<double>>(statisticHeatmap.StatisticData));
+                        StatisticScrollData statisticScrollData = JsonConvert.DeserializeObject<StatisticScrollData>(statisticHeatmap.StatisticData);
+                        documentHeight = statisticScrollData.documentHeight;
+                        scrollData.AddRange(statisticScrollData.scroll);
                     }
 
                     if (trackedDataIDs.Count != 0)
                     {
                         ScrollResponse scrollResponse = new ScrollResponse();
                         scrollResponse.height = item;
+                        scrollResponse.documentHeight = documentHeight;
                         scrollResponse.positions = JsonConvert.SerializeObject(scrollData);
                         scrolls.Add(scrollResponse);
                     }
@@ -531,9 +545,7 @@ namespace HeatMapAPIServices.Repository
 
 
                 List<TrackedHeatmapData> datas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
-                        .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
-                        .Where(s => s.CreatedAt >= from)
-                        .Where(s => s.CreatedAt <= to)
+                        .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl && s.CreatedAt >= from && s.CreatedAt <= to)
                         .ToList();
 
                 List<DateTime> times = new List<DateTime>();
@@ -597,6 +609,54 @@ namespace HeatMapAPIServices.Repository
         {
             DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0);
             return origin.AddSeconds(timestamp);
+        }
+
+        public Object getStatisticFunnel(int webID, int trackingFunnelInfoID, int from, int to, int userId)
+        {
+            try
+            {
+                if (!checkAuthencation(webID, userId)) return null;
+                TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.FirstOrDefault(s => s.TrackingFunnelInfoId == trackingFunnelInfoID);
+                List<Step> trackingInfoFunnelSteps = JsonConvert.DeserializeObject<List<Step>>(trackingFunnelInfo.Steps);
+                List<int> trackedFunnelDataIDs = context.TrackedFunnelData
+                    .Where(s => s.WebId == webID && from <= s.CreatedAt && s.CreatedAt <= to)
+                    .Select(s => s.TrackedFunnelDataId)
+                    .ToList();
+                List<StatisticFunnel> statisticFunnels = context.StatisticFunnel.Where(s => trackedFunnelDataIDs.Contains(s.TrackedFunnelDataId)).ToList();
+                List<StatisticFunnelResponse> statisticFunnelResponses = new List<StatisticFunnelResponse>();
+                for (int i = 1; i <= trackingInfoFunnelSteps.Count; i++)
+                {
+                    List<Step> steps = trackingInfoFunnelSteps.GetRange(0, i);
+                    List<string> stepsUrl = steps.Select(s => s.stepUrl).ToList();
+                    string map = "";
+                    int count = 0;
+                    foreach (var item in stepsUrl)
+                    {
+                        map += item;
+                    }
+                    foreach (var item in statisticFunnels)
+                    {
+                        List<string> statisticData = JsonConvert.DeserializeObject<List<string>>(item.StatisticData);
+                        string statisticMap = "";
+                        foreach (var st in statisticData)
+                        {
+                            statisticMap += st;
+                        }
+                        if (statisticMap.Contains(map)) count++;
+                    }
+
+                    StatisticFunnelResponse statisticFunnelResponse =
+                        new StatisticFunnelResponse(trackingInfoFunnelSteps[i - 1].name, trackingInfoFunnelSteps[i - 1].stepUrl, count);
+                    statisticFunnelResponses.Add(statisticFunnelResponse);
+                }
+                return statisticFunnelResponses;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("\n==========================================================================\nERROR: " + ex.Message);
+                return null;
+            }
+
         }
 
     }
