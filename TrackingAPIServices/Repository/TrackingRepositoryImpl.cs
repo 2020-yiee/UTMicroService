@@ -615,7 +615,7 @@ namespace HeatMapAPIServices.Repository
         {
             try
             {
-                if (!checkAuthencation(webID, userId)) return null;
+                //if (!checkAuthencation(webID, userId)) return null;
                 TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.FirstOrDefault(s => s.TrackingFunnelInfoId == trackingFunnelInfoID);
                 List<Step> trackingInfoFunnelSteps = JsonConvert.DeserializeObject<List<Step>>(trackingFunnelInfo.Steps);
                 List<int> trackedFunnelDataIDs = context.TrackedFunnelData
@@ -628,21 +628,39 @@ namespace HeatMapAPIServices.Repository
                 {
                     List<Step> steps = trackingInfoFunnelSteps.GetRange(0, i);
                     List<string> stepsUrl = steps.Select(s => s.stepUrl).ToList();
-                    string map = "";
                     int count = 0;
-                    foreach (var item in stepsUrl)
-                    {
-                        map += item;
-                    }
                     foreach (var item in statisticFunnels)
                     {
                         List<string> statisticData = JsonConvert.DeserializeObject<List<string>>(item.StatisticData);
-                        string statisticMap = "";
-                        foreach (var st in statisticData)
+
+                        for (int j = 0; j < statisticData.Count; j++)
                         {
-                            statisticMap += st;
+                            int downcount = steps.Count;
+                            var matchStep = steps[0];
+                            if (statisticData[j].Equals(matchStep.stepUrl))
+                            {
+                                downcount -= 1;
+                                if (downcount == 0) count += 1;
+                                int index = j;
+                                while (downcount > 0)
+                                {
+                                    index += 1;
+                                    if (index >= statisticData.Count) break;
+                                    matchStep = steps[steps.IndexOf(matchStep) + 1];
+                                    string nextStep = statisticData[index];
+                                    if (nextStep.Equals(matchStep.stepUrl))
+                                    {
+                                        downcount -= 1;
+                                        if (downcount == 0) count += 1;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
                         }
-                        if (statisticMap.Contains(map)) count++;
+
                     }
 
                     StatisticFunnelResponse statisticFunnelResponse =
@@ -656,8 +674,7 @@ namespace HeatMapAPIServices.Repository
                 Console.WriteLine("\n==========================================================================\nERROR: " + ex.Message);
                 return null;
             }
-
         }
-
     }
+
 }

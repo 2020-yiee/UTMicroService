@@ -184,7 +184,7 @@ namespace HeatMapAPIServices.Controllers
             return Ok(result);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("api/funnel/statistic/{webID}/{trackingInfoID}")]
         public IActionResult getStatisticFunnel([FromRoute] int webID, [FromRoute] int trackingInfoID, int from, int to)
         {

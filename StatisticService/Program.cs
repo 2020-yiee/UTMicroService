@@ -146,7 +146,6 @@ namespace StatisticService
 
                         var client = new RestClient("http://localhost:7777/dom/coordinates/" + url);
                         Console.WriteLine("\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
-                        Console.WriteLine("request body:" + requestData);
                         // client.Authenticator = new HttpBasicAuthenticator(username, password);
                         var request = new RestRequest();
                         request.AddParameter("url", url);
@@ -203,7 +202,7 @@ namespace StatisticService
                 //funnel
                 foreach (var trackedFunnelData in context.TrackedFunnelData.ToList())
                 {
-                    List<string> distinctData = JsonConvert.DeserializeObject<List<string>>(trackedFunnelData.TrackedSteps).Distinct().ToList();
+                    List<string> distinctData = JsonConvert.DeserializeObject<List<string>>(trackedFunnelData.TrackedSteps).ToList();
                     StatisticFunnel statisticFunnel = context.StatisticFunnel.Where(s => s.TrackedFunnelDataId == trackedFunnelData.TrackedFunnelDataId).FirstOrDefault();
                     if (statisticFunnel != null)
                     {

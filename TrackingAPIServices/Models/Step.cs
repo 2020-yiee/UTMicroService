@@ -8,6 +8,7 @@ namespace StatisticAPIService.Models
     public class Step
     {
         public string name { get; set; }
+        public int type { get; set; }
         public string stepUrl { get; set; }
     }
 }
