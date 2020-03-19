@@ -615,7 +615,7 @@ namespace HeatMapAPIServices.Repository
         {
             try
             {
-                //if (!checkAuthencation(webID, userId)) return null;
+                if (!checkAuthencation(webID, userId)) return null;
                 TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.FirstOrDefault(s => s.TrackingFunnelInfoId == trackingFunnelInfoID);
                 List<Step> trackingInfoFunnelSteps = JsonConvert.DeserializeObject<List<Step>>(trackingFunnelInfo.Steps);
                 List<int> trackedFunnelDataIDs = context.TrackedFunnelData
