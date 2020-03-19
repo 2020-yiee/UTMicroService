@@ -10,6 +10,7 @@ namespace CustomersAPIServices.Models.RequestModels
         public string email { get; set; }
         public string fullName { get; set; }
         public string password { get; set; }
+        public string websiteName { get; set; }
         public string domainUrl { get; set; }
         public string organizationName { get; set; }
     }

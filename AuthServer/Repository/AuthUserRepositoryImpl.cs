@@ -35,15 +35,15 @@ namespace AuthServer.Repository
                     {
                         int totalUsers = context.User.Count();
                         int totalWebsites = context.Website.Count();
-                        
-                            return new
-                            {
-                                admin = admin,
-                                token = _helper.GenerateJwtToken(model.email, admin, "admin"),
-                                totalUsers = totalUsers,
-                                totalWebsites = totalWebsites
 
-                            };
+                        return new
+                        {
+                            admin = admin,
+                            token = _helper.GenerateJwtToken(model.email, admin, "admin"),
+                            totalUsers = totalUsers,
+                            totalWebsites = totalWebsites
+
+                        };
                     }
                     else
                     {
@@ -77,8 +77,8 @@ namespace AuthServer.Repository
                             {
                                 token = _helper.GenerateJwtToken(model.email, user, "user"),
                                 organizations = new List<Object>(),
-                                user = new {userID = user.UserId,fullName = user.FullName, email =  user.Email }
-                                
+                                user = new { userID = user.UserId, fullName = user.FullName, email = user.Email }
+
                             };
                         }
                         List<Organization> organizations = context.Organization
@@ -93,10 +93,12 @@ namespace AuthServer.Repository
                                     .Where(x => x.OrganizationId == organization.OrganizationId)
                                     .Where(x => x.Removed == false)
                                     .ToList()
-                                    .Select(x => new WebsiteResponse(x.WebId,x.DomainUrl, x.Removed, x.OrganizationId))
+                                    .Select(x => new WebsiteResponse(x.WebId, x.Name, x.DomainUrl, x.Removed, x.OrganizationId
+                                    , x.Verified, x.CreatedAt, context.User.Where(s => s.UserId == x.AuthorId).FirstOrDefault().FullName))
                                     .ToList();
+                            var access = context.Access.Where(s => s.UserId == user.UserId && s.OrganizationId == organization.OrganizationId).FirstOrDefault();
 
-                            organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name, websites));
+                            organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name, access.Role, websites));
                         }
 
                         return new
@@ -104,7 +106,7 @@ namespace AuthServer.Repository
                             token = _helper.GenerateJwtToken(model.email, user, "user"),
                             organizations = organizationResponses,
                             user = new { userID = user.UserId, fullName = user.FullName, email = user.Email }
-                            
+
                         };
                     }
                     else

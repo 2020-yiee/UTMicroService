@@ -1,6 +1,6 @@
 ﻿namespace HeatMapAPIServices.Controllers
 {
-    public class udpateTrackingInfoRequest
+    public class udpateTrackingStepInfoRequest
     {
         public int webID { get; set; }
         public int trackingFunnelInfoID { get; set; }

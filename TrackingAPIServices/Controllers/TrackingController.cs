@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using TrackingAPIServices.EFModels;
+using TrackingAPIServices.Models;
 
 namespace HeatMapAPIServices.Controllers
 {
@@ -138,9 +139,9 @@ namespace HeatMapAPIServices.Controllers
             else return BadRequest();
         }
 
-        [HttpPut("api/funnel-info")]
+        [HttpPut("api/funnel-info/step")]
         [Authorize]
-        public IActionResult updateNameStepsTrackingFunnelInfo([FromBody] udpateTrackingInfoRequest request)
+        public IActionResult updateNameStepsTrackingFunnelInfo([FromBody] udpateTrackingStepInfoRequest request)
         {
             var result = iRepository.udpateFunnelTrackingInfo(request, GetUserId());
             if (result != null)
@@ -150,7 +151,15 @@ namespace HeatMapAPIServices.Controllers
             else return BadRequest();
         }
 
-        
+        [HttpPut("api/funnel-info")]
+        [Authorize]
+        public IActionResult updateNamerackingFunnelInfo([FromBody] udpateTrackingNameInfoRequest request)
+        {
+            return iRepository.udpateNameFunnelTrackingInfo(request, GetUserId());
+            
+        }
+
+
         [HttpDelete("api/funnel-info")]
         [Authorize]
         public IActionResult deleteTrackingFunnelInfo(int trackingFunnelInfoID)

@@ -3,6 +3,7 @@ using CustomersAPIServices.EFModels;
 using CustomersAPIServices.Models;
 using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,10 +27,12 @@ namespace CustomersAPIServices.Repository
         object updateOrganization(UpdateOrganizationRequest request, int userId);
         object DeleteOrganization(int organizationID, int v);
         bool verifyWebsite(verifiedRequest request);
-        object getStatisticData(int webID, int trackingInfoID, int from, int to, int userId);
         User lockUser(LockRequest request);
         object getAllUserOrganizationAndWebsites(int userID);
         Object getAllWebSite();
         Website lockWebsite(LockRequest request);
+        IActionResult getAllMemberOfOrganization(int organizationIDs,int v);
+        IActionResult removeOrganzationMember(RemoveMemberRequest request, int v);
+        IActionResult changeNameWebsite(changeNameWebsiteRequest request, int v);
     }
 }

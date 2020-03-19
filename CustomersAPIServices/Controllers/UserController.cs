@@ -177,6 +177,13 @@ namespace CustomersAPIServices.Controllers
             return BadRequest();
         }
 
+        [HttpPut("api/user/website")]
+        [Authorize]
+        public IActionResult changeNameWebsite([FromBody] changeNameWebsiteRequest request)
+        {
+            return repository.changeNameWebsite(request, GetUserId());
+        }
+
 
 
         //===================================================================================
@@ -204,6 +211,21 @@ namespace CustomersAPIServices.Controllers
             Object result = repository.DeleteOrganization(organizationID,GetUserId());
             if (result != null) return Ok(result);
             return BadRequest();
+        }
+
+        [Authorize]
+        [HttpGet("api/user/organization/members")]
+        public IActionResult getMemberOrganization(int organizationID)
+        {
+            return repository.getAllMemberOfOrganization(organizationID, GetUserId());
+        }
+
+        [Authorize]
+        [HttpDelete("api/user/organization/member/remove")]
+        public IActionResult removeOrganizationMember([FromBody] RemoveMemberRequest request)
+        {
+            return repository.removeOrganzationMember(request, GetUserId());
+
         }
 
         //========================================================================================

@@ -1,5 +1,6 @@
 ﻿using HeatMapAPIServices.Controllers;
 using HeatMapAPIServices.Models;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RestSharp;
 using StatisticAPIService.Models;
@@ -98,6 +99,18 @@ namespace HeatMapAPIServices.Repository
             return false;
 
         }
+        private bool checkTrackingHeatmapInfoExisted1(int webId, string name)
+        {
+            List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == webId)
+                .ToList().Select(s => s.TrackingUrl).ToList();
+            List<string> listName = context.TrackingHeatmapInfo.Where(s => s.WebId == webId)
+                .ToList().Select(s => s.Name).ToList();
+
+            if ( listName.Contains(name) == true) return false;
+            Website web = context.Website.Where(s => s.WebId == webId).FirstOrDefault();
+            return false;
+
+        }
 
 
         public IEnumerable<TrackingHeatmapInfo> getCheckingHeatmapInfo(int websiteId, int userId)
@@ -165,7 +178,7 @@ namespace HeatMapAPIServices.Repository
 
         public TrackingHeatmapInfo updateTrackingHeatmapInfor(UpdateTrackingHeatmapInforRequest request, int userId)
         {
-            if (!checkTrackingHeatmapInfoExisted(request.webID, request.trackingUrl, request.name)) return null;
+            if (!checkTrackingHeatmapInfoExisted1(request.webID, request.name)) return null;
             if (!checkAuthencation(request.webID, userId)) return null;
             try
             {
@@ -175,7 +188,6 @@ namespace HeatMapAPIServices.Repository
                 {
                     info.WebId = request.webID;
                     info.Name = request.name;
-                    info.TrackingUrl = request.trackingUrl;
                     context.SaveChanges();
                     return info;
                 }
@@ -305,7 +317,7 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public object udpateFunnelTrackingInfo(udpateTrackingInfoRequest request, int userId)
+        public object udpateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int userId)
         {
             try
             {
@@ -674,6 +686,21 @@ namespace HeatMapAPIServices.Repository
                 Console.WriteLine("\n==========================================================================\nERROR: " + ex.Message);
                 return null;
             }
+        }
+
+        public IActionResult udpateNameFunnelTrackingInfo(udpateTrackingNameInfoRequest request, int v)
+        {
+            TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.Where(s => s.TrackingFunnelInfoId == request.trackingFunnelInfoID)
+                .FirstOrDefault();
+            if (trackingFunnelInfo == null) return new NotFoundResult();
+            Website website = context.Website.Where(s => s.WebId == trackingFunnelInfo.WebId).FirstOrDefault();
+            Access access = context.Access.Where(s => s.OrganizationId == website.OrganizationId
+            && s.UserId == v).FirstOrDefault();
+            if (access == null) return new BadRequestResult();
+            if (access.Role != 1) return new UnauthorizedResult();
+            trackingFunnelInfo.Name = request.newName;
+            context.SaveChanges();
+            return new OkObjectResult(trackingFunnelInfo);
         }
     }
 

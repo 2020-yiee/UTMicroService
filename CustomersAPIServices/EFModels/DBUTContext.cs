@@ -48,7 +48,21 @@ namespace CustomersAPIServices.EFModels
 
                 entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
 
+                entity.Property(e => e.DayJoin).HasColumnName("dayJoin");
+
                 entity.Property(e => e.Role).HasColumnName("role");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.Access)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Access_Organization");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Access)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Access_User");
             });
 
             modelBuilder.Entity<Admin>(entity =>
@@ -80,6 +94,8 @@ namespace CustomersAPIServices.EFModels
             modelBuilder.Entity<Organization>(entity =>
             {
                 entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
+
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -117,6 +133,10 @@ namespace CustomersAPIServices.EFModels
 
             modelBuilder.Entity<TrackedFunnelData>(entity =>
             {
+                entity.HasIndex(e => e.TrackedFunnelDataId)
+                    .HasName("IX_TrackedFunnelData")
+                    .IsUnique();
+
                 entity.Property(e => e.TrackedFunnelDataId).HasColumnName("trackedFunnelDataID");
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
@@ -148,7 +168,9 @@ namespace CustomersAPIServices.EFModels
 
                 entity.Property(e => e.ScreenWidth).HasColumnName("screenWidth");
 
-                entity.Property(e => e.SessionId).HasColumnName("sessionID");
+                entity.Property(e => e.SessionId)
+                    .IsRequired()
+                    .HasColumnName("sessionID");
 
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
@@ -183,7 +205,9 @@ namespace CustomersAPIServices.EFModels
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
-                entity.Property(e => e.ImageUrl).HasColumnName("imageUrl");
+                entity.Property(e => e.LgImageUrl).HasColumnName("lgImageUrl");
+
+                entity.Property(e => e.MdImageUrl).HasColumnName("mdImageUrl");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -191,6 +215,8 @@ namespace CustomersAPIServices.EFModels
                     .HasMaxLength(50);
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
+
+                entity.Property(e => e.SmImageUrl).HasColumnName("smImageUrl");
 
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
@@ -224,16 +250,36 @@ namespace CustomersAPIServices.EFModels
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
 
+                entity.Property(e => e.AuthorId).HasColumnName("authorID");
+
+                entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
+
                 entity.Property(e => e.DomainUrl)
                     .IsRequired()
                     .HasColumnName("domainUrl")
                     .IsUnicode(false);
+
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasColumnName("name");
 
                 entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
                 entity.Property(e => e.Verified).HasColumnName("verified");
+
+                entity.HasOne(d => d.Author)
+                    .WithMany(p => p.Website)
+                    .HasForeignKey(d => d.AuthorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Website_User");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.Website)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Website_Organization");
             });
         }
     }

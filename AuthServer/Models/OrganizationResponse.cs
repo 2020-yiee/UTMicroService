@@ -10,12 +10,14 @@ namespace AuthServer.Models
     {
         public int organizationID { get; set; }
         public string organizationName { get; set; }
+        public int userRole { get; set; }
         public List<WebsiteResponse> websites { get; set; }
 
-        public OrganizationResponse(int organizationID, string organizationName, List<WebsiteResponse> websites)
+        public OrganizationResponse(int organizationID, string organizationName, int userRole, List<WebsiteResponse> websites)
         {
             this.organizationID = organizationID;
             this.organizationName = organizationName;
+            this.userRole = userRole;
             this.websites = websites;
         }
     }

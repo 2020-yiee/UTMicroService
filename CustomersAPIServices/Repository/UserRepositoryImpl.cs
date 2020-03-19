@@ -2,6 +2,7 @@
 using CustomersAPIServices.Models;
 using CustomersAPIServices.Models.RequestModels;
 using CustomersAPIServices.Models.ResponseModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -42,10 +43,10 @@ namespace CustomersAPIServices.Repository
                 Organization organization = (Organization)createOrganization(new OrganizationRequest(request.organizationName), addUser.UserId);
 
                 List<WebsiteResponse> websites = new List<WebsiteResponse>();
-                    websites.Add(createWebsite(new CreateWebsiteRequest(organization.OrganizationId,request.domainUrl), addUser.UserId));
+                    websites.Add(createWebsite(new CreateWebsiteRequest(organization.OrganizationId,request.domainUrl,request.websiteName), addUser.UserId));
 
                 List<OrganizationResponse> organizationResponses = new List<OrganizationResponse>();
-                organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name,websites));
+                organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name,1,websites));
                 return new
                 {
                     
@@ -133,10 +134,12 @@ namespace CustomersAPIServices.Repository
                             .Where(x => x.OrganizationId == organization.OrganizationId)
                             .Where(x => x.Removed == false)
                             .ToList()
-                            .Select(x => new WebsiteResponse(x.WebId, x.DomainUrl, x.Removed, x.OrganizationId,x.Verified))
+                            .Select(x => new WebsiteResponse(x.WebId,x.Name, x.DomainUrl, x.Removed, x.OrganizationId
+                            ,x.Verified,x.CreatedAt,context.User.Where(s => s.UserId == x.AuthorId).FirstOrDefault().FullName))
                             .ToList();
+                    var access = context.Access.Where(s => s.UserId == userId && s.OrganizationId == organization.OrganizationId).FirstOrDefault();
 
-                    organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name, websites));
+                    organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name,access.Role, websites));
                 }
 
                 return new
@@ -184,7 +187,8 @@ namespace CustomersAPIServices.Repository
                 var websites = context.Website
                     .Where(s => s.Removed == false)
                     .Where(s => organizationIds.Contains(s.OrganizationId) == true)
-                    .Select(x => new WebsiteResponse(x.WebId, x.DomainUrl, x.Removed,x.OrganizationId,x.Verified)).ToList();
+                    .Select(x => new WebsiteResponse(x.WebId, x.Name,x.DomainUrl, x.Removed,x.OrganizationId
+                    ,x.Verified,x.CreatedAt,user.FullName)).ToList();
                 return websites;
                 
             }
@@ -237,13 +241,18 @@ namespace CustomersAPIServices.Repository
             website.Removed = false;
             website.OrganizationId = request.organizationID;
             website.Verified = false;
+            website.Name = request.name;
+            var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+            website.CreatedAt = (long)timeSpan.TotalSeconds;
+            website.AuthorId = userId;
             try
             {
                 context.Website.Add(website);
                 context.SaveChanges();
                 //Website temp = context.Website.Where(s => s.WebOwnerId == website.WebOwnerId)
                 //    .Where(s => s.WebUrl == website.WebUrl).FirstOrDefault();
-                return new WebsiteResponse(website.WebId, website.DomainUrl, website.Removed,website.OrganizationId,website.Verified);
+                return new WebsiteResponse(website.WebId, website.Name,website.DomainUrl, website.Removed
+                    ,website.OrganizationId,website.Verified,website.CreatedAt,user.FullName);
             }
             catch (Exception ex)
             {
@@ -331,49 +340,6 @@ namespace CustomersAPIServices.Repository
             }
             else return false;
         }
-
-        public object getStatisticData(int webID, int trackingInfoID, int from, int to, int userId)
-        {
-            GetStatisicHeatMap response = new GetStatisicHeatMap();
-            try
-            {
-                if (!checkAuthencation(webID, userId)) return null;
-                TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.WebId == webID)
-                .Where(s => s.TrackingHeatmapInfoId == trackingInfoID)
-                .FirstOrDefault();
-                response.imageUrl = trackingHeatmapInfo.ImageUrl;
-                foreach (var eventType in EVENT_TYPE_LIST)
-                {
-                    List<int> trackedHeatmapDataIds = context.TrackedHeatmapData.Where(s => s.WebId == webID)
-                    .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
-                    .Where(s => s.CreatedAt >= from)
-                    .Where(s => s.CreatedAt <= to)
-                    .Where(s => s.EventType == eventType)
-                    .Select(s => s.TrackedHeatmapDataId).ToList();
-                    List<StatisticHeatmap> statisticHeatmaps = context.StatisticHeatmap
-                        .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
-                    .ToList();
-                    List<StatisticData> statisticDatas = new List<StatisticData>();
-                    foreach (var item in statisticHeatmaps)
-                    {
-                        statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
-                    }
-                    if(eventType == 0)response.click = JsonConvert.SerializeObject(statisticDatas);
-                    if(eventType == 1)response.hover = JsonConvert.SerializeObject(statisticDatas);
-                    
-
-                }
-                
-                return response;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return null;
-                throw;
-            }
-        }
-
         private Boolean checkAuthencation(int websiteId, int userId)
         {
             List<int> orgIds = context.Access.Where(s => s.UserId == userId).Select(s => s.OrganizationId).ToList();
@@ -445,7 +411,58 @@ namespace CustomersAPIServices.Repository
 
         public object getAllWebSite()
         {
-            return context.Website.ToList();
+            List<Website> websites =  context.Website.ToList();
+            List<WebsiteResponse> responses = new List<WebsiteResponse>();
+            foreach (var website in websites)
+            {
+                User user = context.User.Where(s => s.UserId == website.AuthorId).FirstOrDefault();
+                if (user == null) return null;
+                WebsiteResponse response = new WebsiteResponse(website.WebId, website.Name, website.DomainUrl, website.Removed
+                    , website.OrganizationId, website.Verified, website.CreatedAt, user.FullName);
+                responses.Add(response);
+            }
+            return responses;
+        }
+
+        public IActionResult getAllMemberOfOrganization(int organizationID,int userID)
+        {
+            List<MemberResponse> memberResponses = new List<MemberResponse>();
+            
+            List<int> userIDs = context.Access.Where(s => s.OrganizationId == organizationID).Select(s => s.UserId).ToList();
+            foreach (var ID in userIDs)
+            {
+                User user = context.User.Where(s => s.UserId == ID).FirstOrDefault();
+                if (user == null) return new BadRequestResult();
+                Access userAccess = context.Access.Where(s => s.UserId == ID && s.OrganizationId == organizationID).FirstOrDefault();
+                if (userAccess == null) return new BadRequestResult();
+                MemberResponse memberResponse = new MemberResponse(user.UserId,user.Email, user.FullName, userAccess.Role,userAccess.DayJoin);
+                memberResponses.Add(memberResponse);
+            }
+            return new OkObjectResult(memberResponses);
+        }
+
+        public IActionResult removeOrganzationMember(RemoveMemberRequest request, int ownerID)
+        {
+            Access access = context.Access.Where(s => s.OrganizationId == request.organizationID && s.UserId == ownerID).FirstOrDefault();
+            if (access == null) return new BadRequestResult();
+            if (access.Role != 1) return new UnauthorizedResult();
+            access = context.Access.Where(s => s.UserId == request.userID && s.OrganizationId == request.organizationID).FirstOrDefault();
+            if (access == null) return new BadRequestResult();
+            context.Access.Remove(access);
+            context.SaveChanges();
+            return new OkResult();
+        }
+
+        public IActionResult changeNameWebsite(changeNameWebsiteRequest request, int v)
+        {
+            Website website = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
+            if (website == null) return new NotFoundResult();
+            Access access = context.Access.Where(s => s.OrganizationId == website.OrganizationId && s.UserId == v).FirstOrDefault();
+            if (access == null) return new BadRequestResult();
+            if (access.Role != 1) return new UnauthorizedResult();
+            website.Name = request.newName;
+            context.SaveChanges();
+            return new OkObjectResult(website);
         }
     }
 }
