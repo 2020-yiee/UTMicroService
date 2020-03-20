@@ -33,6 +33,5 @@ namespace CustomersAPIServices.Repository
         Website lockWebsite(LockRequest request);
         IActionResult getAllMemberOfOrganization(int organizationIDs,int v);
         IActionResult removeOrganzationMember(RemoveMemberRequest request, int v);
-        IActionResult changeNameWebsite(changeNameWebsiteRequest request, int v);
     }
 }

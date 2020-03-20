@@ -12,7 +12,6 @@ namespace CustomersAPIServices.EFModels
         public bool Verified { get; set; }
         public long CreatedAt { get; set; }
         public int AuthorId { get; set; }
-        public string Name { get; set; }
 
         public virtual User Author { get; set; }
         public virtual Organization Organization { get; set; }

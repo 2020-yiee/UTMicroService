@@ -176,16 +176,6 @@ namespace CustomersAPIServices.Controllers
             if (result) return Ok();
             return BadRequest();
         }
-
-        [HttpPut("api/user/website")]
-        [Authorize]
-        public IActionResult changeNameWebsite([FromBody] changeNameWebsiteRequest request)
-        {
-            return repository.changeNameWebsite(request, GetUserId());
-        }
-
-
-
         //===================================================================================
 
         [Authorize]

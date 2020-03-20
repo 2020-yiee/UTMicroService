@@ -93,7 +93,7 @@ namespace AuthServer.Repository
                                     .Where(x => x.OrganizationId == organization.OrganizationId)
                                     .Where(x => x.Removed == false)
                                     .ToList()
-                                    .Select(x => new WebsiteResponse(x.WebId, x.Name, x.DomainUrl, x.Removed, x.OrganizationId
+                                    .Select(x => new WebsiteResponse(x.WebId, x.DomainUrl, x.Removed, x.OrganizationId
                                     , x.Verified, x.CreatedAt, context.User.Where(s => s.UserId == x.AuthorId).FirstOrDefault().FullName))
                                     .ToList();
                             var access = context.Access.Where(s => s.UserId == user.UserId && s.OrganizationId == organization.OrganizationId).FirstOrDefault();

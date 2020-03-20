@@ -259,10 +259,6 @@ namespace CustomersAPIServices.EFModels
                     .HasColumnName("domainUrl")
                     .IsUnicode(false);
 
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasColumnName("name");
-
                 entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
 
                 entity.Property(e => e.Removed).HasColumnName("removed");

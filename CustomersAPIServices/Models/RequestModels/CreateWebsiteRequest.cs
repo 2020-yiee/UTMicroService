@@ -9,13 +9,11 @@ namespace CustomersAPIServices.Models.RequestModels
     {
         public int organizationID { get; set; }
         public string domainUrl { get; set; }
-        public string name { get; set; }
 
-        public CreateWebsiteRequest(int organizationID, string domainUrl, string name)
+        public CreateWebsiteRequest(int organizationID, string domainUrl)
         {
             this.organizationID = organizationID;
             this.domainUrl = domainUrl;
-            this.name = name;
         }
     }
 }
