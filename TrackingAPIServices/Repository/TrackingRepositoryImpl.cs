@@ -137,7 +137,10 @@ namespace HeatMapAPIServices.Repository
             if (orgIds == null || orgIds.Count == 0) return false;
             Website website = context.Website.FirstOrDefault(s => s.WebId == websiteId);
             if (website == null) return false;
-            return orgIds.Contains(website.OrganizationId);
+            if( !orgIds.Contains(website.OrganizationId)) return false;
+            if (context.Access.Where(s => s.OrganizationId == website.OrganizationId &&
+             s.UserId == userId).Select(s => s.Role).FirstOrDefault() != 1) return false;
+            return true;
         }
 
         public Object createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId)
@@ -178,16 +181,16 @@ namespace HeatMapAPIServices.Repository
 
         public TrackingHeatmapInfo updateTrackingHeatmapInfor(UpdateTrackingHeatmapInforRequest request, int userId)
         {
-            if (!checkTrackingHeatmapInfoExisted1(request.webID, request.name)) return null;
-            if (!checkAuthencation(request.webID, userId)) return null;
+            TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID).FirstOrDefault();
+            if (!checkTrackingHeatmapInfoExisted1(trackingHeatmapInfo.WebId, request.newName)) return null;
+            if (!checkAuthencation(trackingHeatmapInfo.WebId, userId)) return null;
             try
             {
                 TrackingHeatmapInfo info = context.TrackingHeatmapInfo
                     .Where(s => s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID).FirstOrDefault();
                 if (info != null)
                 {
-                    info.WebId = request.webID;
-                    info.Name = request.name;
+                    info.Name = request.newName;
                     context.SaveChanges();
                     return info;
                 }
@@ -698,6 +701,9 @@ namespace HeatMapAPIServices.Repository
             && s.UserId == v).FirstOrDefault();
             if (access == null) return new BadRequestResult();
             if (access.Role != 1) return new UnauthorizedResult();
+            List<string> names = context.TrackingFunnelInfo.Where(s => s.WebId == website.WebId)
+                .Select(s => s.Name).ToList();
+            if (names.Contains(request.newName)) return new BadRequestResult();
             trackingFunnelInfo.Name = request.newName;
             context.SaveChanges();
             return new OkObjectResult(trackingFunnelInfo);
