@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: service-user-88785bc84-h2j2p	
+  name: service-user-5cd84df589-x544f		
 spec:
   type: ClusterIP
   selector:

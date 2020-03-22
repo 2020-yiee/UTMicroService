@@ -4,7 +4,7 @@ using System.Text;
 
 namespace StatisticService.Models
 {
-    class TempData
+    class data
     {
         public string selector { get; set; }
         public int width { get; set; }
@@ -12,7 +12,7 @@ namespace StatisticService.Models
         public int offsetX { get; set; }
         public int offsetY { get; set; }
 
-        public TempData(string selector, int width, int height, int offsetX, int offsetY)
+        public data(string selector, int width, int height, int offsetX, int offsetY)
         {
             this.selector = selector;
             this.width = width;

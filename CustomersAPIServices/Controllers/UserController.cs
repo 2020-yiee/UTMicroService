@@ -60,18 +60,15 @@ namespace CustomersAPIServices.Controllers
         [HttpGet("api/admin/ors-and-webs")]
         public IActionResult getUserOrganizationAndWebsites(int userID)
         {
-            Object result = repository.getAllUserOrganizationAndWebsites(userID);
-            if (result != null) return Ok(result);
-            return BadRequest();
+            return repository.getAllUserOrganizationAndWebsites(userID);
         }
 
         [Authorize(Roles = "admin")]
         [HttpGet("api/admin/websites")]
         public IActionResult getAllWebsites()
         {
-            Object result = repository.getAllWebSite();
-            if (result != null) return Ok(result);
-            return BadRequest();
+            return repository.getAllWebSite();
+            
         }
 
         [Authorize(Roles = "admin")]
@@ -82,8 +79,6 @@ namespace CustomersAPIServices.Controllers
             if (result != null) return Ok(result);
             return BadRequest();
         }
-
-
 
         //====================================user crud======================================================
         [Authorize]
@@ -99,17 +94,15 @@ namespace CustomersAPIServices.Controllers
             {
                 return BadRequest(ex.Message);
                 throw;
-            }
-            
+            }    
             return BadRequest();
         }
 
         [HttpPost("api/user")]
         public IActionResult CreateUser([FromBody] CreateUserRequest request)
         {
-            var user = repository.createUser(request);
-            if (user != null) return Ok(user);
-            return BadRequest(user);
+            return repository.createUser(request);
+            
         }
 
         [HttpPut("api/user")]

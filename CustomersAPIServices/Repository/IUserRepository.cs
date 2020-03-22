@@ -13,7 +13,7 @@ namespace CustomersAPIServices.Repository
 {
     public interface IUserRepository
     {
-        Object createUser(CreateUserRequest webOwner);
+        IActionResult createUser(CreateUserRequest webOwner);
         IEnumerable<User> getAllUsers();
         Object getUser(int webOwnerId);
 
@@ -28,8 +28,8 @@ namespace CustomersAPIServices.Repository
         object DeleteOrganization(int organizationID, int v);
         bool verifyWebsite(verifiedRequest request);
         User lockUser(LockRequest request);
-        object getAllUserOrganizationAndWebsites(int userID);
-        Object getAllWebSite();
+        IActionResult getAllUserOrganizationAndWebsites(int userID);
+        IActionResult getAllWebSite();
         Website lockWebsite(LockRequest request);
         IActionResult getAllMemberOfOrganization(int organizationIDs,int v);
         IActionResult removeOrganzationMember(RemoveMemberRequest request, int v);

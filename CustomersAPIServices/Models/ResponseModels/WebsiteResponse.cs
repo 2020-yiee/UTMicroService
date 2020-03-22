@@ -14,8 +14,9 @@ namespace CustomersAPIServices.Models.ResponseModels
         public bool verified { get; set; }
         public long createdAt { get; set; }
         public string authorName { get; set; }
+        public int authorID { get; set; }
 
-        public WebsiteResponse(int webID, string webUrl, bool removed, int organizationID, bool verified, long createdAt, string authorName)
+        public WebsiteResponse(int webID, string webUrl, bool removed, int organizationID, bool verified, long createdAt, string authorName, int authorID)
         {
             this.webID = webID;
             this.webUrl = webUrl;
@@ -24,6 +25,7 @@ namespace CustomersAPIServices.Models.ResponseModels
             this.verified = verified;
             this.createdAt = createdAt;
             this.authorName = authorName;
+            this.authorID = authorID;
         }
     }
 }

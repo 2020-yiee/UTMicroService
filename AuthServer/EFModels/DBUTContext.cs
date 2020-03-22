@@ -32,7 +32,7 @@ namespace AuthServer.EFModels
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("server=swhdb.database.windows.net;Database=DBUT;Trusted_Connection=False;user Id=adminSWhDb;password=vuquanghuy123!");
+                optionsBuilder.UseSqlServer("server=34.87.164.163;Database=DBUT;Trusted_Connection=False;user Id=sqlserver;password=123");
             }
         }
 
@@ -44,25 +44,13 @@ namespace AuthServer.EFModels
             {
                 entity.HasKey(e => new { e.UserId, e.OrganizationId });
 
-                entity.Property(e => e.UserId).HasColumnName("userID");
+                entity.Property(e => e.UserId).HasColumnName("userId");
 
-                entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
+                entity.Property(e => e.OrganizationId).HasColumnName("organizationId");
 
                 entity.Property(e => e.DayJoin).HasColumnName("dayJoin");
 
                 entity.Property(e => e.Role).HasColumnName("role");
-
-                entity.HasOne(d => d.Organization)
-                    .WithMany(p => p.Access)
-                    .HasForeignKey(d => d.OrganizationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Access_Organization");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.Access)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Access_User");
             });
 
             modelBuilder.Entity<Admin>(entity =>
@@ -73,13 +61,11 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.Email)
                     .IsRequired()
-                    .HasColumnName("email")
-                    .HasMaxLength(50);
+                    .HasColumnName("email");
 
                 entity.Property(e => e.FullName)
                     .IsRequired()
-                    .HasColumnName("fullName")
-                    .HasMaxLength(50);
+                    .HasColumnName("fullName");
 
                 entity.Property(e => e.Password)
                     .IsRequired()
@@ -87,8 +73,7 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.Username)
                     .IsRequired()
-                    .HasColumnName("username")
-                    .HasMaxLength(50);
+                    .HasColumnName("username");
             });
 
             modelBuilder.Entity<Organization>(entity =>
@@ -99,8 +84,7 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasColumnName("name")
-                    .HasMaxLength(50);
+                    .HasColumnName("name");
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
             });
@@ -122,6 +106,8 @@ namespace AuthServer.EFModels
             {
                 entity.HasKey(e => e.TrackedHeatmapDataId);
 
+                entity.ToTable("statisticHeatmap");
+
                 entity.Property(e => e.TrackedHeatmapDataId)
                     .HasColumnName("trackedHeatmapDataID")
                     .ValueGeneratedNever();
@@ -133,10 +119,6 @@ namespace AuthServer.EFModels
 
             modelBuilder.Entity<TrackedFunnelData>(entity =>
             {
-                entity.HasIndex(e => e.TrackedFunnelDataId)
-                    .HasName("IX_TrackedFunnelData")
-                    .IsUnique();
-
                 entity.Property(e => e.TrackedFunnelDataId).HasColumnName("trackedFunnelDataID");
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
@@ -168,9 +150,7 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.ScreenWidth).HasColumnName("screenWidth");
 
-                entity.Property(e => e.SessionId)
-                    .IsRequired()
-                    .HasColumnName("sessionID");
+                entity.Property(e => e.SessionId).HasColumnName("sessionID");
 
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
@@ -187,8 +167,7 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasColumnName("name")
-                    .HasMaxLength(50);
+                    .HasColumnName("name");
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
@@ -211,8 +190,7 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.Name)
                     .IsRequired()
-                    .HasColumnName("name")
-                    .HasMaxLength(50);
+                    .HasColumnName("name");
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
@@ -256,26 +234,13 @@ namespace AuthServer.EFModels
 
                 entity.Property(e => e.DomainUrl)
                     .IsRequired()
-                    .HasColumnName("domainUrl")
-                    .IsUnicode(false);
+                    .HasColumnName("domainUrl");
 
                 entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
 
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
                 entity.Property(e => e.Verified).HasColumnName("verified");
-
-                entity.HasOne(d => d.Author)
-                    .WithMany(p => p.Website)
-                    .HasForeignKey(d => d.AuthorId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Website_User");
-
-                entity.HasOne(d => d.Organization)
-                    .WithMany(p => p.Website)
-                    .HasForeignKey(d => d.OrganizationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Website_Organization");
             });
         }
     }

@@ -9,8 +9,5 @@ namespace AuthServer.EFModels
         public int OrganizationId { get; set; }
         public int Role { get; set; }
         public long DayJoin { get; set; }
-
-        public virtual Organization Organization { get; set; }
-        public virtual User User { get; set; }
     }
 }

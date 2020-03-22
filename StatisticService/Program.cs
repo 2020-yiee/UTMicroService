@@ -14,7 +14,7 @@ namespace StatisticService
         private static readonly DBUTContext context = new DBUTContext();
 
 
-        public static void Main(string[] args)
+        public static async System.Threading.Tasks.Task Main(string[] args)
         {
             List<int> EVENT_TYPE_LIST = new List<int>();
             int currentID = -1;
@@ -26,85 +26,93 @@ namespace StatisticService
             while (true)
             {
                 Console.WriteLine("\n\n\n\n*********\nNEW ROUND WITH ID " + currentID + "\n*********\n");
-                currentID = updateStatisticData();
+                currentID = await updateStatisticData();
                 Thread.Sleep(6 * 60 * 1000);
             }
 
 
+            
 
-            int updateStatisticData()
+            async System.Threading.Tasks.Task<int> updateStatisticData()
             {
                 List<TrackedHeatmapData> trackedList = context.TrackedHeatmapData.Where(s => s.TrackedHeatmapDataId > currentID)
                 .Where(s => EVENT_TYPE_LIST.Contains(s.EventType)).ToList();
 
                 //scroll data
                 List<TrackedHeatmapData> trackedScrollData = context.TrackedHeatmapData.Where(s => s.EventType == 2 && s.TrackedHeatmapDataId > currentID).ToList();
-                foreach (var item in trackedScrollData)
+                try
                 {
-                    ScrollDatas scrollData = JsonConvert.DeserializeObject<ScrollDatas>(item.Data);
-                    List<ScrollData> scrolls = scrollData.scroll;
-
-                    List<double> positions = scrolls.Select(s => s.position).Distinct().ToList();
-
-                    List<ScrollData> maps = new List<ScrollData>();
-                    foreach (var position in positions)
+                    foreach (var item in trackedScrollData)
                     {
-                        List<double> durations = scrolls.Where(s => s.position == position).Select(s => s.duration).ToList();
-                        double sum = durations.Sum();
-                        maps.Add(new ScrollData(position, sum));
-                    }
+                        ScrollDatas scrollData = JsonConvert.DeserializeObject<ScrollDatas>(item.Data);
+                        List<ScrollData> scrolls = scrollData.scroll;
 
+                        List<double> positions = scrolls.Select(s => s.position).Distinct().ToList();
 
-                    List<double> statisticScroll = new List<double>();
-                    foreach (var map in maps)
-                    {
-
-                        double top = map.duration < 10 ? map.duration : 10;
-                        if (map.duration >= 1)
-                            for (int i = 1; i <= top; i++)
-                            {
-                                statisticScroll.Add(map.position);
-                            }
-                    }
-
-                    StatisticScrollData statisticScrollData = new StatisticScrollData();
-                    statisticScrollData.documentHeight = scrollData.documentHeight;
-                    statisticScrollData.scroll = statisticScroll;
-
-
-                    StatisticHeatmap statisticHeatmap = context.StatisticHeatmap
-                        .Where(s => s.TrackedHeatmapDataId == item.TrackedHeatmapDataId).FirstOrDefault();
-                    if (statisticHeatmap == null)
-                    {
-                        statisticHeatmap = new StatisticHeatmap();
-                        statisticHeatmap.TrackedHeatmapDataId = item.TrackedHeatmapDataId;
-                        statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
-                        try
+                        List<ScrollData> maps = new List<ScrollData>();
+                        foreach (var position in positions)
                         {
-                            
-                            context.StatisticHeatmap.Add(statisticHeatmap);
-                            context.SaveChanges();
-                            Console.WriteLine("STATISTIC SCROLL DATA FOR ID " + statisticHeatmap.TrackedHeatmapDataId);
+                            List<double> durations = scrolls.Where(s => s.position == position).Select(s => s.duration).ToList();
+                            double sum = durations.Sum();
+                            maps.Add(new ScrollData(position, sum));
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("ERROR ADD STATISTIC SCROLL DATA");
-                        }
-                    }
-                    else
-                    {
-                        try
+
+
+                        List<double> statisticScroll = new List<double>();
+                        foreach (var map in maps)
                         {
 
-                            Console.WriteLine("STATISTIC SCROLL DATA FOR ID " + statisticHeatmap.TrackedHeatmapDataId);
+                            double top = map.duration < 10 ? map.duration : 10;
+                            if (map.duration >= 1)
+                                for (int i = 1; i <= top; i++)
+                                {
+                                    statisticScroll.Add(map.position);
+                                }
+                        }
+
+                        StatisticScrollData statisticScrollData = new StatisticScrollData();
+                        statisticScrollData.documentHeight = scrollData.documentHeight;
+                        statisticScrollData.scroll = statisticScroll;
+
+
+                        StatisticHeatmap statisticHeatmap = context.StatisticHeatmap
+                            .Where(s => s.TrackedHeatmapDataId == item.TrackedHeatmapDataId).FirstOrDefault();
+                        if (statisticHeatmap == null)
+                        {
+                            statisticHeatmap = new StatisticHeatmap();
+                            statisticHeatmap.TrackedHeatmapDataId = item.TrackedHeatmapDataId;
                             statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
-                            context.SaveChanges();
+                            try
+                            {
+
+                                context.StatisticHeatmap.Add(statisticHeatmap);
+                                await context.SaveChangesAsync();
+                                Console.WriteLine("STATISTIC SCROLL DATA FOR ID " + statisticHeatmap.TrackedHeatmapDataId);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine("ERROR ADD STATISTIC SCROLL DATA");
+                            }
                         }
-                        catch (Exception)
+                        else
                         {
-                            Console.WriteLine("ERROR UPDATE STATISTIC SCROLL DATA ID " + statisticHeatmap.TrackedHeatmapDataId);
+                            try
+                            {
+
+                                Console.WriteLine("STATISTIC SCROLL DATA FOR ID " + statisticHeatmap.TrackedHeatmapDataId);
+                                statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
+                                await context.SaveChangesAsync();
+                            }
+                            catch (Exception)
+                            {
+                                Console.WriteLine("ERROR UPDATE STATISTIC SCROLL DATA ID " + statisticHeatmap.TrackedHeatmapDataId);
+                            }
                         }
                     }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("scrool data error: do not add documentHeight");
                 }
 
 
@@ -123,15 +131,19 @@ namespace StatisticService
                     try
                     {
                         List<TrackedHeatmapData> subTrackedList = trackedList.Where(s => s.TrackingUrl == url).ToList();
-                        List<RequestData> requestData = new List<RequestData>();
+                        List<List<RequestData>> requestData = new List<List<RequestData>>();
+                        List<RequestData> mobile = new List<RequestData>();
+                        List<RequestData> tablet = new List<RequestData>();
+                        List<RequestData> desktop = new List<RequestData>();
+
                         foreach (var subItem in subTrackedList)
                         {
                             //List<RequestData> requestData = new List<RequestData>();
 
-                            List<TempData> data = new List<TempData>();
+                            List<data> data = new List<data>();
                             try
                             {
-                                data = JsonConvert.DeserializeObject<List<TempData>>(subItem.Data);
+                                data = JsonConvert.DeserializeObject<List<data>>(subItem.Data);
                             }
                             catch (Exception)
                             {
@@ -139,10 +151,25 @@ namespace StatisticService
                             if (data != null || data.Count != 0)
                                 foreach (var item in data)
                                 {
-                                    requestData.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
+                                    if (subItem.ScreenWidth < 540)
+                                    {
+                                        mobile.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
+                                    }
+                                    if (540 <= subItem.ScreenWidth && subItem.ScreenWidth < 768)
+                                    {
+                                        tablet.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
+                                    }
+                                    if (subItem.ScreenWidth >= 768)
+                                    {
+                                        desktop.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
+                                    }
                                 }
 
                         }
+
+                        requestData.Add(mobile);
+                        requestData.Add(tablet);
+                        requestData.Add(desktop);
 
                         var client = new RestClient("http://localhost:7777/dom/coordinates/" + url);
                         Console.WriteLine("\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
@@ -150,41 +177,51 @@ namespace StatisticService
                         var request = new RestRequest();
                         request.AddParameter("url", url);
                         request.AddHeader("Content-Type", "application/json");
+                        var json = JsonConvert.SerializeObject(requestData);
                         request.AddJsonBody(requestData);
                         var response = client.Post(request);
                         var content = response.Content;
 
                         Console.WriteLine(" done call api" + "\n===================================================================================\n" + "Response:\n");
-                        Console.WriteLine(content.ToString());
-
+                        Console.WriteLine(response.StatusCode +" "+response.ErrorMessage);
                         List<ResponseData> responseData = new List<ResponseData>();
                         var settings = new JsonSerializerSettings
                         {
                             NullValueHandling = NullValueHandling.Include,
                             MissingMemberHandling = MissingMemberHandling.Ignore
                         };
-                        responseData = JsonConvert.DeserializeObject<List<ResponseData>>(content);
+
+                        List<List<ResponseData>> responseDatas = JsonConvert.DeserializeObject<List<List<ResponseData>>>(content);
+                        foreach (var item in responseDatas)
+                        {
+                            responseData.AddRange(item);
+                        }
+
+                        //responseData = JsonConvert.DeserializeObject<List<ResponseData>>(content);
 
                         List<int> uniqueTrackedHeatmapDataID = responseData.Select(s => s.trackedHeatmapDataID).Distinct().ToList();
 
                         foreach (var id in uniqueTrackedHeatmapDataID)
                         {
                             List<ResponseData> subData = responseData.Where(s => s.trackedHeatmapDataID == id).ToList();
-                            StatisticHeatmap statisticHeatmap = new StatisticHeatmap();
-                            statisticHeatmap.TrackedHeatmapDataId = id;
-                            List<StatisticData> statisticDatas = new List<StatisticData>();
-                            foreach (var item in subData)
+                            StatisticHeatmap statisticHeatmap = context.StatisticHeatmap.Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
+                            if (statisticHeatmap == null)
                             {
-                                statisticDatas.Add(new StatisticData(item.x, item.y));
-                            }
-                            statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticDatas);
-                            try
-                            {
-                                context.StatisticHeatmap.Add(statisticHeatmap);
-                                context.SaveChanges();
-                            }
-                            catch (Exception ex)
-                            {
+                                statisticHeatmap.TrackedHeatmapDataId = id;
+                                List<StatisticData> statisticDatas = new List<StatisticData>();
+                                foreach (var item in subData)
+                                {
+                                    statisticDatas.Add(new StatisticData(item.x, item.y));
+                                }
+                                statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticDatas);
+                                try
+                                {
+                                    context.StatisticHeatmap.Add(statisticHeatmap);
+                                    await context.SaveChangesAsync();
+                                }
+                                catch (Exception ex)
+                                {
+                                }
                             }
 
                         }
@@ -198,26 +235,19 @@ namespace StatisticService
                     }
 
                 }
-
                 //funnel
                 foreach (var trackedFunnelData in context.TrackedFunnelData.ToList())
                 {
-                    List<string> distinctData = JsonConvert.DeserializeObject<List<string>>(trackedFunnelData.TrackedSteps).ToList();
+                    
                     StatisticFunnel statisticFunnel = context.StatisticFunnel.Where(s => s.TrackedFunnelDataId == trackedFunnelData.TrackedFunnelDataId).FirstOrDefault();
-                    if (statisticFunnel != null)
+                    if (statisticFunnel == null)
                     {
                         Console.WriteLine("ADD STATISTIC FUNNEL FOR ID " + trackedFunnelData.TrackedFunnelDataId);
-                        statisticFunnel.StatisticData = JsonConvert.SerializeObject(distinctData);
-                        context.SaveChanges();
-                    }
-                    else
-                    {
-                        Console.WriteLine("ADD STATISTIC FUNNEL FOR ID " + trackedFunnelData.TrackedFunnelDataId);
-                        statisticFunnel = new StatisticFunnel();
-                        statisticFunnel.TrackedFunnelDataId = trackedFunnelData.TrackedFunnelDataId;
-                        statisticFunnel.StatisticData = JsonConvert.SerializeObject(distinctData);
-                        context.StatisticFunnel.Add(statisticFunnel);
-                        context.SaveChanges();
+                        StatisticFunnel newStatisticFunnel = new StatisticFunnel();
+                        newStatisticFunnel.TrackedFunnelDataId = trackedFunnelData.TrackedFunnelDataId;
+                        newStatisticFunnel.StatisticData = trackedFunnelData.TrackedSteps;
+                        context.StatisticFunnel.Add(newStatisticFunnel);
+                        await context.SaveChangesAsync();
                     }
                 }
 

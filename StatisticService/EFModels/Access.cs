@@ -8,5 +8,6 @@ namespace StatisticService.EFModels
         public int UserId { get; set; }
         public int OrganizationId { get; set; }
         public int Role { get; set; }
+        public long DayJoin { get; set; }
     }
 }

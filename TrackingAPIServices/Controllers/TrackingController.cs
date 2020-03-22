@@ -59,7 +59,7 @@ namespace HeatMapAPIServices.Controllers
         [HttpGet("api/user/statistic/{webID}/{trackingInfoID}")]
         public IActionResult getStatisticHeatmap([FromRoute] int webID, [FromRoute] int trackingInfoID, int from, int to, int device)
         {
-            Object result = iRepository.getStatisticHeatMap(webID, trackingInfoID, from, to,device, GetUserId());
+            Object result = iRepository.getStatisticHeatMap(webID, trackingInfoID, from, to, device, GetUserId());
             if (result != null) return Ok(result);
             return BadRequest();
         }
@@ -71,9 +71,8 @@ namespace HeatMapAPIServices.Controllers
         [Authorize]
         public IActionResult getTrackingHeatmapInfo(int webID)
         {
-            List<TrackingHeatmapInfo> infor = iRepository.getCheckingHeatmapInfo(webID, GetUserId()).ToList();
-            if (infor != null) return Ok(infor);
-            return BadRequest();
+           return iRepository.getCheckingHeatmapInfo(webID, GetUserId());
+            
         }
 
         [HttpPost("api/tracking-info")]
@@ -81,12 +80,8 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult createTrackingInfo([FromBody]CreateTrackingHeatmapInforRequest request)
         {
 
-            var result = iRepository.createHeatmapTrackingInfor(request, GetUserId());
-            if (result != null)
-            {
-                return Ok(result);
-            }
-            else return BadRequest();
+           return iRepository.createHeatmapTrackingInfor(request, GetUserId());
+           
         }
 
         [HttpPut("api/tracking-info")]
@@ -131,12 +126,8 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult createTrackingFunnelInfo([FromBody]CreateTrackingFunnelInforRequest request)
         {
 
-            var result = iRepository.createFunnelTrackingInfo(request, GetUserId());
-            if (result != null)
-            {
-                return Ok(result);
-            }
-            else return BadRequest();
+            return iRepository.createFunnelTrackingInfo(request, GetUserId());
+            
         }
 
         [HttpPut("api/funnel-info/step")]
@@ -156,7 +147,7 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult updateNamerackingFunnelInfo([FromBody] udpateTrackingNameInfoRequest request)
         {
             return iRepository.udpateNameFunnelTrackingInfo(request, GetUserId());
-            
+
         }
 
 
@@ -164,7 +155,7 @@ namespace HeatMapAPIServices.Controllers
         [Authorize]
         public IActionResult deleteTrackingFunnelInfo(int trackingFunnelInfoID)
         {
-            
+
             bool result = iRepository.deleteTrackingFunnelInfo(trackingFunnelInfoID, GetUserId());
             if (result)
             {
@@ -182,7 +173,7 @@ namespace HeatMapAPIServices.Controllers
             return BadRequest();
         }
 
-        
+
 
         //=================================statistic funnel=====================================================
         [HttpGet("api/statistic-funnel-data")]

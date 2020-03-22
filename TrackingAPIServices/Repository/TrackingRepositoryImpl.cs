@@ -18,12 +18,18 @@ namespace HeatMapAPIServices.Repository
         private readonly DBUTContext context = new DBUTContext();
 
         private List<int> EVENT_TYPE_LIST = new List<int>();
+        private List<string> TYPEURL = new List<string>();
 
         public TrackingRepositoryImpl()
         {
             EVENT_TYPE_LIST.Add(2);
             EVENT_TYPE_LIST.Add(1);
             EVENT_TYPE_LIST.Add(0);
+            TYPEURL.Add("match");
+            TYPEURL.Add("start-with");
+            TYPEURL.Add("end-with");
+            TYPEURL.Add("contain");
+            TYPEURL.Add("regex");
         }
 
         public IEnumerable<TrackedHeatmapData> getTrackedHeatmapData(string trackingUrl, int type)
@@ -44,20 +50,22 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public bool createTrackedHeatmapData(SaveDataRequest data)
+        public bool createTrackedHeatmapData(SaveDataRequest request)
         {
             try
             {
                 TrackedHeatmapData trackedData = new TrackedHeatmapData();
-                trackedData.TrackingUrl = data.trackingUrl;
-                trackedData.WebId = data.webID;
-                trackedData.Data = data.data;
-                trackedData.EventType = data.eventType;
+                trackedData.TrackingUrl = request.trackingUrl;
+                trackedData.WebId = request.webID;
+                Website website = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
+                website.Verified = true;
+                trackedData.Data = request.data;
+                trackedData.EventType = request.eventType;
                 var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
                 trackedData.CreatedAt = (long)timeSpan.TotalSeconds;
-                trackedData.SessionId = data.sessionID;
-                trackedData.ScreenWidth = data.screenWidth;
-                trackedData.ScreenHeight = data.screenHeight;
+                trackedData.SessionId = request.sessionID;
+                trackedData.ScreenWidth = request.screenWidth;
+                trackedData.ScreenHeight = request.screenHeight;
 
                 context.TrackedHeatmapData.Add(trackedData);
                 context.SaveChanges();
@@ -106,28 +114,28 @@ namespace HeatMapAPIServices.Repository
             List<string> listName = context.TrackingHeatmapInfo.Where(s => s.WebId == webId)
                 .ToList().Select(s => s.Name).ToList();
 
-            if ( listName.Contains(name) == true) return false;
+            if (listName.Contains(name) == true) return false;
             Website web = context.Website.Where(s => s.WebId == webId).FirstOrDefault();
             return false;
 
         }
 
 
-        public IEnumerable<TrackingHeatmapInfo> getCheckingHeatmapInfo(int websiteId, int userId)
+        public IActionResult getCheckingHeatmapInfo(int websiteId, int userId)
         {
             try
             {
-                if (!checkAuthencation(websiteId, userId)) return null;
+                if (!checkAuthencation(websiteId, userId)) return new UnauthorizedResult();
                 IEnumerable<TrackingHeatmapInfo> trackingInfo = context.TrackingHeatmapInfo
                     .Where(s => s.WebId == websiteId)
                     .Where(s => s.Removed == false)
                     .ToList();
-                return trackingInfo;
+                return new OkObjectResult(trackingInfo);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR: " + ex.Message);
-                return null;
+                return new BadRequestResult();
             }
         }
 
@@ -137,17 +145,18 @@ namespace HeatMapAPIServices.Repository
             if (orgIds == null || orgIds.Count == 0) return false;
             Website website = context.Website.FirstOrDefault(s => s.WebId == websiteId);
             if (website == null) return false;
-            if( !orgIds.Contains(website.OrganizationId)) return false;
+            if (!orgIds.Contains(website.OrganizationId)) return false;
             if (context.Access.Where(s => s.OrganizationId == website.OrganizationId &&
              s.UserId == userId).Select(s => s.Role).FirstOrDefault() != 1) return false;
             return true;
         }
 
-        public Object createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId)
+        public IActionResult createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId)
         {
-            if (!checkAuthencation(request.webID, userId)) return null;
-            if (checkTrackingHeatmapInfoExisted(request.webID, request.trackingUrl, request.name)) return null;
+            if (!checkAuthencation(request.webID, userId)) return new BadRequestResult();
+            if (checkTrackingHeatmapInfoExisted(request.webID, request.trackingUrl, request.name)) return new BadRequestResult();
             if (!checkDomainUrl(request.webID, request.trackingUrl)) return null;
+            if (!TYPEURL.Contains(request.typeUrl)) return new BadRequestResult();
             TrackingHeatmapInfo info = new TrackingHeatmapInfo();
             info.WebId = request.webID;
             info.Name = request.name;
@@ -155,6 +164,7 @@ namespace HeatMapAPIServices.Repository
             info.Removed = false;
             var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
             info.CreatedAt = (long)timeSpan.TotalSeconds;
+            info.TypeUrl = request.typeUrl;
             try
             {
                 context.TrackingHeatmapInfo.Add(info);
@@ -170,12 +180,12 @@ namespace HeatMapAPIServices.Repository
                 info.MdImageUrl = captureResponse.mdImageUrl;
                 info.LgImageUrl = captureResponse.lgImageUrl;
                 context.SaveChanges();
-                return info;
+                return new OkObjectResult(info);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR: " + ex.Message);
-                return null;
+                return new BadRequestResult();
             }
         }
 
@@ -267,6 +277,7 @@ namespace HeatMapAPIServices.Repository
                 foreach (Step item in deserializedSteps)
                 {
                     if (!item.stepUrl.Contains(domainUrl)) return false;
+                    if (!TYPEURL.Contains(item.typeUrl)) return false;
                 }
             }
             catch (Exception ex)
@@ -295,11 +306,11 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public object createFunnelTrackingInfo(CreateTrackingFunnelInforRequest request, int userId)
+        public IActionResult createFunnelTrackingInfo(CreateTrackingFunnelInforRequest request, int userId)
         {
-            if (!checkAuthencation(request.webID, userId)) return null;
-            if (checkTrackingFunnelInfoExisted(request.webID, request.steps.ToString(), request.name)) return null;
-            if (!checkStepDomainUrl(request.webID, request.steps.ToString())) return null;
+            if (!checkAuthencation(request.webID, userId)) return new BadRequestResult();
+            if (checkTrackingFunnelInfoExisted(request.webID, request.steps.ToString(), request.name)) return new BadRequestResult();
+            if (!checkStepDomainUrl(request.webID, request.steps.ToString())) return new BadRequestResult();
             TrackingFunnelInfo info = new TrackingFunnelInfo();
             info.WebId = request.webID;
             info.Name = request.name;
@@ -311,12 +322,12 @@ namespace HeatMapAPIServices.Repository
             {
                 context.TrackingFunnelInfo.Add(info);
                 context.SaveChanges();
-                return info;
+                return new OkObjectResult(info);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR: " + ex.Message);
-                return null;
+                return new BadRequestResult();
             }
         }
 
@@ -374,23 +385,25 @@ namespace HeatMapAPIServices.Repository
         {
             return context.TrackedFunnelData.Where(s => s.SessionId == sessionId).FirstOrDefault();
         }
-        public bool createTrackedFunnelData(SaveFunnelDataRequest data)
+        public bool createTrackedFunnelData(SaveFunnelDataRequest request)
         {
             try
             {
-                TrackedFunnelData datac = checkTrackedFunnelDataExisted(data.sessionID);
+                TrackedFunnelData datac = checkTrackedFunnelDataExisted(request.sessionID);
                 if (datac != null)
                 {
-                    datac.TrackedSteps = data.trackedSteps;
+                    datac.TrackedSteps = request.trackedSteps;
                     context.SaveChanges();
                     return true;
                 }
                 else
                 {
                     datac = new TrackedFunnelData();
-                    datac.SessionId = data.sessionID;
-                    datac.WebId = data.webID;
-                    datac.TrackedSteps = data.trackedSteps;
+                    datac.SessionId = request.sessionID;
+                    datac.WebId = request.webID;
+                    Website website = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
+                    website.Verified = true;
+                    datac.TrackedSteps = request.trackedSteps;
                     var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
                     datac.CreatedAt = (long)timeSpan.TotalSeconds;
                     context.TrackedFunnelData.Add(datac);
@@ -510,7 +523,7 @@ namespace HeatMapAPIServices.Repository
                 }
 
                 //scroll
-                List<long> listScreenHeight = context.TrackedHeatmapData.Select(s => s.ScreenHeight).Distinct().ToList();
+                List<long?> listScreenHeight = context.TrackedHeatmapData.Select(s => s.ScreenHeight).Distinct().ToList();
                 List<ScrollResponse> scrolls = new List<ScrollResponse>();
 
                 foreach (var item in listScreenHeight)
@@ -547,7 +560,7 @@ namespace HeatMapAPIServices.Repository
                     if (trackedDataIDs.Count != 0)
                     {
                         ScrollResponse scrollResponse = new ScrollResponse();
-                        scrollResponse.height = item;
+                        scrollResponse.height = item.GetValueOrDefault();
                         scrollResponse.documentHeight = documentHeight;
                         scrollResponse.positions = JsonConvert.SerializeObject(scrollData);
                         scrolls.Add(scrollResponse);
@@ -679,7 +692,8 @@ namespace HeatMapAPIServices.Repository
                     }
 
                     StatisticFunnelResponse statisticFunnelResponse =
-                        new StatisticFunnelResponse(trackingInfoFunnelSteps[i - 1].name, trackingInfoFunnelSteps[i - 1].stepUrl, count);
+                        new StatisticFunnelResponse(trackingInfoFunnelSteps[i - 1].name, trackingInfoFunnelSteps[i - 1].stepUrl
+                        , trackingInfoFunnelSteps[i - 1].typeUrl, count);
                     statisticFunnelResponses.Add(statisticFunnelResponse);
                 }
                 return statisticFunnelResponses;

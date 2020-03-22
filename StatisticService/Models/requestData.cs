@@ -22,5 +22,16 @@ namespace StatisticService.Models
             this.offsetX = offsetX;
             this.offsetY = offsetY;
         }
+
+        public string ToStrings()
+        {
+            return "trackedHeatmapDataID:" + this.trackedHeatmapDataID + "\n"
+                + "selector:" + this.selector + "\n"
+                + "width:" + this.width + "\n"
+                + "height:" + this.height + "\n"
+                + "offsetX:" + this.offsetX + "\n"
+                + "offsetY:" + this.offsetY + "\n";
+        }
+        
     }
 }

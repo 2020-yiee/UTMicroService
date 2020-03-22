@@ -13,4 +13,3 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\TrackingAPIServices\obj\Debug\
 D:\learningData\CN9\SWP49X\Service\UTMicroService\TrackingAPIServices\obj\Debug\netcoreapp2.2\TrackingAPIServices.RazorTargetAssemblyInfo.cache
 D:\learningData\CN9\SWP49X\Service\UTMicroService\TrackingAPIServices\obj\Debug\netcoreapp2.2\TrackingAPIServices.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\TrackingAPIServices\obj\Debug\netcoreapp2.2\TrackingAPIServices.pdb
-D:\learningData\CN9\SWP49X\Service\UTMicroService\TrackingAPIServices\obj\Debug\netcoreapp2.2\TrackingAPIServices.csprojAssemblyReference.cache

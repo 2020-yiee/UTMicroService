@@ -10,5 +10,7 @@ namespace TrackingAPIServices.EFModels
         public bool Removed { get; set; }
         public int OrganizationId { get; set; }
         public bool Verified { get; set; }
+        public long CreatedAt { get; set; }
+        public int AuthorId { get; set; }
     }
 }
