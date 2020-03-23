@@ -54,6 +54,10 @@ namespace HeatMapAPIServices.Repository
         {
             try
             {
+                Website website1 = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
+                if (website1 == null || website1.Removed ==true) return false;
+                User user = context.User.Where(s => s.UserId == website1.AuthorId).FirstOrDefault();
+                if (user == null || user.Actived == false) return false;
                 TrackedHeatmapData trackedData = new TrackedHeatmapData();
                 trackedData.TrackingUrl = request.trackingUrl;
                 trackedData.WebId = request.webID;
@@ -392,6 +396,11 @@ namespace HeatMapAPIServices.Repository
         {
             try
             {
+                Website website1 = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
+                if (website1 == null || website1.Removed == true) return false;
+                User user = context.User.Where(s => s.UserId == website1.AuthorId).FirstOrDefault();
+                if (user == null || user.Actived == false) return false;
+
                 TrackedFunnelData datac = checkTrackedFunnelDataExisted(request.sessionID);
                 if (datac != null)
                 {
