@@ -186,7 +186,7 @@ namespace HeatMapAPIServices.Controllers
 
         [Authorize]
         [HttpGet("api/funnel/statistic/{webID}/{trackingInfoID}")]
-        public IActionResult getStatisticFunnel([FromRoute] int webID, [FromRoute] int trackingInfoID, int from, int to)
+        public IActionResult getStatisticFunnel([FromRoute] int webID, [FromRoute] int trackingInfoID, long from, long to)
         {
             Object result = iRepository.getStatisticFunnel(webID, trackingInfoID, from, to, GetUserId());
             if (result != null) return Ok(result);
