@@ -27,7 +27,7 @@ namespace StatisticService
             {
                 Console.WriteLine("\n\n\n\n*********\nNEW ROUND WITH ID " + currentID + "\n*********\n");
                 currentID = await updateStatisticData();
-                Thread.Sleep(6 * 60 * 1000);
+                Thread.Sleep(2 * 60 * 1000);
             }
 
 
@@ -207,6 +207,7 @@ namespace StatisticService
                             StatisticHeatmap statisticHeatmap = context.StatisticHeatmap.Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
                             if (statisticHeatmap == null)
                             {
+                                statisticHeatmap = new StatisticHeatmap();
                                 statisticHeatmap.TrackedHeatmapDataId = id;
                                 List<StatisticData> statisticDatas = new List<StatisticData>();
                                 foreach (var item in subData)

@@ -7,6 +7,7 @@ using StatisticAPIService.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TrackingAPIServices.EFModels;
 using TrackingAPIServices.Models;
@@ -55,7 +56,7 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 Website website1 = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
-                if (website1 == null || website1.Removed ==true) return false;
+                if (website1 == null || website1.Removed == true) return false;
                 User user = context.User.Where(s => s.UserId == website1.AuthorId).FirstOrDefault();
                 if (user == null || user.Actived == false) return false;
                 TrackedHeatmapData trackedData = new TrackedHeatmapData();
@@ -471,6 +472,8 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 if (!checkAuthencation(webID, userId)) return null;
+
+                //click hover
                 TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.WebId == webID)
                 .Where(s => s.TrackingHeatmapInfoId == trackingInfoID)
                 .FirstOrDefault();
@@ -482,27 +485,57 @@ namespace HeatMapAPIServices.Repository
                 }
                 foreach (var eventType in EVENT_TYPE_LIST)
                 {
-                    List<TrackedHeatmapData> trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                    List<TrackedHeatmapData> trackedHeatmapDatas = new List<TrackedHeatmapData>();
+                    switch (trackingHeatmapInfo.TypeUrl)
+                    {
+                        case "match":
+                             trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
                                 .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
                                 .Where(s => s.CreatedAt >= from)
                                 .Where(s => s.CreatedAt <= to)
+                                .Where(s => s.EventType == eventType).ToList(); break;
+                        case "contain":
+                            trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                                .Where(s => s.TrackingUrl.Contains(trackingHeatmapInfo.TrackingUrl))
+                                .Where(s => s.CreatedAt >= from)
+                                .Where(s => s.CreatedAt <= to)
+                                .Where(s => s.EventType == eventType).ToList(); break;
+                        case "start-with":
+                            trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                                .Where(s => s.TrackingUrl.LastIndexOf(trackingHeatmapInfo.TrackingUrl) == 0)
+                                .Where(s => s.CreatedAt >= from)
+                                .Where(s => s.CreatedAt <= to)
+                                .Where(s => s.EventType == eventType).ToList(); break;
+                        case "end-with":
+                            trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                                .Where(s =>(s.TrackingUrl.LastIndexOf(trackingHeatmapInfo.TrackingUrl)+ trackingHeatmapInfo.TrackingUrl.Length)
+                                == s.TrackingUrl.Length)
+                                .Where(s => s.CreatedAt >= from)
+                                .Where(s => s.CreatedAt <= to)
+                                .Where(s => s.EventType == eventType).ToList(); break;
+                        case "regex":
+                            List<TrackedHeatmapData> trackedHeatmapData = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                                .Where(s => s.CreatedAt >= from)
+                                .Where(s => s.CreatedAt <= to)
                                 .Where(s => s.EventType == eventType).ToList();
+                            Regex reg = new Regex(trackingHeatmapInfo.TrackingUrl);
+                            foreach (var item in trackedHeatmapData)
+                            {
+                                if (reg.IsMatch(item.TrackingUrl)) trackedHeatmapDatas.Add(item);
+                            }
+                            break;
+                    }
+                    if (trackedHeatmapDatas == null || trackedHeatmapDatas.Count == 0) return new NotFoundResult();
+                    List<StatisticHeatmap> statisticHeatmaps = new List<StatisticHeatmap>();
                     switch (device)
                     {
                         case 0:
                             List<int> trackedHeatmapDataIds = trackedHeatmapDatas
                                 .Where(s => s.ScreenWidth < 540)
                                 .Select(s => s.TrackedHeatmapDataId).ToList();
-                            List<StatisticHeatmap> statisticHeatmaps = context.StatisticHeatmap
+                            statisticHeatmaps = context.StatisticHeatmap
                                 .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
-                            .ToList();
-                            List<StatisticData> statisticDatas = new List<StatisticData>();
-                            foreach (var item in statisticHeatmaps)
-                            {
-                                statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
-                            }
-                            if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
-                            if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas); break;
+                            .ToList();break;
                         case 1:
                             trackedHeatmapDataIds = trackedHeatmapDatas
                            .Where(s => s.ScreenWidth < 768 && s.ScreenWidth >= 540)
@@ -510,29 +543,31 @@ namespace HeatMapAPIServices.Repository
                             statisticHeatmaps = context.StatisticHeatmap
                                 .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
                             .ToList();
-                            statisticDatas = new List<StatisticData>();
-                            foreach (var item in statisticHeatmaps)
-                            {
-                                statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
-                            }
-                            if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
-                            if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas); break;
+                            break;
                         case 2:
                             trackedHeatmapDataIds = trackedHeatmapDatas
-                        .Where(s => s.ScreenWidth >= 768)
-                        .Select(s => s.TrackedHeatmapDataId).ToList();
+                                .Where(s => s.ScreenWidth >= 768)
+                                .Select(s => s.TrackedHeatmapDataId).ToList();
                             statisticHeatmaps = context.StatisticHeatmap
                                 .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
                             .ToList();
-                            statisticDatas = new List<StatisticData>();
-                            foreach (var item in statisticHeatmaps)
-                            {
-                                statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
-                            }
-                            if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
-                            if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas); break;
+                            break;
                     }
+                    List<StatisticData> statisticDatas = new List<StatisticData>();
+                    foreach (var item in statisticHeatmaps)
+                    {
+                        try
+                        {
+                            statisticDatas.AddRange(JsonConvert.DeserializeObject<List<StatisticData>>(item.StatisticData));
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    if (eventType == 0) response.click = JsonConvert.SerializeObject(statisticDatas);
+                    if (eventType == 1) response.hover = JsonConvert.SerializeObject(statisticDatas);
                 }
+
 
                 //scroll
                 List<long?> listScreenHeight = context.TrackedHeatmapData.Select(s => s.ScreenHeight).Distinct().ToList();
@@ -564,9 +599,12 @@ namespace HeatMapAPIServices.Repository
                     foreach (var id in trackedDataIDs)
                     {
                         StatisticHeatmap statisticHeatmap = context.StatisticHeatmap.Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
-                        StatisticScrollData statisticScrollData = JsonConvert.DeserializeObject<StatisticScrollData>(statisticHeatmap.StatisticData);
-                        documentHeight = statisticScrollData.documentHeight;
-                        scrollData.AddRange(statisticScrollData.scroll);
+                        if (statisticHeatmap != null)
+                        {
+                            StatisticScrollData statisticScrollData = JsonConvert.DeserializeObject<StatisticScrollData>(statisticHeatmap.StatisticData);
+                            documentHeight = statisticScrollData.documentHeight;
+                            scrollData.AddRange(statisticScrollData.scroll);
+                        }
                     }
 
                     if (trackedDataIDs.Count != 0)
@@ -705,6 +743,14 @@ namespace HeatMapAPIServices.Repository
                                     count = statisticStep(downcount, count, statisticData, steps, matchStep, j);
                                 }
                             }
+                            else if (matchStep.typeUrl == "regex")
+                            {
+                                Regex reg = new Regex(matchStep.stepUrl);
+                                if (reg.IsMatch(statisticData[j]))
+                                {
+                                    count = statisticStep(downcount, count, statisticData, steps, matchStep, j);
+                                }
+                            }
                         }
                     }
                     StatisticFunnelResponse statisticFunnelResponse =
@@ -720,7 +766,7 @@ namespace HeatMapAPIServices.Repository
                 return null;
             }
         }
-        private int statisticStep(int downcount,int counter,List<string> statisticData,List<Step> steps,Step matchStep, int j)
+        private int statisticStep(int downcount, int counter, List<string> statisticData, List<Step> steps, Step matchStep, int j)
         {
             int count = counter;
             downcount -= 1;
@@ -771,6 +817,19 @@ namespace HeatMapAPIServices.Repository
                 else if (matchStep.typeUrl == "end-with")
                 {
                     if ((nextStep.LastIndexOf(matchStep.stepUrl) + matchStep.stepUrl.Length) == nextStep.Length)
+                    {
+                        downcount -= 1;
+                        if (downcount == 0) count += 1;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else if (matchStep.typeUrl == "regex")
+                {
+                    Regex reg = new Regex(matchStep.stepUrl);
+                    if (reg.IsMatch(nextStep))
                     {
                         downcount -= 1;
                         if (downcount == 0) count += 1;

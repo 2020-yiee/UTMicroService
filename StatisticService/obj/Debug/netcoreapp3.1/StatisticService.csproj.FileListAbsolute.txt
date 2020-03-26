@@ -51,3 +51,5 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\net
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.pdb
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.csprojAssemblyReference.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.csproj.CoreCompileInputs.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.genruntimeconfig.cache

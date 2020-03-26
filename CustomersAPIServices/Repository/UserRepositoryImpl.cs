@@ -411,19 +411,20 @@ namespace CustomersAPIServices.Repository
                     .Where(s => organizationIds.Contains(s.OrganizationId) == true)
                     .ToList();
 
-                List<OrganizationResponse> organizationResponses = new List<OrganizationResponse>();
+                List<OrganizationResponseForAdmin> organizationResponses = new List<OrganizationResponseForAdmin>();
                 foreach (var organization in organizations)
                 {
                     var websites = context.Website
                             .Where(x => x.OrganizationId == organization.OrganizationId)
                             .ToList()
-                            .Select(x => new WebsiteResponse(x.WebId, x.DomainUrl, x.Removed, x.OrganizationId
+                            .Select(x => new WebsiteResponseForAdmin(x.WebId, x.DomainUrl, x.Removed, x.OrganizationId
                             , x.Verified, x.CreatedAt, context.User.Where(s => s.UserId == x.AuthorId).FirstOrDefault().FullName,
-                            context.User.Where(s => s.UserId == x.AuthorId).FirstOrDefault().UserId))
+                            context.User.Where(s => s.UserId == x.AuthorId).FirstOrDefault().UserId,
+                            context.User.Where(s => s.UserId == x.AuthorId).FirstOrDefault().Actived))
                             .ToList();
                     var access = context.Access.Where(s => s.UserId == userID && s.OrganizationId == organization.OrganizationId).FirstOrDefault();
 
-                    organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name, access.Role, organization.Removed,websites));
+                    organizationResponses.Add(new OrganizationResponseForAdmin(organization.OrganizationId, organization.Name, access.Role, organization.Removed,websites));
                 }
 
                 return new OkObjectResult(
@@ -461,13 +462,13 @@ namespace CustomersAPIServices.Repository
         public IActionResult getAllWebSite()
         {
             List<Website> websites =  context.Website.ToList();
-            List<WebsiteResponse> responses = new List<WebsiteResponse>();
+            List<WebsiteResponseForAdmin> responses = new List<WebsiteResponseForAdmin>();
             foreach (var website in websites)
             {
                 User user = context.User.Where(s => s.UserId == website.AuthorId).FirstOrDefault();
                 if (user == null) return null;
-                WebsiteResponse response = new WebsiteResponse(website.WebId, website.DomainUrl, website.Removed
-                    , website.OrganizationId, website.Verified, website.CreatedAt, user.FullName,user.UserId);
+                WebsiteResponseForAdmin response = new WebsiteResponseForAdmin(website.WebId, website.DomainUrl, website.Removed
+                    , website.OrganizationId, website.Verified, website.CreatedAt, user.FullName,user.UserId,user.Actived);
                 responses.Add(response);
             }
             return new OkObjectResult(responses);
