@@ -9,10 +9,10 @@ namespace StatisticService.Models
         public string selector { get; set; }
         public int width { get; set; }
         public int height { get; set; }
-        public int offsetX { get; set; }
-        public int offsetY { get; set; }
+        public double offsetX { get; set; }
+        public double offsetY { get; set; }
 
-        public data(string selector, int width, int height, int offsetX, int offsetY)
+        public data(string selector, int width, int height, double offsetX, double offsetY)
         {
             this.selector = selector;
             this.width = width;

@@ -46,3 +46,5 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\CustomersAPIServices\obj\Debug
 D:\learningData\CN9\SWP49X\Service\UTMicroService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.pdb
 D:\learningData\CN9\SWP49X\Service\UTMicroService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.csprojAssemblyReference.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.csproj.CoreCompileInputs.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\CustomersAPIServices\obj\Debug\netcoreapp2.2\CustomersAPIServices.genruntimeconfig.cache
