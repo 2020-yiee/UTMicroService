@@ -489,11 +489,11 @@ namespace HeatMapAPIServices.Repository
                     switch (trackingHeatmapInfo.TypeUrl)
                     {
                         case "match":
-                             trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
-                                .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
-                                .Where(s => s.CreatedAt >= from)
-                                .Where(s => s.CreatedAt <= to)
-                                .Where(s => s.EventType == eventType).ToList(); break;
+                            trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                               .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
+                               .Where(s => s.CreatedAt >= from)
+                               .Where(s => s.CreatedAt <= to)
+                               .Where(s => s.EventType == eventType).ToList(); break;
                         case "contain":
                             trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
                                 .Where(s => s.TrackingUrl.Contains(trackingHeatmapInfo.TrackingUrl))
@@ -508,7 +508,7 @@ namespace HeatMapAPIServices.Repository
                                 .Where(s => s.EventType == eventType).ToList(); break;
                         case "end-with":
                             trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
-                                .Where(s =>(s.TrackingUrl.LastIndexOf(trackingHeatmapInfo.TrackingUrl)+ trackingHeatmapInfo.TrackingUrl.Length)
+                                .Where(s => (s.TrackingUrl.LastIndexOf(trackingHeatmapInfo.TrackingUrl) + trackingHeatmapInfo.TrackingUrl.Length)
                                 == s.TrackingUrl.Length)
                                 .Where(s => s.CreatedAt >= from)
                                 .Where(s => s.CreatedAt <= to)
@@ -535,7 +535,7 @@ namespace HeatMapAPIServices.Repository
                                 .Select(s => s.TrackedHeatmapDataId).ToList();
                             statisticHeatmaps = context.StatisticHeatmap
                                 .Where(s => trackedHeatmapDataIds.Contains(s.TrackedHeatmapDataId) == true)
-                            .ToList();break;
+                            .ToList(); break;
                         case 1:
                             trackedHeatmapDataIds = trackedHeatmapDatas
                            .Where(s => s.ScreenWidth < 768 && s.ScreenWidth >= 540)
@@ -710,37 +710,72 @@ namespace HeatMapAPIServices.Repository
                     foreach (var item in statisticFunnels)
                     {
                         List<string> statisticData = JsonConvert.DeserializeObject<List<string>>(item.StatisticData);
-
+                        int downcount = steps.Count;
+                        var matchStep = steps[0];
                         for (int j = 0; j < statisticData.Count; j++)
                         {
-                            int downcount = steps.Count;
-                            var matchStep = steps[0];
+                            
                             if (matchStep.typeUrl == "match")
                             {
                                 if (statisticData[j].Equals(matchStep.stepUrl))
                                 {
-                                    count = statisticStep(downcount, count, statisticData, steps, matchStep, j);
+                                    downcount -= 1;
+                                    if (downcount == 0)
+                                    {
+                                        count += 1;
+                                        matchStep = steps[0];
+                                        downcount = steps.Count;
+                                    }else
+                                    matchStep = steps[steps.IndexOf(matchStep) + 1];
+
                                 }
                             }
                             else if (matchStep.typeUrl == "contain")
                             {
                                 if (statisticData[j].Contains(matchStep.stepUrl))
                                 {
-                                    count = statisticStep(downcount, count, statisticData, steps, matchStep, j);
+                                    downcount -= 1;
+                                    if (downcount == 0)
+                                    {
+                                        count += 1;
+                                        matchStep = steps[0];
+                                        downcount = steps.Count;
+                                    }
+                                    else
+                                    matchStep = steps[steps.IndexOf(matchStep) + 1];
+
                                 }
                             }
                             else if (matchStep.typeUrl == "start-with")
                             {
                                 if (statisticData[j].LastIndexOf(matchStep.stepUrl) == 0)
                                 {
-                                    count = statisticStep(downcount, count, statisticData, steps, matchStep, j);
+                                    downcount -= 1;
+                                    if (downcount == 0)
+                                    {
+                                        count += 1;
+                                        matchStep = steps[0];
+                                        downcount = steps.Count;
+                                    }
+                                    else
+                                    matchStep = steps[steps.IndexOf(matchStep) + 1];
+
                                 }
                             }
                             else if (matchStep.typeUrl == "end-with")
                             {
                                 if ((statisticData[j].LastIndexOf(matchStep.stepUrl) + matchStep.stepUrl.Length) == statisticData[j].Length)
                                 {
-                                    count = statisticStep(downcount, count, statisticData, steps, matchStep, j);
+                                    downcount -= 1;
+                                    if (downcount == 0)
+                                    {
+                                        count += 1;
+                                        matchStep = steps[0];
+                                        downcount = steps.Count;
+                                    }
+                                    else
+                                    matchStep = steps[steps.IndexOf(matchStep) + 1];
+
                                 }
                             }
                             else if (matchStep.typeUrl == "regex")
@@ -748,7 +783,15 @@ namespace HeatMapAPIServices.Repository
                                 Regex reg = new Regex(matchStep.stepUrl);
                                 if (reg.IsMatch(statisticData[j]))
                                 {
-                                    count = statisticStep(downcount, count, statisticData, steps, matchStep, j);
+                                    downcount -= 1;
+                                    if (downcount == 0)
+                                    {
+                                        count += 1;
+                                        matchStep = steps[0];
+                                        downcount = steps.Count;
+                                    }
+                                    matchStep = steps[steps.IndexOf(matchStep) + 1];
+
                                 }
                             }
                         }
@@ -766,82 +809,7 @@ namespace HeatMapAPIServices.Repository
                 return null;
             }
         }
-        private int statisticStep(int downcount, int counter, List<string> statisticData, List<Step> steps, Step matchStep, int j)
-        {
-            int count = counter;
-            downcount -= 1;
-            if (downcount == 0) count += 1;
-            int index = j;
-            while (downcount > 0)
-            {
-                index += 1;
-                if (index >= statisticData.Count) break;
-                matchStep = steps[steps.IndexOf(matchStep) + 1];
-                string nextStep = statisticData[index];
-                if (matchStep.typeUrl == "match")
-                {
-                    if (nextStep.Equals(matchStep.stepUrl))
-                    {
-                        downcount -= 1;
-                        if (downcount == 0) count += 1;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else if (matchStep.typeUrl == "contain")
-                {
-                    if (nextStep.Contains(matchStep.stepUrl))
-                    {
-                        downcount -= 1;
-                        if (downcount == 0) count += 1;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else if (matchStep.typeUrl == "start-with")
-                {
-                    if (nextStep.LastIndexOf(matchStep.stepUrl) == 0)
-                    {
-                        downcount -= 1;
-                        if (downcount == 0) count += 1;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else if (matchStep.typeUrl == "end-with")
-                {
-                    if ((nextStep.LastIndexOf(matchStep.stepUrl) + matchStep.stepUrl.Length) == nextStep.Length)
-                    {
-                        downcount -= 1;
-                        if (downcount == 0) count += 1;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else if (matchStep.typeUrl == "regex")
-                {
-                    Regex reg = new Regex(matchStep.stepUrl);
-                    if (reg.IsMatch(nextStep))
-                    {
-                        downcount -= 1;
-                        if (downcount == 0) count += 1;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-            return count;
-        }
+
         public IActionResult udpateNameFunnelTrackingInfo(udpateTrackingNameInfoRequest request, int v)
         {
             TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.Where(s => s.TrackingFunnelInfoId == request.trackingFunnelInfoID)
@@ -860,7 +828,7 @@ namespace HeatMapAPIServices.Repository
             return new OkObjectResult(trackingFunnelInfo);
         }
 
-        
+
     }
 
 }
