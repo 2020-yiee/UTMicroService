@@ -102,7 +102,7 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult deleteTrackingInfo(int trackingHeatmapInfoID)
         {
 
-            bool result = iRepository.deleteTrackingFunnelInfo(trackingHeatmapInfoID, GetUserId());
+            bool result = iRepository.deleteTrackingHeatmapInfo(trackingHeatmapInfoID, GetUserId());
             if (result)
             {
                 return Ok();

@@ -217,7 +217,7 @@ namespace HeatMapAPIServices.Repository
                 return null;
             }
         }
-        public bool deleteTrackingHeatmapInfor(int trackingHeatmapInfoId, int userId)
+        public bool deleteTrackingHeatmapInfo(int trackingHeatmapInfoId, int userId)
         {
             TrackingHeatmapInfo thi = context.TrackingHeatmapInfo.Where(s => s.TrackingHeatmapInfoId == trackingHeatmapInfoId).FirstOrDefault();
             if (thi == null) return false;
@@ -273,12 +273,12 @@ namespace HeatMapAPIServices.Repository
             return false;
         }
 
-        private bool checkStepDomainUrl(int webId, string steps)
+        private bool checkStepDomainUrl(int webId, List<Step> steps)
         {
             try
             {
                 string domainUrl = context.Website.Where(s => s.WebId == webId).Select(s => s.DomainUrl).FirstOrDefault();
-                List<Step> deserializedSteps = JsonConvert.DeserializeObject<List<Step>>(steps);
+                List<Step> deserializedSteps = steps;
                 foreach (Step item in deserializedSteps)
                 {
                     if (!TYPEURL.Contains(item.typeUrl)) return false;
@@ -318,11 +318,11 @@ namespace HeatMapAPIServices.Repository
         {
             if (!checkAuthencation(request.webID, userId)) return new BadRequestResult();
             if (checkTrackingFunnelInfoExisted(request.webID, request.steps.ToString(), request.name)) return new BadRequestResult();
-            if (!checkStepDomainUrl(request.webID, request.steps.ToString())) return new BadRequestResult();
+            if (!checkStepDomainUrl(request.webID, request.steps)) return new BadRequestResult();
             TrackingFunnelInfo info = new TrackingFunnelInfo();
             info.WebId = request.webID;
             info.Name = request.name;
-            info.Steps = request.steps.ToString();
+            info.Steps = JsonConvert.SerializeObject(request.steps);
             info.Removed = false;
             var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
             info.CreatedAt = (long)timeSpan.TotalSeconds;
@@ -344,12 +344,12 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 if (!checkAuthencation(request.webID, userId)) return null;
-                if (!checkStepDomainUrl(request.webID, request.steps.ToString())) return null;
+                if (!checkStepDomainUrl(request.webID, request.steps)) return null;
                 TrackingFunnelInfo info = context.TrackingFunnelInfo
                     .Where(s => s.TrackingFunnelInfoId == request.trackingFunnelInfoID)
                     .FirstOrDefault();
                 if (info == null) return null;
-                info.Steps = request.steps.ToString();
+                info.Steps = JsonConvert.SerializeObject(request.steps);
                 context.SaveChanges();
                 return info;
             }
@@ -859,6 +859,8 @@ namespace HeatMapAPIServices.Repository
             context.SaveChanges();
             return new OkObjectResult(trackingFunnelInfo);
         }
+
+        
     }
 
 }
