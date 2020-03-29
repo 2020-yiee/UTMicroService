@@ -46,3 +46,5 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\AuthServer\obj\Debug\netcoreap
 D:\learningData\CN9\SWP49X\Service\UTMicroService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.pdb
 D:\learningData\CN9\SWP49X\Service\UTMicroService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.csprojAssemblyReference.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.csproj.CoreCompileInputs.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\AuthServer\obj\Debug\netcoreapp2.2\AuthServer.genruntimeconfig.cache

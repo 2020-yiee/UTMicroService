@@ -130,7 +130,28 @@ namespace CustomersAPIServices.Controllers
             if (result != null) return Ok(result);
             return BadRequest();
         }
-        
+
+        [Authorize]
+        [HttpGet("api/user/organization/member/invite")]
+        public IActionResult inviteUser(string email,int organizationID)
+        {
+            return repository.inviteUser(GetUserId(), email,organizationID);
+        }
+
+        [Authorize]
+        [HttpDelete("api/user/organization/member/uninvite")]
+        public IActionResult uninviteUser(string email, int organizationID)
+        {
+            return repository.uninviteUser(GetUserId(), email, organizationID);
+        }
+
+        [Authorize]
+        [HttpPut("api/user/organization/member/change-role")]
+        public IActionResult changeRole(string email, int organizationID)
+        {
+            return repository.changeRole(GetUserId(), email, organizationID);
+        }
+
         //=======================================================================================
 
         [HttpPost("api/website/verify")]
@@ -201,14 +222,6 @@ namespace CustomersAPIServices.Controllers
         public IActionResult getMemberOrganization(int organizationID)
         {
             return repository.getAllMemberOfOrganization(organizationID, GetUserId());
-        }
-
-        [Authorize]
-        [HttpDelete("api/user/organization/member/remove")]
-        public IActionResult removeOrganizationMember([FromBody] RemoveMemberRequest request)
-        {
-            return repository.removeOrganzationMember(request, GetUserId());
-
         }
 
         //========================================================================================

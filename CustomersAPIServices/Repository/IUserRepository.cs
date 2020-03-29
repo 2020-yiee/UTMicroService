@@ -32,6 +32,8 @@ namespace CustomersAPIServices.Repository
         IActionResult getAllWebSite();
         Website lockWebsite(LockRequest request);
         IActionResult getAllMemberOfOrganization(int organizationIDs,int v);
-        IActionResult removeOrganzationMember(RemoveMemberRequest request, int v);
+        IActionResult inviteUser(int userID,string email,int organizationID);
+        IActionResult uninviteUser(int v, string email, int organizationID);
+        IActionResult changeRole(int v, string email, int organizationID);
     }
 }

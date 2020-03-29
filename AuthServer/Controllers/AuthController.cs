@@ -26,22 +26,24 @@ namespace AuthServer.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<object> Get([FromBody] LoginRequestModel model)
+        public IActionResult Get([FromBody] LoginRequestModel model)
         {
-            var webOwner = await _repository.getUserByEmailAndPassword(model);
-            if (Object.Equals(webOwner, false)) return StatusCode(401);
-            if (webOwner == null) return StatusCode(403);
-            return Ok(webOwner);
+            return _repository.getUserByEmailAndPassword(model);
+            
         }
 
         [HttpPost("login/admin")]
-        public async Task<object> loginAdmin([FromBody] LoginRequestModel model)
+        public IActionResult loginAdmin([FromBody] LoginRequestModel model)
         {
-            var webOwner = await _repository.getAdminByEmailAndPassword(model);
-            if (Object.Equals(webOwner, false)) return StatusCode(401);
-            if (webOwner == null) return StatusCode(403);
-            return Ok(webOwner);
+            return _repository.getAdminByEmailAndPassword(model);
+            
 
+        }
+
+        [HttpGet("forgot-password")]
+        public IActionResult forgotPassword([FromQuery] string mail)
+        {
+            return _repository.processForgotPassword(mail);
         }
     }
 }

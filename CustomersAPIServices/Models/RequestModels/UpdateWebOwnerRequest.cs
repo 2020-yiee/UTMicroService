@@ -9,5 +9,7 @@ namespace CustomersAPIServices.Models.RequestModels
     {
         public string email { get; set; }
         public string fullName { get; set; }
+        public string oldPassword { get; set; }
+        public string newPassword { get; set; }
     }
 }

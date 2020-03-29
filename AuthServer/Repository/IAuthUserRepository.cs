@@ -1,5 +1,6 @@
 ﻿using AuthServer.EFModels;
 using AuthServer.Models;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,8 @@ namespace AuthServer.Repository
 {
     public interface IAuthUserRepository
     {
-        Task<Object> getUserByEmailAndPassword(LoginRequestModel model);
-        Task<Object> getAdminByEmailAndPassword(LoginRequestModel model);
+        IActionResult getUserByEmailAndPassword(LoginRequestModel model);
+        IActionResult getAdminByEmailAndPassword(LoginRequestModel model);
+        IActionResult processForgotPassword(string mail);
     }
 }

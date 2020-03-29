@@ -166,15 +166,24 @@ namespace CustomersAPIServices.Repository
 
         public bool updateUser(UpdateUserRequest request,int userId)
         {
-            var webOwner = context.User.Where(s => s.UserId == userId)
+            var user = context.User.Where(s => s.UserId == userId)
                 .FirstOrDefault();
-            if (webOwner != null)
+            if (user != null)
                 try
                 {
-                    webOwner.FullName = request.fullName;
-                    webOwner.Email = request.email;
-                    context.SaveChanges();
-                    return true;
+                    var checkPassword = BCrypt.Net.BCrypt.Verify(request.oldPassword, user.Password);
+                    if (checkPassword)
+                    {
+                        user.FullName = request.fullName;
+                        user.Email = request.email;
+                        user.Password = Hashing.HashPassword(request.newPassword);
+                        context.SaveChanges();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -217,7 +226,7 @@ namespace CustomersAPIServices.Repository
                     .Where(s => s.UserId == userId)
                     .Where(s => s.Actived == true).FirstOrDefault();
                 if (user == null) return false;
-                List<int> organizationIds = context.Access.Where(s => s.UserId == user.UserId).Select(s => s.OrganizationId).ToList();
+                List<int> organizationIds = context.Access.Where(s => s.UserId == user.UserId && s.Role == 1).Select(s => s.OrganizationId).ToList();
 
                 Website website = context.Website
                     //.Where(s => s.WebOwnerId == webOwnerId)
@@ -297,6 +306,7 @@ namespace CustomersAPIServices.Repository
                 access.OrganizationId = organization.OrganizationId;
                 access.UserId = userId;
                 access.Role = 1;
+                access.DayJoin = (long)timeSpan.TotalSeconds;
                 context.Access.Add(access);
                 context.SaveChanges();
 
@@ -312,7 +322,7 @@ namespace CustomersAPIServices.Repository
         public object updateOrganization(UpdateOrganizationRequest request, int userId)
         {
             List<int> organizationIds = context.Access
-                .Where(s => s.UserId == userId).Select(s => s.OrganizationId).ToList();
+                .Where(s => s.UserId == userId && s.Role == 1).Select(s => s.OrganizationId).ToList();
 
             Organization organization = context.Organization
                 .FirstOrDefault(s => s.OrganizationId == request.organizationID
@@ -327,7 +337,7 @@ namespace CustomersAPIServices.Repository
         public object DeleteOrganization(int organizationID, int userId)
         {
             List<int> organizationIds = context.Access
-                .Where(s => s.UserId == userId).Select(s => s.OrganizationId).ToList();
+                .Where(s => s.UserId == userId && s.Role == 1).Select(s => s.OrganizationId).ToList();
 
             Organization organization = context.Organization
                 .FirstOrDefault(s => s.OrganizationId == organizationID
@@ -352,7 +362,7 @@ namespace CustomersAPIServices.Repository
         }
         private Boolean checkAuthencation(int websiteId, int userId)
         {
-            List<int> orgIds = context.Access.Where(s => s.UserId == userId).Select(s => s.OrganizationId).ToList();
+            List<int> orgIds = context.Access.Where(s => s.UserId == userId && s.Role == 1).Select(s => s.OrganizationId).ToList();
             if (orgIds == null || orgIds.Count == 0) return false;
             Website website = context.Website.FirstOrDefault(s => s.WebId == websiteId);
             if (website == null) return false;
@@ -490,17 +500,51 @@ namespace CustomersAPIServices.Repository
             }
             return new OkObjectResult(memberResponses);
         }
-
-        public IActionResult removeOrganzationMember(RemoveMemberRequest request, int ownerID)
+        public IActionResult inviteUser(int userID,string email,int orgID)
         {
-            Access access = context.Access.Where(s => s.OrganizationId == request.organizationID && s.UserId == ownerID).FirstOrDefault();
-            if (access == null) return new BadRequestResult();
-            if (access.Role != 1) return new UnauthorizedResult();
-            access = context.Access.Where(s => s.UserId == request.userID && s.OrganizationId == request.organizationID).FirstOrDefault();
-            if (access == null) return new BadRequestResult();
+            if(!checkOrgAuthencation(orgID, userID)) return new UnauthorizedResult();
+            var user = context.User.Where(s => s.Email == email).FirstOrDefault();
+            if (user == null) return new NotFoundResult();
+            Access access = new Access();
+            var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+            access.DayJoin = (long)timeSpan.TotalSeconds;
+            access.OrganizationId = orgID;
+            access.UserId = user.UserId;
+            access.Role = 2;
+            context.Access.Add(access);
+            context.SaveChanges();
+            return new OkObjectResult(access);
+        }
+
+        private Boolean checkOrgAuthencation(int orgID, int userId)
+        {
+            Access access = context.Access.Where(s => s.UserId == userId && s.Role ==1 && s.OrganizationId == orgID).FirstOrDefault();
+            if (access == null) return false;
+            return true;
+        }
+
+        public IActionResult uninviteUser(int userID, string email, int orgID)
+        {
+            if (!checkOrgAuthencation(orgID, userID)) return new UnauthorizedResult();
+            var user = context.User.Where(s => s.Email == email).FirstOrDefault();
+            if (user == null) return new NotFoundResult();
+            Access access = context.Access.Where(s => s.UserId == user.UserId && s.Role == 2 && s.OrganizationId == orgID).FirstOrDefault();
+            if (access == null) return new NotFoundResult();
             context.Access.Remove(access);
             context.SaveChanges();
-            return new OkResult();
+            return new OkObjectResult(access);
+        }
+
+        public IActionResult changeRole(int userID, string email, int orgID)
+        {
+            if (!checkOrgAuthencation(orgID, userID)) return new UnauthorizedResult();
+            var user = context.User.Where(s => s.Email == email).FirstOrDefault();
+            if (user == null) return new NotFoundResult();
+            Access access = context.Access.Where(s => s.UserId == user.UserId && s.OrganizationId == orgID).FirstOrDefault();
+            if (access == null) return new NotFoundResult();
+            if (access.Role == 2) access.Role = 3; else access.Role = 2;
+            context.SaveChanges();
+            return new OkObjectResult(access);
         }
     }
 }

@@ -2,6 +2,7 @@
 using AuthServer.Helper;
 using AuthServer.Models;
 using AuthServer.Models.ResponseModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,14 +19,14 @@ namespace AuthServer.Repository
             _helper = helper;
         }
 
-        public async Task<Object> getAdminByEmailAndPassword(LoginRequestModel model)
+        public IActionResult getAdminByEmailAndPassword(LoginRequestModel model)
         {
             using (var context = new DBUTContext())
             {
-                var admin = await context.Admin
+                var admin = context.Admin
                     .Where(s => s.Email == model.email)
                     .Where(s => s.Actived == true)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefault();
                 bool checkPassword = false;
                 if (admin != null)
                 {
@@ -36,33 +37,33 @@ namespace AuthServer.Repository
                         int totalUsers = context.User.Count();
                         int totalWebsites = context.Website.Count();
 
-                        return new
+                        return new OkObjectResult(new
                         {
                             admin = admin,
                             token = _helper.GenerateJwtToken(model.email, admin, "admin"),
                             totalUsers = totalUsers,
                             totalWebsites = totalWebsites
 
-                        };
+                        }) ;
                     }
                     else
                     {
-                        return false;
+                        return new BadRequestResult();
                     }
 
                 }
-                return null;
+                return new NotFoundResult();
             }
         }
 
-        public async Task<Object> getUserByEmailAndPassword(LoginRequestModel model)
+        public IActionResult getUserByEmailAndPassword(LoginRequestModel model)
         {
             using (var context = new DBUTContext())
             {
-                var user = await context.User
+                var user = context.User
                     .Where(s => s.Email == model.email)
                     .Where(s => s.Actived == true)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefault();
                 bool checkPassword = false;
                 if (user != null)
                 {
@@ -73,13 +74,13 @@ namespace AuthServer.Repository
                         List<int> organizationIds = context.Access.Where(s => s.UserId == user.UserId).Select(s => s.OrganizationId).ToList();
                         if (organizationIds == null || organizationIds.Count == 0)
                         {
-                            return new
+                            return new OkObjectResult(new
                             {
                                 token = _helper.GenerateJwtToken(model.email, user, "user"),
                                 organizations = new List<Object>(),
                                 user = new { userID = user.UserId, fullName = user.FullName, email = user.Email }
 
-                            };
+                            });
                         }
                         List<Organization> organizations = context.Organization
                             .Where(s => organizationIds.Contains(s.OrganizationId) == true)
@@ -101,21 +102,37 @@ namespace AuthServer.Repository
                             organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name, access.Role, websites));
                         }
 
-                        return new
+                        return new OkObjectResult(new
                         {
                             token = _helper.GenerateJwtToken(model.email, user, "user"),
                             organizations = organizationResponses,
                             user = new { userID = user.UserId, fullName = user.FullName, email = user.Email }
 
-                        };
+                        });
                     }
                     else
                     {
-                        return false;
+                        return new BadRequestResult();
                     }
 
                 }
-                return null;
+                return new NotFoundResult();
+            }
+        }
+
+        public IActionResult processForgotPassword(string mail)
+        {
+            using (var context = new DBUTContext())
+            {
+                var user = context.User.Where(s => s.Email == mail).FirstOrDefault();
+                if (user == null) return new NotFoundResult();
+                var password = _helper.RandomPassword();
+                user.Password = Hashing.HashPassword(password);
+                context.SaveChanges();
+                bool sendMail = _helper.sendMail(user.Email, user.FullName, password);
+                if (sendMail) return new OkResult();
+                else return new UnprocessableEntityResult();
+
             }
         }
     }

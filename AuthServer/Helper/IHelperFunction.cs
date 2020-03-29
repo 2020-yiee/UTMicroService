@@ -10,5 +10,7 @@ namespace AuthServer.Helper
     {
         object GenerateJwtToken(string email, User user, string Role);
         object GenerateJwtToken(string email, Admin user, string Role);
+        String RandomPassword();
+        bool sendMail(string email, string fullname, string password);
     }
 }
