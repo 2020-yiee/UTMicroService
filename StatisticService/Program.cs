@@ -250,6 +250,11 @@ namespace StatisticService
                         context.StatisticFunnel.Add(newStatisticFunnel);
                         await context.SaveChangesAsync();
                     }
+                    else
+                    {
+                        statisticFunnel.StatisticData = trackedFunnelData.TrackedSteps;
+                        await context.SaveChangesAsync();
+                    }
                 }
 
                 Console.WriteLine("Statistic done .");

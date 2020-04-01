@@ -156,7 +156,7 @@ namespace HeatMapAPIServices.Repository
             return true;
         }
 
-        public IActionResult createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId)
+        public IActionResult createHeatmapTrackingInfo(CreateTrackingHeatmapInforRequest request, int userId)
         {
             if (!checkAuthencation(request.webID, userId)) return new BadRequestResult();
             if (checkTrackingHeatmapInfoExisted(request.webID, request.trackingUrl, request.name)) return new BadRequestResult();
@@ -178,8 +178,24 @@ namespace HeatMapAPIServices.Repository
                 // client.Authenticator = new HttpBasicAuthenticator(username, password);
                 var requests = new RestRequest();
                 requests.AddHeader("Content-Type", "application/json");
-                var response = client.Post(requests);
-                var content = response.Content;
+                requests.Timeout = 20000;
+                string content = null;
+                try
+                {
+                    var response = client.Post(requests);
+                    content = response.Content;
+                }
+                catch (Exception)
+                {
+                    context.TrackingHeatmapInfo.Remove(info);
+                    context.SaveChanges();
+                    throw;
+                }
+                if (content == null)
+                {
+                    context.TrackingHeatmapInfo.Remove(info);
+                    context.SaveChanges();
+                }
                 CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
                 info.SmImageUrl = captureResponse.smImageUrl;
                 info.MdImageUrl = captureResponse.mdImageUrl;
@@ -194,11 +210,11 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public TrackingHeatmapInfo updateTrackingHeatmapInfor(UpdateTrackingHeatmapInforRequest request, int userId)
+        public IActionResult updateTrackingHeatmapInfo(UpdateTrackingHeatmapInforRequest request, int userId)
         {
             TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID).FirstOrDefault();
-            if (!checkTrackingHeatmapInfoExisted1(trackingHeatmapInfo.WebId, request.newName)) return null;
-            if (!checkAuthencation(trackingHeatmapInfo.WebId, userId)) return null;
+            if (!checkTrackingHeatmapInfoExisted1(trackingHeatmapInfo.WebId, request.newName)) return new BadRequestResult();
+            if (!checkAuthencation(trackingHeatmapInfo.WebId, userId)) return new BadRequestResult();
             try
             {
                 TrackingHeatmapInfo info = context.TrackingHeatmapInfo
@@ -207,14 +223,14 @@ namespace HeatMapAPIServices.Repository
                 {
                     info.Name = request.newName;
                     context.SaveChanges();
-                    return info;
+                    return new OkObjectResult(info);
                 }
-                else return null;
+                else return new BadRequestResult();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR: " + ex.Message);
-                return null;
+                return new UnprocessableEntityResult();
             }
         }
         public bool deleteTrackingHeatmapInfo(int trackingHeatmapInfoId, int userId)
@@ -339,24 +355,26 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public object udpateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int userId)
+        public IActionResult udpateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int userId)
         {
             try
             {
-                if (!checkAuthencation(request.webID, userId)) return null;
-                if (!checkStepDomainUrl(request.webID, request.steps)) return null;
+                if (!checkAuthencation(request.webID, userId)) return new BadRequestResult();
+                if (!checkStepDomainUrl(request.webID, request.steps)) return new BadRequestResult();
+                udpateNameFunnelTrackingInfo(
+                    new udpateTrackingNameInfoRequest(request.trackingFunnelInfoID, request.newName), userId);
                 TrackingFunnelInfo info = context.TrackingFunnelInfo
                     .Where(s => s.TrackingFunnelInfoId == request.trackingFunnelInfoID)
                     .FirstOrDefault();
-                if (info == null) return null;
+                if (info == null) return new BadRequestResult();
                 info.Steps = JsonConvert.SerializeObject(request.steps);
                 context.SaveChanges();
-                return info;
+                return new OkObjectResult(info);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("ERROR " + ex.Message);
-                return null;
+                return new UnprocessableEntityResult();
             }
         }
 
@@ -466,17 +484,22 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public object getStatisticHeatMap(int webID, int trackingInfoID, int from, int to, int device, int userId)
+        public IActionResult getStatisticHeatMap(int webID, int trackingInfoID, int from, int to, int device, int userId)
         {
             GetStatisicHeatMap response = new GetStatisicHeatMap();
             try
             {
-                if (!checkAuthencation(webID, userId)) return null;
+                if (!checkAuthencation(webID, userId)) return new UnauthorizedResult();
 
                 //click hover
                 TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.WebId == webID)
                 .Where(s => s.TrackingHeatmapInfoId == trackingInfoID)
                 .FirstOrDefault();
+                if (trackingHeatmapInfo == null) return new NotFoundResult();
+                if (trackingHeatmapInfo.Removed) return new NotFoundResult();
+                response.name = trackingHeatmapInfo.Name;
+                response.typeUrl = trackingHeatmapInfo.TypeUrl;
+                response.trackingUrl = trackingHeatmapInfo.TrackingUrl;
                 switch (device)
                 {
                     case 0: response.imageUrl = trackingHeatmapInfo.SmImageUrl; break;
@@ -621,7 +644,7 @@ namespace HeatMapAPIServices.Repository
 
 
 
-
+                //count
                 List<TrackedHeatmapData> datas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
                         .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl && s.CreatedAt >= from && s.CreatedAt <= to)
                         .ToList();
@@ -673,12 +696,12 @@ namespace HeatMapAPIServices.Repository
 
 
 
-                return response;
+                return new OkObjectResult(response);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return null;
+                return new UnprocessableEntityResult();
 
             }
         }
@@ -689,11 +712,11 @@ namespace HeatMapAPIServices.Repository
             return origin.AddSeconds(timestamp);
         }
 
-        public Object getStatisticFunnel(int webID, int trackingFunnelInfoID, long from, long to, int userId)
+        public IActionResult getStatisticFunnel(int webID, int trackingFunnelInfoID, long from, long to, int userId)
         {
             try
             {
-                if (!checkAuthencation(webID, userId)) return null;
+                if (!checkAuthencation(webID, userId)) return new UnauthorizedResult();
                 TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.FirstOrDefault(s => s.TrackingFunnelInfoId == trackingFunnelInfoID);
                 List<Step> trackingInfoFunnelSteps = JsonConvert.DeserializeObject<List<Step>>(trackingFunnelInfo.Steps);
                 List<int> trackedFunnelDataIDs = context.TrackedFunnelData
@@ -801,12 +824,17 @@ namespace HeatMapAPIServices.Repository
                         , trackingInfoFunnelSteps[i - 1].typeUrl, count);
                     statisticFunnelResponses.Add(statisticFunnelResponse);
                 }
-                return statisticFunnelResponses;
+                return new OkObjectResult(new
+                {
+                    name = trackingFunnelInfo.Name,
+                    statistic = statisticFunnelResponses
+
+                });
             }
             catch (Exception ex)
             {
                 Console.WriteLine("\n==========================================================================\nERROR: " + ex.Message);
-                return null;
+                return new UnprocessableEntityResult();
             }
         }
 

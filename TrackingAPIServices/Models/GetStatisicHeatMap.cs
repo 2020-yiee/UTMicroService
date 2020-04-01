@@ -7,5 +7,8 @@
         public string scroll { get; set; }
         public string visit { get; set; }     
         public string imageUrl { get; set; }
+        public string name { get; set; }
+        public string typeUrl { get; set; }
+        public string trackingUrl { get; set; }
     }
 }

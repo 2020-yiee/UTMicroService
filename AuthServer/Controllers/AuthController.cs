@@ -41,7 +41,7 @@ namespace AuthServer.Controllers
         }
 
         [HttpGet("forgot-password")]
-        public IActionResult forgotPassword([FromQuery] string mail)
+        public IActionResult resend([FromQuery] string mail)
         {
             return _repository.processForgotPassword(mail);
         }

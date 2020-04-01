@@ -15,24 +15,24 @@ namespace CustomersAPIServices.Repository
     {
         IActionResult createUser(CreateUserRequest webOwner);
         IEnumerable<User> getAllUsers();
-        Object getUser(int webOwnerId);
+        IActionResult getUser(int webOwnerId);
 
         Boolean deleteUser(int WebOwnerId);
         Boolean updateUser(UpdateUserRequest request,int userId);
         IEnumerable<WebsiteResponse> getWebsites(int webOwnerId);
         bool deleteWebsite(int webOwnerId, int webId);
         WebsiteResponse createWebsite(CreateWebsiteRequest request,int userId);
-        object checkUserEmail(string email);
+        IActionResult checkUserEmail(string email);
         object createOrganization(OrganizationRequest request, int v);
         object updateOrganization(UpdateOrganizationRequest request, int userId);
         object DeleteOrganization(int organizationID, int v);
         bool verifyWebsite(verifiedRequest request);
-        User lockUser(LockRequest request);
+        IActionResult lockUser(LockRequest request);
         IActionResult getAllUserOrganizationAndWebsites(int userID);
         IActionResult getAllWebSite();
-        Website lockWebsite(LockRequest request);
+        IActionResult lockWebsite(LockRequest request);
         IActionResult getAllMemberOfOrganization(int organizationIDs,int v);
-        IActionResult inviteUser(int userID,string email,int organizationID);
+        IActionResult inviteUser(int userID,string email,int organizationID,int roleID);
         IActionResult uninviteUser(int v, string email, int organizationID);
         IActionResult changeRole(int v, string email, int organizationID);
     }

@@ -112,7 +112,7 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public Object getUser(int userId)
+        public IActionResult getUser(int userId)
         {
             User temp = context.User
                     .Where(s => s.UserId == userId)
@@ -123,12 +123,14 @@ namespace CustomersAPIServices.Repository
                 List<int> organizationIds = context.Access.Where(s => s.UserId == temp.UserId).Select(s => s.OrganizationId).ToList();
                 if(organizationIds==null || organizationIds.Count == 0)
                 {
-                    return new
-                    {
-                        organizations = new List<Object>(),
-                        user = new UserResponse(temp.UserId, temp.FullName, temp.Email)
-                       
-                    };
+                    return new OkObjectResult(
+                        new
+                        {
+                            organizations = new List<Object>(),
+                            user = new UserResponse(temp.UserId, temp.FullName, temp.Email)
+
+                        }
+                        );
                 }
                 List<Organization> organizations = context.Organization
                     .Where(s => organizationIds.Contains(s.OrganizationId) == true)
@@ -151,12 +153,12 @@ namespace CustomersAPIServices.Repository
                     organizationResponses.Add(new OrganizationResponse(organization.OrganizationId, organization.Name,access.Role,organization.Removed,websites));
                 }
 
-                return new
+                return new OkObjectResult(new
                 {
                     organizations = organizationResponses,
                     user = new UserResponse(temp.UserId, temp.FullName, temp.Email)
 
-                };
+                });
             }
             else
             {
@@ -226,7 +228,8 @@ namespace CustomersAPIServices.Repository
                     .Where(s => s.UserId == userId)
                     .Where(s => s.Actived == true).FirstOrDefault();
                 if (user == null) return false;
-                List<int> organizationIds = context.Access.Where(s => s.UserId == user.UserId && s.Role == 1).Select(s => s.OrganizationId).ToList();
+                List<int> organizationIds = context.Access.Where(s => s.UserId == user.UserId)
+                    .Where(s => s.Role == 1 || s.Role == 2).Select(s => s.OrganizationId).ToList();
 
                 Website website = context.Website
                     //.Where(s => s.WebOwnerId == webOwnerId)
@@ -253,6 +256,8 @@ namespace CustomersAPIServices.Repository
             User user = context.User
                     .Where(s => s.UserId == userId)
                     .Where(s => s.Actived == true).FirstOrDefault();
+            Organization organization = context.Organization.Where(s => s.OrganizationId == request.organizationID).FirstOrDefault();
+            if (organization == null) return null;
             if (user == null) return null;
             Website website = new Website();
             website.DomainUrl = request.domainUrl;
@@ -278,15 +283,15 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public object checkUserEmail( string email)
+        public IActionResult checkUserEmail( string email)
         {
             User user = context.User.Where(s => s.Email == email).FirstOrDefault();
-            if (user != null) return new
+            if (user != null) return new OkObjectResult(new
             {
                 type = "ERROR",
                 emailMessage = "Email has been existed"
-            };
-            return new { type = "SUCCESS" };
+            });
+            return new OkObjectResult(new { type = "SUCCESS" });
 
         }
 
@@ -359,15 +364,7 @@ namespace CustomersAPIServices.Repository
                 return true;
             }
             else return false;
-        }
-        private Boolean checkAuthencation(int websiteId, int userId)
-        {
-            List<int> orgIds = context.Access.Where(s => s.UserId == userId && s.Role == 1).Select(s => s.OrganizationId).ToList();
-            if (orgIds == null || orgIds.Count == 0) return false;
-            Website website = context.Website.FirstOrDefault(s => s.WebId == websiteId);
-            if (website == null) return false;
-            return orgIds.Contains(website.OrganizationId);
-        }
+        }       
         //=============================================admin==================================================
         public IEnumerable<User> getAllUsers()
         {
@@ -381,7 +378,7 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public User lockUser(LockRequest request)
+        public IActionResult lockUser(LockRequest request)
         {
             try
             {
@@ -391,11 +388,11 @@ namespace CustomersAPIServices.Repository
                     user.Actived = request.locked;
                     context.SaveChanges();
                 }
-                return user;
+                return new OkObjectResult(user);
             }
             catch (Exception)
             {
-                return null;
+                return new UnprocessableEntityResult();
             }
         }
 
@@ -451,7 +448,7 @@ namespace CustomersAPIServices.Repository
             }
         }
 
-        public Website lockWebsite(LockRequest request)
+        public IActionResult lockWebsite(LockRequest request)
         {
             try
             {
@@ -461,11 +458,11 @@ namespace CustomersAPIServices.Repository
                     website.Removed = request.locked;
                     context.SaveChanges();
                 }
-                return website;
+                return new OkObjectResult(website);
             }
             catch (Exception ex)
             {
-                return null;
+                return new UnprocessableEntityResult();
             }
         }
 
@@ -500,7 +497,7 @@ namespace CustomersAPIServices.Repository
             }
             return new OkObjectResult(memberResponses);
         }
-        public IActionResult inviteUser(int userID,string email,int orgID)
+        public IActionResult inviteUser(int userID,string email,int orgID, int roleID)
         {
             if(!checkOrgAuthencation(orgID, userID)) return new UnauthorizedResult();
             var user = context.User.Where(s => s.Email == email).FirstOrDefault();
@@ -510,7 +507,7 @@ namespace CustomersAPIServices.Repository
             access.DayJoin = (long)timeSpan.TotalSeconds;
             access.OrganizationId = orgID;
             access.UserId = user.UserId;
-            access.Role = 2;
+            access.Role = roleID;
             context.Access.Add(access);
             context.SaveChanges();
             return new OkObjectResult(access);
@@ -528,7 +525,8 @@ namespace CustomersAPIServices.Repository
             if (!checkOrgAuthencation(orgID, userID)) return new UnauthorizedResult();
             var user = context.User.Where(s => s.Email == email).FirstOrDefault();
             if (user == null) return new NotFoundResult();
-            Access access = context.Access.Where(s => s.UserId == user.UserId && s.Role == 2 && s.OrganizationId == orgID).FirstOrDefault();
+            Access access = context.Access.Where(s => s.UserId == user.UserId && s.OrganizationId == orgID).
+                Where(s => s.Role == 2 || s.Role == 3).FirstOrDefault();
             if (access == null) return new NotFoundResult();
             context.Access.Remove(access);
             context.SaveChanges();

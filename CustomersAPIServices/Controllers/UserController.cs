@@ -51,9 +51,7 @@ namespace CustomersAPIServices.Controllers
         [HttpPut("api/admin/user/lock")]
         public IActionResult lockUser([FromBody] LockRequest request)
         {
-            User result = repository.lockUser(request);
-            if (result != null) return Ok(result);
-            return BadRequest();
+            return repository.lockUser(request);
         }
 
         [Authorize(Roles = "admin")]
@@ -75,9 +73,7 @@ namespace CustomersAPIServices.Controllers
         [HttpPut("api/admin/website/lock")]
         public IActionResult lockWebsites([FromBody] LockRequest request)
         {
-            Website result = repository.lockWebsite(request);
-            if (result != null) return Ok(result);
-            return BadRequest();
+            return repository.lockWebsite(request);
         }
 
         //====================================user crud======================================================
@@ -85,17 +81,8 @@ namespace CustomersAPIServices.Controllers
         [HttpGet("api/user")]   
         public IActionResult getUser()
         {
-            try
-            {
-                Object result = repository.getUser(GetUserId());
-                if (result != null) return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-                throw;
-            }    
-            return BadRequest();
+                return repository.getUser(GetUserId());
+            
         }
 
         [HttpPost("api/user")]
@@ -126,16 +113,14 @@ namespace CustomersAPIServices.Controllers
         [HttpGet("api/user/check")]
         public IActionResult checkUsernameOrEmail(string email)
         {
-            var result = repository.checkUserEmail( email);
-            if (result != null) return Ok(result);
-            return BadRequest();
+            return repository.checkUserEmail( email);
         }
 
         [Authorize]
         [HttpGet("api/user/organization/member/invite")]
-        public IActionResult inviteUser(string email,int organizationID)
+        public IActionResult inviteUser(string email,int organizationID, int roleID)
         {
-            return repository.inviteUser(GetUserId(), email,organizationID);
+            return repository.inviteUser(GetUserId(), email,organizationID, roleID);
         }
 
         [Authorize]

@@ -15,8 +15,8 @@ namespace HeatMapAPIServices.Repository
         Boolean createTrackedHeatmapData(SaveDataRequest data);
         IEnumerable<TrackedHeatmapData> getTrackedHeatmapData(string trackingUrl, int type);
         IActionResult getCheckingHeatmapInfo(int websiteId, int userId);
-        IActionResult createHeatmapTrackingInfor(CreateTrackingHeatmapInforRequest request, int userId);
-        TrackingHeatmapInfo updateTrackingHeatmapInfor(UpdateTrackingHeatmapInforRequest request, int userId);
+        IActionResult createHeatmapTrackingInfo(CreateTrackingHeatmapInforRequest request, int userId);
+        IActionResult updateTrackingHeatmapInfo(UpdateTrackingHeatmapInforRequest request, int userId);
         bool deleteTrackingHeatmapInfo(int trackingHeatmapInfoId, int userId);
         bool deleteTrackingFunnelInfo(int trackingId, int userId);
         IEnumerable<TrackingFunnelInfo> getCheckingFunnelInfo(int webID, int v);
@@ -25,9 +25,9 @@ namespace HeatMapAPIServices.Repository
         List<TrackedFunnelData> getTrackedFunnelData(int webID);
         List<StatisticHeatmap> getstatisticHeatmapData(int trackingHeatmapInfoID);
         List<StatisticFunnel> getstatisticFunnelData(int trackingFunnelInfoID);
-        object udpateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int v);
-        object getStatisticHeatMap(int webID, int trackingInfoID, int from, int to, int device, int v);
-        Object getStatisticFunnel(int webID, int trackingFunnelInfoID, long from, long to, int userId);
+        IActionResult udpateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int v);
+        IActionResult getStatisticHeatMap(int webID, int trackingInfoID, int from, int to, int device, int v);
+        IActionResult getStatisticFunnel(int webID, int trackingFunnelInfoID, long from, long to, int userId);
         IActionResult udpateNameFunnelTrackingInfo(udpateTrackingNameInfoRequest request, int v);
     }
 }
