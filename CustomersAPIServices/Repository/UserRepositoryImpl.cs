@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Mail;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,6 +78,31 @@ namespace CustomersAPIServices.Repository
                 new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, Role)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("LgS9RPkJ0bf9PgdkzzHZM7hJdGCdW_gfGVHDNT1P3FvDdDpAWzan2JOzDtAuYHoP"));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.UtcNow.AddDays(Convert.ToDouble(7));
+
+            var token = new JwtSecurityToken(
+                "https://dev-tkt68df2.auth0.com/",
+                "fHkCJ1ingY7v9zWpbrKwDqeGlr3zIIlm",
+                claims,
+                expires: expires,
+                signingCredentials: creds
+            );
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        public string GenerateJwtInviteToken(User user,string email, string Role,int orgID, int orgRole)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim("UserId", user.UserId.ToString()),
+                new Claim("orgID", orgID.ToString()),
+                new Claim("orgRole", orgRole.ToString()),
+                new Claim("email", email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Role, Role)
             };
 
@@ -500,8 +526,19 @@ namespace CustomersAPIServices.Repository
         public IActionResult inviteUser(int userID,string email,int orgID, int roleID)
         {
             if(!checkOrgAuthencation(orgID, userID)) return new UnauthorizedResult();
+            if (roleID == 1) return new BadRequestResult();
             var user = context.User.Where(s => s.Email == email).FirstOrDefault();
-            if (user == null) return new NotFoundResult();
+            if (user == null)
+            {
+                sendInviteMail(email
+                    ,GenerateJwtInviteToken(
+                        context.User.Where(s =>s.UserId == userID).FirstOrDefault()
+                        ,email
+                        , "user", orgID,roleID
+                    )
+                    );
+                return new NotFoundResult();
+            }
             Access access = new Access();
             var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
             access.DayJoin = (long)timeSpan.TotalSeconds;
@@ -543,6 +580,63 @@ namespace CustomersAPIServices.Repository
             if (access.Role == 2) access.Role = 3; else access.Role = 2;
             context.SaveChanges();
             return new OkObjectResult(access);
+        }
+
+        public bool sendInviteMail(string email, string token)
+        {
+            try
+            {
+                MailMessage mail = new MailMessage();
+                SmtpClient SmtpServer = new SmtpClient("smtp.gmail.com");
+
+                mail.From = new MailAddress("yitechteam@gmail.com");
+                mail.To.Add(email);
+                mail.Subject = "Invite letter from Yitech";
+                mail.Body = "<p>Hi, we are Yitech service, your friend invited you to join our service and his/her organization</p>" +
+                    "<p><a href='http://www.google.com?token="+token+
+                    "'>click here</a>" + " to access his/her organization.</p> Thank you.";
+                mail.IsBodyHtml = true;
+                SmtpServer.Port = 587;
+                SmtpServer.Credentials = new System.Net.NetworkCredential("yitechteam@gmail.com", "yitechteam2020!");
+                SmtpServer.EnableSsl = true;
+
+                SmtpServer.Send(mail);
+                Console.WriteLine("mail Send");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                return false;
+            }
+        }
+
+        public IActionResult inviteNewUser(InviteNewUserRequest request, int inviteUserID, string email, int orgID, int orgRole)
+        {
+            try
+            {
+                User user = new User();
+                user.Actived = true;
+                user.Email = email;
+                user.FullName = request.fullName;
+                user.Password = Hashing.HashPassword(request.password);
+                context.User.Add(user);
+                context.SaveChanges();
+
+                Access access = new Access();
+                var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+                access.DayJoin = (long)timeSpan.TotalSeconds;
+                access.OrganizationId = orgID;
+                access.UserId = user.UserId;
+                access.Role = orgRole;
+                context.Access.Add(access);
+                context.SaveChanges();
+                return getUser(user.UserId);
+            }
+            catch (Exception)
+            {
+                return new BadRequestResult();
+            }
         }
     }
 }

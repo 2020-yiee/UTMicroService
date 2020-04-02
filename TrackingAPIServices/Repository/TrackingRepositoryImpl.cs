@@ -99,24 +99,39 @@ namespace HeatMapAPIServices.Repository
 
         //----------------------------------tracking heatmap info--------------------------------
 
-        private bool checkTrackingHeatmapInfoExisted(int webId, string trackingUrl, string name)
+        private bool checkTrackingHeatmapInfoExisted(CreateTrackingHeatmapInforRequest request)
         {
-            List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == webId)
+            List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == request.webID && s.Removed == false)
                 .ToList().Select(s => s.TrackingUrl).ToList();
-            List<string> listName = context.TrackingHeatmapInfo.Where(s => s.WebId == webId)
+            List<string> listName = context.TrackingHeatmapInfo.Where(s => s.WebId == request.webID && s.Removed == false)
                 .ToList().Select(s => s.Name).ToList();
-
-            if (listTrackingUrl.Contains(trackingUrl) == true || listName.Contains(name) == true) return false;
-            Website web = context.Website.Where(s => s.WebId == webId).FirstOrDefault();
-            if (!trackingUrl.Contains(web.DomainUrl)) return true;
+            if (listTrackingUrl.Contains(request.trackingUrl) == true || listName.Contains(request.name) == true) return true;
             return false;
 
         }
+        private bool checkDomainUrl(CreateTrackingHeatmapInforRequest request)
+        {
+            try
+            {
+                string domainUrl = context.Website.Where(s => s.WebId == request.webID).Select(s => s.DomainUrl).FirstOrDefault();
+                if(request.typeUrl == "start-with" || request.typeUrl == "match")
+                {
+                    if (!request.trackingUrl.Contains(domainUrl)) return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR " + ex.Message);
+                return false;
+                throw;
+            }
+            return true;
+        }
         private bool checkTrackingHeatmapInfoExisted1(int webId, string name)
         {
-            List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == webId)
+            List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == webId && s.Removed == false)
                 .ToList().Select(s => s.TrackingUrl).ToList();
-            List<string> listName = context.TrackingHeatmapInfo.Where(s => s.WebId == webId)
+            List<string> listName = context.TrackingHeatmapInfo.Where(s => s.WebId == webId && s.Removed == false)
                 .ToList().Select(s => s.Name).ToList();
 
             if (listName.Contains(name) == true) return false;
@@ -159,8 +174,8 @@ namespace HeatMapAPIServices.Repository
         public IActionResult createHeatmapTrackingInfo(CreateTrackingHeatmapInforRequest request, int userId)
         {
             if (!checkAuthencation(request.webID, userId)) return new BadRequestResult();
-            if (checkTrackingHeatmapInfoExisted(request.webID, request.trackingUrl, request.name)) return new BadRequestResult();
-            if (!checkDomainUrl(request.webID, request.trackingUrl)) return null;
+            if (checkTrackingHeatmapInfoExisted(request)) return new BadRequestResult();
+            if (!checkDomainUrl(request)) return null;
             if (!TYPEURL.Contains(request.typeUrl)) return new BadRequestResult();
             TrackingHeatmapInfo info = new TrackingHeatmapInfo();
             info.WebId = request.webID;
@@ -178,7 +193,7 @@ namespace HeatMapAPIServices.Repository
                 // client.Authenticator = new HttpBasicAuthenticator(username, password);
                 var requests = new RestRequest();
                 requests.AddHeader("Content-Type", "application/json");
-                requests.Timeout = 20000;
+                requests.Timeout = 60000;
                 string content = null;
                 try
                 {
@@ -189,19 +204,23 @@ namespace HeatMapAPIServices.Repository
                 {
                     context.TrackingHeatmapInfo.Remove(info);
                     context.SaveChanges();
-                    throw;
+                    return new UnprocessableEntityResult();
                 }
                 if (content == null)
                 {
                     context.TrackingHeatmapInfo.Remove(info);
                     context.SaveChanges();
+                    return new UnprocessableEntityResult();
                 }
-                CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
-                info.SmImageUrl = captureResponse.smImageUrl;
-                info.MdImageUrl = captureResponse.mdImageUrl;
-                info.LgImageUrl = captureResponse.lgImageUrl;
-                context.SaveChanges();
-                return new OkObjectResult(info);
+                else
+                {
+                    CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
+                    info.SmImageUrl = captureResponse.smImageUrl;
+                    info.MdImageUrl = captureResponse.mdImageUrl;
+                    info.LgImageUrl = captureResponse.lgImageUrl;
+                    context.SaveChanges();
+                    return new OkObjectResult(info);
+                }
             }
             catch (Exception ex)
             {
@@ -212,13 +231,15 @@ namespace HeatMapAPIServices.Repository
 
         public IActionResult updateTrackingHeatmapInfo(UpdateTrackingHeatmapInforRequest request, int userId)
         {
-            TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID).FirstOrDefault();
+            TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => 
+            s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID && s.Removed == false).FirstOrDefault();
             if (!checkTrackingHeatmapInfoExisted1(trackingHeatmapInfo.WebId, request.newName)) return new BadRequestResult();
             if (!checkAuthencation(trackingHeatmapInfo.WebId, userId)) return new BadRequestResult();
             try
             {
                 TrackingHeatmapInfo info = context.TrackingHeatmapInfo
-                    .Where(s => s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID).FirstOrDefault();
+                    .Where(s => s.TrackingHeatmapInfoId == request.trackingHeatmapInfoID
+                    && s.Removed == false).FirstOrDefault();
                 if (info != null)
                 {
                     info.Name = request.newName;
@@ -235,7 +256,8 @@ namespace HeatMapAPIServices.Repository
         }
         public bool deleteTrackingHeatmapInfo(int trackingHeatmapInfoId, int userId)
         {
-            TrackingHeatmapInfo thi = context.TrackingHeatmapInfo.Where(s => s.TrackingHeatmapInfoId == trackingHeatmapInfoId).FirstOrDefault();
+            TrackingHeatmapInfo thi = context.TrackingHeatmapInfo.Where(s => s.TrackingHeatmapInfoId == trackingHeatmapInfoId
+            && s.Removed == false).FirstOrDefault();
             if (thi == null) return false;
             if (!checkAuthencation(thi.WebId, userId)) return false;
             try
@@ -259,29 +281,15 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        private bool checkDomainUrl(int webId, string url)
-        {
-            try
-            {
-                string domainUrl = context.Website.Where(s => s.WebId == webId).Select(s => s.DomainUrl).FirstOrDefault();
-                if (!url.Contains(domainUrl)) return false;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("ERROR " + ex.Message);
-                return false;
-                throw;
-            }
-            return true;
-        }
+        
 
         //----------------------------tracking funnel info-----------------------------------
 
         private bool checkTrackingFunnelInfoExisted(int webId, string steps, string name)
         {
-            List<string> listSteps = context.TrackingFunnelInfo.Where(s => s.WebId == webId)
+            List<string> listSteps = context.TrackingFunnelInfo.Where(s => s.WebId == webId && s.Removed == false)
                 .ToList().Select(s => s.Steps).ToList();
-            List<string> listName = context.TrackingFunnelInfo.Where(s => s.WebId == webId)
+            List<string> listName = context.TrackingFunnelInfo.Where(s => s.WebId == webId && s.Removed == false)
                 .ToList().Select(s => s.Name).ToList();
 
             if (listSteps.Contains(steps) == true || listName.Contains(name) == true) return true;
@@ -297,6 +305,7 @@ namespace HeatMapAPIServices.Repository
                 List<Step> deserializedSteps = steps;
                 foreach (Step item in deserializedSteps)
                 {
+                    if (!TYPEURL.Contains(item.typeUrl)) return false;
                     if (!TYPEURL.Contains(item.typeUrl)) return false;
                     if (item.typeUrl == "match" && item.typeUrl == "start-with")
                     {
@@ -355,21 +364,33 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
-        public IActionResult udpateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int userId)
+        public IActionResult updateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int userId)
         {
             try
             {
-                if (!checkAuthencation(request.webID, userId)) return new BadRequestResult();
-                if (!checkStepDomainUrl(request.webID, request.steps)) return new BadRequestResult();
-                udpateNameFunnelTrackingInfo(
-                    new udpateTrackingNameInfoRequest(request.trackingFunnelInfoID, request.newName), userId);
-                TrackingFunnelInfo info = context.TrackingFunnelInfo
-                    .Where(s => s.TrackingFunnelInfoId == request.trackingFunnelInfoID)
+                TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo
+                    .Where(s => s.TrackingFunnelInfoId == request.trackingFunnelInfoID && s.Removed == false)
                     .FirstOrDefault();
-                if (info == null) return new BadRequestResult();
-                info.Steps = JsonConvert.SerializeObject(request.steps);
+                if (trackingFunnelInfo == null) return new BadRequestResult(); 
+                
+                if (!checkAuthencation(trackingFunnelInfo.WebId, userId)) return new BadRequestResult();
+                if (!checkStepDomainUrl(trackingFunnelInfo.WebId, request.steps)) return new BadRequestResult();
+
+                //update name tracking funnel info
+                Website website = context.Website.Where(s => s.WebId == trackingFunnelInfo.WebId).FirstOrDefault();
+                Access access = context.Access.Where(s => s.OrganizationId == website.OrganizationId
+                && s.UserId == userId).FirstOrDefault();
+                if (access == null) return new BadRequestResult();
+                if (access.Role != 1) return new UnauthorizedResult();
+                List<string> names = context.TrackingFunnelInfo.Where(s => s.WebId == website.WebId
+                && s.Removed == false && s.TrackingFunnelInfoId != request.trackingFunnelInfoID)
+                    .Select(s => s.Name).ToList();
+                if (names.Contains(request.newName)) return new BadRequestResult();
+                trackingFunnelInfo.Name = request.newName;
+                
+                trackingFunnelInfo.Steps = JsonConvert.SerializeObject(request.steps);
                 context.SaveChanges();
-                return new OkObjectResult(info);
+                return new OkObjectResult(trackingFunnelInfo);
             }
             catch (Exception ex)
             {
@@ -380,7 +401,8 @@ namespace HeatMapAPIServices.Repository
 
         public bool deleteTrackingFunnelInfo(int trackingId, int userId)
         {
-            TrackingFunnelInfo thi = context.TrackingFunnelInfo.Where(s => s.TrackingFunnelInfoId == trackingId).FirstOrDefault();
+            TrackingFunnelInfo thi = context.TrackingFunnelInfo.Where(s => s.TrackingFunnelInfoId == trackingId
+            && s.Removed == false).FirstOrDefault();
             if (thi == null) return false;
             if (!checkAuthencation(thi.WebId, userId)) return false;
             try
@@ -492,7 +514,8 @@ namespace HeatMapAPIServices.Repository
                 if (!checkAuthencation(webID, userId)) return new UnauthorizedResult();
 
                 //click hover
-                TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.WebId == webID)
+                TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.WebId == webID
+                && s.Removed == false)
                 .Where(s => s.TrackingHeatmapInfoId == trackingInfoID)
                 .FirstOrDefault();
                 if (trackingHeatmapInfo == null) return new NotFoundResult();
@@ -717,7 +740,8 @@ namespace HeatMapAPIServices.Repository
             try
             {
                 if (!checkAuthencation(webID, userId)) return new UnauthorizedResult();
-                TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.FirstOrDefault(s => s.TrackingFunnelInfoId == trackingFunnelInfoID);
+                TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.FirstOrDefault(s => 
+                s.TrackingFunnelInfoId == trackingFunnelInfoID && s.Removed == false);
                 List<Step> trackingInfoFunnelSteps = JsonConvert.DeserializeObject<List<Step>>(trackingFunnelInfo.Steps);
                 List<int> trackedFunnelDataIDs = context.TrackedFunnelData
                     .Where(s => s.WebId == webID && from <= s.CreatedAt && s.CreatedAt <= to)
@@ -837,25 +861,6 @@ namespace HeatMapAPIServices.Repository
                 return new UnprocessableEntityResult();
             }
         }
-
-        public IActionResult udpateNameFunnelTrackingInfo(udpateTrackingNameInfoRequest request, int v)
-        {
-            TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.Where(s => s.TrackingFunnelInfoId == request.trackingFunnelInfoID)
-                .FirstOrDefault();
-            if (trackingFunnelInfo == null) return new NotFoundResult();
-            Website website = context.Website.Where(s => s.WebId == trackingFunnelInfo.WebId).FirstOrDefault();
-            Access access = context.Access.Where(s => s.OrganizationId == website.OrganizationId
-            && s.UserId == v).FirstOrDefault();
-            if (access == null) return new BadRequestResult();
-            if (access.Role != 1) return new UnauthorizedResult();
-            List<string> names = context.TrackingFunnelInfo.Where(s => s.WebId == website.WebId)
-                .Select(s => s.Name).ToList();
-            if (names.Contains(request.newName)) return new BadRequestResult();
-            trackingFunnelInfo.Name = request.newName;
-            context.SaveChanges();
-            return new OkObjectResult(trackingFunnelInfo);
-        }
-
 
     }
 

@@ -132,7 +132,7 @@ namespace HeatMapAPIServices.Controllers
         [Authorize]
         public IActionResult updateNameStepsTrackingFunnelInfo([FromBody] udpateTrackingStepInfoRequest request)
         {
-            return iRepository.udpateFunnelTrackingInfo(request, GetUserId());
+            return iRepository.updateFunnelTrackingInfo(request, GetUserId());
         }
 
         //[HttpPut("api/funnel-info")]

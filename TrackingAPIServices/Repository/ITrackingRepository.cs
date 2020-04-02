@@ -25,9 +25,8 @@ namespace HeatMapAPIServices.Repository
         List<TrackedFunnelData> getTrackedFunnelData(int webID);
         List<StatisticHeatmap> getstatisticHeatmapData(int trackingHeatmapInfoID);
         List<StatisticFunnel> getstatisticFunnelData(int trackingFunnelInfoID);
-        IActionResult udpateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int v);
+        IActionResult updateFunnelTrackingInfo(udpateTrackingStepInfoRequest request, int v);
         IActionResult getStatisticHeatMap(int webID, int trackingInfoID, int from, int to, int device, int v);
-        IActionResult getStatisticFunnel(int webID, int trackingFunnelInfoID, long from, long to, int userId);
-        IActionResult udpateNameFunnelTrackingInfo(udpateTrackingNameInfoRequest request, int v);
+        IActionResult getStatisticFunnel(int webID, int trackingFunnelInfoID, long from, long to, int userId);  
     }
 }

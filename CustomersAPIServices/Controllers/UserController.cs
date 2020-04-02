@@ -124,6 +124,17 @@ namespace CustomersAPIServices.Controllers
         }
 
         [Authorize]
+        [HttpPost("api/user/organization/member/invite/new")]
+        public IActionResult inviteNewUser([FromBody] InviteNewUserRequest request)
+        {
+            return repository.inviteNewUser(request,GetUserId()
+                ,this.User.Claims.First(i => i.Type == "email").Value
+                , int.Parse(this.User.Claims.First(i => i.Type == "orgID").Value)
+                , int.Parse(this.User.Claims.First(i => i.Type == "orgRole").Value));
+        }
+
+
+        [Authorize]
         [HttpDelete("api/user/organization/member/uninvite")]
         public IActionResult uninviteUser(string email, int organizationID)
         {

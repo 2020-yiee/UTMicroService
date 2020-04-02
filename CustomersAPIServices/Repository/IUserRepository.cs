@@ -35,5 +35,6 @@ namespace CustomersAPIServices.Repository
         IActionResult inviteUser(int userID,string email,int organizationID,int roleID);
         IActionResult uninviteUser(int v, string email, int organizationID);
         IActionResult changeRole(int v, string email, int organizationID);
+        IActionResult inviteNewUser(InviteNewUserRequest request, int v1, string value, int v2, int v3);
     }
 }
