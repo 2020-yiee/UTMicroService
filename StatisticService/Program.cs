@@ -17,29 +17,67 @@ namespace StatisticService
         public static async System.Threading.Tasks.Task Main(string[] args)
         {
             List<int> EVENT_TYPE_LIST = new List<int>();
-            int currentID = -1;
+            int currentClickHoverID = -1;
+            int currentScrollID = -1;
+            int currentFunnelID = -1;
 
             Console.WriteLine("Hello World!");
             EVENT_TYPE_LIST.Add(0);
             EVENT_TYPE_LIST.Add(1);
-            //updateStatisticData();
             while (true)
             {
-                Console.WriteLine("\n\n\n\n*********\nNEW ROUND WITH ID " + currentID + "\n*********\n");
-                currentID = await updateStatisticData();
+                Console.WriteLine("\n\n\n\n*********\nNEW ROUND WITH ID \nCurrent click hover id =" + currentClickHoverID + "\nCurrent scroll id =" + currentScrollID +
+                    "\nCurrent funnel id =" + currentFunnelID + "\n*********\n");
+
+                currentScrollID = await updateStatisticScrollDataAsync();
+                currentFunnelID = await updateStatisticFunnelDataAsync();
+                currentClickHoverID = await updateStatisticClickHoverDataAsync();
+
                 Thread.Sleep(2 * 60 * 1000);
             }
 
-
-            
-
-            async System.Threading.Tasks.Task<int> updateStatisticData()
+            //============================================================================================================================================================
+            async System.Threading.Tasks.Task<int> updateStatisticFunnelDataAsync()
             {
-                List<TrackedHeatmapData> trackedList = context.TrackedHeatmapData.Where(s => s.TrackedHeatmapDataId > currentID)
-                .Where(s => EVENT_TYPE_LIST.Contains(s.EventType)).ToList();
+                int max = -1;
 
+                //funnel
+                foreach (var trackedFunnelData in context.TrackedFunnelData.ToList())
+                {
+
+                    StatisticFunnel statisticFunnel = context.StatisticFunnel.Where(s => s.TrackedFunnelDataId == trackedFunnelData.TrackedFunnelDataId).FirstOrDefault();
+                    if (statisticFunnel == null)
+                    {
+                        Console.WriteLine("ADD STATISTIC FUNNEL FOR ID " + trackedFunnelData.TrackedFunnelDataId);
+                        StatisticFunnel newStatisticFunnel = new StatisticFunnel();
+                        newStatisticFunnel.TrackedFunnelDataId = trackedFunnelData.TrackedFunnelDataId;
+                        newStatisticFunnel.StatisticData = trackedFunnelData.TrackedSteps;
+                        context.StatisticFunnel.Add(newStatisticFunnel);
+                        await context.SaveChangesAsync();
+
+                        max = newStatisticFunnel.TrackedFunnelDataId;
+                    }
+                    else
+                    {
+                        if (statisticFunnel.StatisticData != trackedFunnelData.TrackedSteps)
+                        {
+                            statisticFunnel.StatisticData = trackedFunnelData.TrackedSteps;
+                            context.SaveChanges();
+                            Console.WriteLine("UPDATE FUNNEL DATA FOR ID " + statisticFunnel.TrackedFunnelDataId);
+                        }
+
+                        max = statisticFunnel.TrackedFunnelDataId;
+                    }
+                }
+                return max;
+            }
+
+            //============================================================================================================================================================
+            async System.Threading.Tasks.Task<int> updateStatisticScrollDataAsync()
+            {
+                int max = currentScrollID;
                 //scroll data
-                List<TrackedHeatmapData> trackedScrollData = context.TrackedHeatmapData.Where(s => s.EventType == 2 && s.TrackedHeatmapDataId > currentID).ToList();
+                List<TrackedHeatmapData> trackedScrollData = context.TrackedHeatmapData.Where(s => s.EventType == 2 && s.TrackedHeatmapDataId > currentScrollID).ToList();
                 try
                 {
                     foreach (var item in trackedScrollData)
@@ -91,6 +129,7 @@ namespace StatisticService
                             }
                             catch (Exception ex)
                             {
+                                Console.WriteLine(ex.Message);
                                 Console.WriteLine("ERROR ADD STATISTIC SCROLL DATA");
                             }
                         }
@@ -99,25 +138,38 @@ namespace StatisticService
                             try
                             {
 
-                                Console.WriteLine("STATISTIC SCROLL DATA FOR ID " + statisticHeatmap.TrackedHeatmapDataId);
-                                statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
-                                await context.SaveChangesAsync();
+                                if (JsonConvert.SerializeObject(statisticScrollData) != statisticHeatmap.StatisticData)
+                                {
+
+                                    Console.WriteLine("UPDATE STATISTIC SCROLL DATA FOR ID " + statisticHeatmap.TrackedHeatmapDataId);
+                                    statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticScrollData);
+                                    await context.SaveChangesAsync();
+                                }
                             }
                             catch (Exception)
                             {
                                 Console.WriteLine("ERROR UPDATE STATISTIC SCROLL DATA ID " + statisticHeatmap.TrackedHeatmapDataId);
                             }
                         }
+                        max = item.TrackedHeatmapDataId;
                     }
                 }
                 catch (Exception)
                 {
                     Console.WriteLine("scrool data error: do not add documentHeight");
                 }
+                return max;
+            }
 
-
+            //============================================================================================================================================================
+            async System.Threading.Tasks.Task<int> updateStatisticClickHoverDataAsync()
+            {
                 //click and hover
-                int max = currentID;
+                List<TrackedHeatmapData> trackedList = context.TrackedHeatmapData.Where(s => s.TrackedHeatmapDataId > currentClickHoverID)
+                .Where(s => EVENT_TYPE_LIST.Contains(s.EventType)).ToList();
+
+
+                int max = currentClickHoverID;
 
                 foreach (var item in trackedList)
                 {
@@ -171,27 +223,55 @@ namespace StatisticService
                         requestData.Add(tablet);
                         requestData.Add(desktop);
 
-                        var client = new RestClient("http://localhost:7777/dom/coordinates/" + url);
-                        Console.WriteLine("\n===================================================================================\n" + "start call api: " + client.BaseUrl.ToString());
+                        var client = new RestClient("http://localhost:8082/dom/coordinates/" + url);
+                        Console.WriteLine("start call api: " + client.BaseUrl.ToString());
                         // client.Authenticator = new HttpBasicAuthenticator(username, password);
                         var request = new RestRequest();
-                        request.AddParameter("url", url);
+                        //request.AddParameter("url", url);
                         request.AddHeader("Content-Type", "application/json");
-                        var json = JsonConvert.SerializeObject(requestData);
+                        //var json = JsonConvert.SerializeObject(requestData);
                         request.AddJsonBody(requestData);
+                        request.Timeout = 60000;
                         var response = client.Post(request);
                         var content = response.Content;
-
-                        Console.WriteLine(" done call api" + "\n===================================================================================\n" + "Response:\n");
-                        Console.WriteLine(response.StatusCode +" "+response.ErrorMessage);
+                        Console.WriteLine(" receive response");
+                        int countTime = 1;
+                        while ((content == null || response.StatusCode.Equals(System.Net.HttpStatusCode.BadRequest)) && countTime <= 5)
+                        {
+                            Console.WriteLine("Error browser service. try again.");
+                            countTime += 1;
+                            Thread.Sleep(5000);
+                            response = client.Post(request);
+                            content = response.Content;
+                        }
+                        if (content == null)
+                        {
+                            max = subTrackedList.Last().TrackedHeatmapDataId;
+                            Console.WriteLine("Error browser service. tried 5 time already and stop.");
+                            return max - 1;
+                        }
+                        Console.WriteLine(" done call api");
+                        Console.WriteLine(response.StatusCode.ToString());
+                        Console.WriteLine("response error message: " + response.ErrorMessage);
                         List<ResponseData> responseData = new List<ResponseData>();
                         var settings = new JsonSerializerSettings
                         {
                             NullValueHandling = NullValueHandling.Include,
                             MissingMemberHandling = MissingMemberHandling.Ignore
                         };
+                        List<List<ResponseData>> responseDatas = new List<List<ResponseData>>();
+                        try
+                        {
+                            responseDatas = JsonConvert.DeserializeObject<List<List<ResponseData>>>(content);
+                        }
+                        catch (Exception ex)
+                        {
 
-                        List<List<ResponseData>> responseDatas = JsonConvert.DeserializeObject<List<List<ResponseData>>>(content);
+                            Console.WriteLine("ERROR from url " + url + " :" + ex.Message);
+                            max = subTrackedList.Last().TrackedHeatmapDataId;
+                            Console.WriteLine("Error browser service. stop.");
+                            return max - 1;
+                        }
                         foreach (var item in responseDatas)
                         {
                             responseData.AddRange(item);
@@ -205,23 +285,44 @@ namespace StatisticService
                         {
                             List<ResponseData> subData = responseData.Where(s => s.trackedHeatmapDataID == id).ToList();
                             StatisticHeatmap statisticHeatmap = context.StatisticHeatmap.Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
+                            List<StatisticData> statisticDatas = new List<StatisticData>();
+                            foreach (var item in subData)
+                            {
+                                statisticDatas.Add(new StatisticData(item.x, item.y));
+                            }
                             if (statisticHeatmap == null)
                             {
                                 statisticHeatmap = new StatisticHeatmap();
                                 statisticHeatmap.TrackedHeatmapDataId = id;
-                                List<StatisticData> statisticDatas = new List<StatisticData>();
-                                foreach (var item in subData)
-                                {
-                                    statisticDatas.Add(new StatisticData(item.x, item.y));
-                                }
                                 statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticDatas);
+                                
                                 try
                                 {
                                     context.StatisticHeatmap.Add(statisticHeatmap);
                                     await context.SaveChangesAsync();
+                                    Console.WriteLine("ADD STATISTIC CLICK HOVER ID " + statisticHeatmap.TrackedHeatmapDataId);
                                 }
                                 catch (Exception ex)
                                 {
+                                    Console.WriteLine(ex.Message);
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                if(statisticHeatmap.StatisticData != JsonConvert.SerializeObject(statisticDatas))
+                                {
+
+                                    try
+                                    {
+                                        await context.SaveChangesAsync();
+                                        Console.WriteLine("UPDATE STATISTIC CLICK HOVER ID " + statisticHeatmap.TrackedHeatmapDataId);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine(ex.Message);
+                                        continue;
+                                    }
                                 }
                             }
 
@@ -229,32 +330,10 @@ namespace StatisticService
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("\n===================================================================================\n"
-                            + "ERROR from url " + url + " :" + ex.Message
-                            + "\n===================================================================================\n");
+                        Console.WriteLine("ERROR from url " + url + " :" + ex.Message);
                         continue;
                     }
 
-                }
-                //funnel
-                foreach (var trackedFunnelData in context.TrackedFunnelData.ToList())
-                {
-                    
-                    StatisticFunnel statisticFunnel = context.StatisticFunnel.Where(s => s.TrackedFunnelDataId == trackedFunnelData.TrackedFunnelDataId).FirstOrDefault();
-                    if (statisticFunnel == null)
-                    {
-                        Console.WriteLine("ADD STATISTIC FUNNEL FOR ID " + trackedFunnelData.TrackedFunnelDataId);
-                        StatisticFunnel newStatisticFunnel = new StatisticFunnel();
-                        newStatisticFunnel.TrackedFunnelDataId = trackedFunnelData.TrackedFunnelDataId;
-                        newStatisticFunnel.StatisticData = trackedFunnelData.TrackedSteps;
-                        context.StatisticFunnel.Add(newStatisticFunnel);
-                        await context.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        statisticFunnel.StatisticData = trackedFunnelData.TrackedSteps;
-                        await context.SaveChangesAsync();
-                    }
                 }
 
                 Console.WriteLine("Statistic done .");

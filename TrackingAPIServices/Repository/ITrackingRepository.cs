@@ -14,12 +14,12 @@ namespace HeatMapAPIServices.Repository
     {
         Boolean createTrackedHeatmapData(SaveDataRequest data);
         IEnumerable<TrackedHeatmapData> getTrackedHeatmapData(string trackingUrl, int type);
-        IActionResult getCheckingHeatmapInfo(int websiteId, int userId);
+        IActionResult getTrackingHeatmapInfo(int websiteId, int userId);
         IActionResult createHeatmapTrackingInfo(CreateTrackingHeatmapInforRequest request, int userId);
         IActionResult updateTrackingHeatmapInfo(UpdateTrackingHeatmapInforRequest request, int userId);
         bool deleteTrackingHeatmapInfo(int trackingHeatmapInfoId, int userId);
         bool deleteTrackingFunnelInfo(int trackingId, int userId);
-        IEnumerable<TrackingFunnelInfo> getCheckingFunnelInfo(int webID, int v);
+        IEnumerable<TrackingFunnelInfoResponse> getTrackingFunnelInfo(int webID, int v);
         IActionResult createFunnelTrackingInfo(CreateTrackingFunnelInforRequest request, int v);
         bool createTrackedFunnelData(SaveFunnelDataRequest data);
         List<TrackedFunnelData> getTrackedFunnelData(int webID);

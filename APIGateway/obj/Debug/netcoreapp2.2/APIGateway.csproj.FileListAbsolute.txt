@@ -32,3 +32,5 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Debug\netcoreap
 D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Debug\netcoreapp2.2\APIGateway.RazorTargetAssemblyInfo.cache
 D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Debug\netcoreapp2.2\APIGateway.dll
 D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Debug\netcoreapp2.2\APIGateway.pdb
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Debug\netcoreapp2.2\APIGateway.csproj.CoreCompileInputs.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\APIGateway\obj\Debug\netcoreapp2.2\APIGateway.genruntimeconfig.cache

@@ -53,3 +53,5 @@ D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\net
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.csprojAssemblyReference.cache
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.csproj.CoreCompileInputs.cache
 D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\obj\Debug\netcoreapp3.1\StatisticService.genruntimeconfig.cache
+D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\netcoreapp3.1\app.yaml
+D:\learningData\CN9\SWP49X\Service\UTMicroService\StatisticService\bin\Debug\netcoreapp3.1\Dockerfile

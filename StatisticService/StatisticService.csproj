@@ -5,6 +5,12 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove=".dockerignore" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include=".dockerignore" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6" />
@@ -18,5 +24,9 @@
     <None Update="Settings.job">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.yaml" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Dockerfile" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

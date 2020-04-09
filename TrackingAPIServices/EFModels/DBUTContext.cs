@@ -163,6 +163,8 @@ namespace TrackingAPIServices.EFModels
             {
                 entity.Property(e => e.TrackingFunnelInfoId).HasColumnName("trackingFunnelInfoID");
 
+                entity.Property(e => e.AuthorId).HasColumnName("authorID");
+
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
                 entity.Property(e => e.Name)
@@ -181,6 +183,8 @@ namespace TrackingAPIServices.EFModels
             modelBuilder.Entity<TrackingHeatmapInfo>(entity =>
             {
                 entity.Property(e => e.TrackingHeatmapInfoId).HasColumnName("trackingHeatmapInfoID");
+
+                entity.Property(e => e.AuthorId).HasColumnName("authorID");
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 

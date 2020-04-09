@@ -11,5 +11,6 @@ namespace CustomersAPIServices.EFModels
         public string Steps { get; set; }
         public bool Removed { get; set; }
         public long CreatedAt { get; set; }
+        public int AuthorId { get; set; }
     }
 }

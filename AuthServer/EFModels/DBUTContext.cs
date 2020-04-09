@@ -163,6 +163,8 @@ namespace AuthServer.EFModels
             {
                 entity.Property(e => e.TrackingFunnelInfoId).HasColumnName("trackingFunnelInfoID");
 
+                entity.Property(e => e.AuthorId).HasColumnName("authorID");
+
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
                 entity.Property(e => e.Name)
@@ -182,6 +184,8 @@ namespace AuthServer.EFModels
             {
                 entity.Property(e => e.TrackingHeatmapInfoId).HasColumnName("trackingHeatmapInfoID");
 
+                entity.Property(e => e.AuthorId).HasColumnName("authorID");
+
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
                 entity.Property(e => e.LgImageUrl).HasColumnName("lgImageUrl");
@@ -199,6 +203,11 @@ namespace AuthServer.EFModels
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
                     .HasColumnName("trackingUrl");
+
+                entity.Property(e => e.TypeUrl)
+                    .HasColumnName("typeUrl")
+                    .HasMaxLength(20)
+                    .HasDefaultValueSql("('match')");
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
             });

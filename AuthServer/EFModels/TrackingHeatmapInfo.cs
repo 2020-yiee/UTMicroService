@@ -14,5 +14,7 @@ namespace AuthServer.EFModels
         public string LgImageUrl { get; set; }
         public string MdImageUrl { get; set; }
         public string SmImageUrl { get; set; }
+        public string TypeUrl { get; set; }
+        public int AuthorId { get; set; }
     }
 }
