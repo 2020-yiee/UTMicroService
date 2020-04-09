@@ -32,7 +32,7 @@ namespace StatisticService.EFModels
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("server=34.87.164.163;Database=DBUT;Trusted_Connection=False;user Id=sqlserver;password=123");
+                optionsBuilder.UseSqlServer("server=35.240.190.80;Database=DBUT;Trusted_Connection=False;user Id=sqlserver;password=123");
             }
         }
 
