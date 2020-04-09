@@ -1,22 +1,22 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: service-tracking
+  name: service-user
 spec:
   replicas: 1
   selector:
     matchLabels:
-      component: service-tracking
+      component: service-user
   template:
     metadata:
       labels:
-        component: service-tracking
+        component: service-user
     spec:
       containers:
         - env:
             - name: SPRING_EUREKA
               value: http://eureka-cluster-ip-service:8761/eureka
-          image: asia.gcr.io/citric-tiger-271310/service-tracking:1.9.7
-          name: service-tracking
+          image: asia.gcr.io/citric-tiger-271310/service-user:1.8.1
+          name: service-user
           ports:
             - containerPort: 80

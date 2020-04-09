@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: service-tracking-5d95f88699-ptdbp								
+  name: service-user-5446bcf8db-795bl		
 spec:
   type: ClusterIP
   selector:
-    component: service-tracking
+    component: service-user
   ports:
   - port: 80
     targetPort: 80

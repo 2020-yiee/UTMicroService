@@ -329,10 +329,17 @@ namespace HeatMapAPIServices.Repository
         {
             using (var context = new DBUTContext())
             {
-                TrackingHeatmapInfo thi = context.TrackingHeatmapInfo.Where(s => s.TrackingHeatmapInfoId == trackingHeatmapInfoId
-            && s.Removed == false && s.AuthorId == userId).FirstOrDefault();
-                if (thi == null) return false;
-                if (!checkWebsiteAuthencation(thi.WebId, userId, true)) return false;
+                TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => 
+                s.TrackingHeatmapInfoId == trackingHeatmapInfoId
+                && s.Removed == false ).FirstOrDefault();
+                if (trackingHeatmapInfo == null) return false;
+                Website website = context.Website.FirstOrDefault(s => s.WebId == trackingHeatmapInfo.WebId);
+                if(context.Access.FirstOrDefault(s => s.OrganizationId == website.OrganizationId
+                && s.UserId == userId).Role != 1)
+                {
+                    if (trackingHeatmapInfo.AuthorId != userId) return false;
+                }
+                if (!checkWebsiteAuthencation(trackingHeatmapInfo.WebId, userId, true)) return false;
                 try
                 {
                     List<TrackingHeatmapInfo> datas = context.TrackingHeatmapInfo
@@ -561,10 +568,16 @@ namespace HeatMapAPIServices.Repository
         {
             using (var context = new DBUTContext())
             {
-                TrackingFunnelInfo thi = context.TrackingFunnelInfo.Where(s => s.TrackingFunnelInfoId == trackingId
+                TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.Where(s => s.TrackingFunnelInfoId == trackingId
             && s.Removed == false).FirstOrDefault();
-                if (thi == null) return false;
-                if (!checkWebsiteAuthencation(thi.WebId, userId, true)) return false;
+                if (trackingFunnelInfo == null) return false;
+                Website website = context.Website.FirstOrDefault(s => s.WebId == trackingFunnelInfo.WebId);
+                if (context.Access.FirstOrDefault(s => s.OrganizationId == website.OrganizationId
+                 && s.UserId == userId).Role != 1)
+                {
+                    if (trackingFunnelInfo.AuthorId != userId) return false;
+                }
+                if (!checkWebsiteAuthencation(trackingFunnelInfo.WebId, userId, true)) return false;
                 try
                 {
                     List<TrackingFunnelInfo> datas = context.TrackingFunnelInfo
