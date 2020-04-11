@@ -60,28 +60,19 @@ namespace HeatMapAPIServices.Repository
             {
                 try
                 {
-                    List<string> validTrackingUrl = context.TrackingHeatmapInfo.Where(s =>
-                        s.Removed == false && s.Tracking == true
-                        && context.Website.Where(w =>
-                            w.Removed == false 
-                            && context.Organization.Where(o => 
-                                o.Removed == false 
-                                && context.User.Where(u => u.Actived == true).Select(u => u.UserId).ToList()
-                                .Contains(context.Access.FirstOrDefault(a =>
-                                    a.OrganizationId == o.OrganizationId && a.Role == 1).UserId))
-                            .Select(o => o.OrganizationId)
-                            .ToList()
-                            .Contains(w.OrganizationId))
-                        .Select(w => w.WebId)
-                        .ToList()
-                        .Contains(s.WebId))
-                       .Select(s => s.TrackingUrl).ToList();
-                    if (!validTrackingUrl.Contains(request.trackingUrl)) return false;
+                    Website website = context.Website.Where(s => s.WebId == request.webID && s.Removed ==false).FirstOrDefault();
+                    if (website == null) return false;
+                    Access access = context.Access.FirstOrDefault(s => s.OrganizationId == website.OrganizationId && s.Role == 1);
+                    if (access == null) return false;
+                    User user = context.User.FirstOrDefault(s => s.UserId == access.UserId && s.Actived == true);
+                    if (user == null) return false;
+                    TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.LastOrDefault(s => s.TrackingUrl == request.trackingUrl
+                    && s.Tracking == true && s.WebId == request.webID);
+                    if (trackingHeatmapInfo == null) return false;
 
                     TrackedHeatmapData trackedData = new TrackedHeatmapData();
                     trackedData.TrackingUrl = request.trackingUrl;
                     trackedData.WebId = request.webID;
-                    Website website = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
                     website.Verified = true;
                     trackedData.Data = request.data;
                     trackedData.EventType = request.eventType;
