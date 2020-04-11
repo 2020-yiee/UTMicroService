@@ -6,6 +6,7 @@ using RestSharp;
 using StatisticAPIService.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -129,7 +130,8 @@ namespace HeatMapAPIServices.Repository
                 List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => 
                 s.WebId == request.webID && s.Removed == false && s.TypeUrl == request.typeUrl)
                 .ToList().Select(s => s.TrackingUrl).ToList();
-                List<string> listName = context.TrackingHeatmapInfo.Where(s => s.WebId == request.webID && s.Removed == false)
+                List<string> listName = context.TrackingHeatmapInfo.Where(
+                    s => s.WebId == request.webID && s.Removed == false)
                     .ToList().Select(s => s.Name).ToList();
                 if (listTrackingUrl.Contains(request.trackingUrl) == true || listName.Contains(request.name) == true) return true;
                 return false;
@@ -181,19 +183,28 @@ namespace HeatMapAPIServices.Repository
                 try
                 {
                     if (!checkWebsiteAuthencation(websiteId, userId, false)) return new UnauthorizedResult();
-                    IEnumerable<TrackingHeatmapInfo> trackingInfos = context.TrackingHeatmapInfo
-                        .Where(s => s.WebId == websiteId)
-                        .Where(s => s.Removed == false)
-                        .ToList();
+                    List<string> trackingHeatmapUrls = context.TrackingHeatmapInfo.Where(
+                        s => s.WebId == websiteId && s.Removed == false).Select(s => s.TrackingUrl)
+                        .Distinct().ToList();
+                    List<TrackingHeatmapInfo> trackingInfos = new List<TrackingHeatmapInfo>();
+                    foreach (var url in trackingHeatmapUrls)
+                    {
+                        trackingInfos.Add(context.TrackingHeatmapInfo.Last(
+                            s => s.TrackingUrl == url && s.Removed == false));
+                    }
 
                     List<TrackingHeatmapInfoResponse> trackingHeatmapInfoResponses = new List<TrackingHeatmapInfoResponse>();
 
                     foreach (var trackingInfo in trackingInfos)
                     {
                         List<TrackedHeatmapData> datas = context.TrackedHeatmapData.Where(s => s.WebId == websiteId)
-                            .Where(s => s.TrackingUrl == trackingInfo.TrackingUrl)
+                            .Where(s => s.TrackingUrl == trackingInfo.TrackingUrl
+                            && s.CreatedAt >= trackingInfo.CreatedAt)
                             .ToList();
-
+                        if(trackingInfo.Tracking == false)
+                        {
+                            datas = datas.Where(s => s.CreatedAt <= trackingInfo.EndAt).ToList();
+                        }
                         List<DateTime> times = new List<DateTime>();
                         foreach (var item in datas)
                         {
@@ -211,10 +222,11 @@ namespace HeatMapAPIServices.Repository
                         {
                             visit += countVisit(time, datas);
                         }
-                        trackingHeatmapInfoResponses.Add(new TrackingHeatmapInfoResponse(trackingInfo.TrackingHeatmapInfoId, trackingInfo.WebId,
-                            trackingInfo.TrackingUrl, trackingInfo.Removed, trackingInfo.Name, trackingInfo.CreatedAt, trackingInfo.LgImageUrl,
-                            trackingInfo.MdImageUrl, trackingInfo.SmImageUrl, trackingInfo.TypeUrl, trackingInfo.AuthorId,
-                            context.User.Where(s => s.UserId == trackingInfo.AuthorId).FirstOrDefault().FullName, visit));
+                        trackingHeatmapInfoResponses.Add(new TrackingHeatmapInfoResponse(
+                            trackingInfo.TrackingHeatmapInfoId,
+                            trackingInfo.TrackingUrl, trackingInfo.Name, trackingInfo.CreatedAt,
+                            context.User.Where(s => s.UserId == trackingInfo.AuthorId).FirstOrDefault().FullName, visit,
+                            trackingInfo.Version));
                     }
 
                     return new OkObjectResult(trackingHeatmapInfoResponses);
@@ -224,6 +236,56 @@ namespace HeatMapAPIServices.Repository
                     Console.WriteLine("ERROR: " + ex.Message);
                     return new BadRequestResult();
                 }
+            }
+        }
+
+        public IActionResult getAllVersionTrackingHeatmapInfo(int trackingHeatmapInfoID,int userId)
+        {
+            using (var context = new DBUTContext())
+            {
+                TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(
+                    s => s.TrackingHeatmapInfoId == trackingHeatmapInfoID && s.Removed == false).FirstOrDefault();
+                if (trackingHeatmapInfo == null) return new NotFoundResult();
+                if (!checkWebsiteAuthencation(trackingHeatmapInfo.WebId, userId, false)) return new UnauthorizedResult();
+                List<TrackingHeatmapInfo> trackingHeatmapInfos = context.TrackingHeatmapInfo.Where(
+                    s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl
+                    && s.Removed == false).ToList();
+                List<TrackingHeatmapInfoResponse> responses = new List<TrackingHeatmapInfoResponse>();
+                foreach (var trackingInfo in trackingHeatmapInfos)
+                {
+                    List<TrackedHeatmapData> datas = context.TrackedHeatmapData.Where(s => s.WebId == trackingInfo.WebId)
+                            .Where(s => s.TrackingUrl == trackingInfo.TrackingUrl
+                            && s.CreatedAt >= trackingInfo.CreatedAt)
+                            .ToList();
+                    if (trackingInfo.Tracking == false)
+                    {
+                        datas = datas.Where(s => s.CreatedAt <= trackingInfo.EndAt).ToList();
+                    }
+                    List<DateTime> times = new List<DateTime>();
+                    foreach (var item in datas)
+                    {
+                        DateTime time = convertTimeStamp(item.CreatedAt);
+                        int day = time.Day;
+                        int month = time.Month;
+                        int year = time.Year;
+                        DateTime timetemp = new DateTime(year, month, day);
+                        times.Add(timetemp);
+                    }
+                    times = times.Distinct().ToList();
+                    List<VisitResponse> visitResponses = new List<VisitResponse>();
+                    int visit = 0;
+                    foreach (DateTime time in times)
+                    {
+                        visit += countVisit(time, datas);
+                    }
+                    responses.Add(new TrackingHeatmapInfoResponse(
+                            trackingInfo.TrackingHeatmapInfoId,
+                            trackingInfo.TrackingUrl, trackingInfo.Name, trackingInfo.CreatedAt,
+                            context.User.Where(s => s.UserId == trackingInfo.AuthorId).FirstOrDefault().FullName, visit,
+                            trackingInfo.Version));
+                }
+                
+                return new OkObjectResult(responses);
             }
         }
 
@@ -259,20 +321,59 @@ namespace HeatMapAPIServices.Repository
         {
             using (var context = new DBUTContext())
             {
-                if (!checkValidTrackingHeatmapInfo(request, userId)) return new BadRequestResult();
+                TimeSpan timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+                bool hasPre = checkTrackingHeatmapInfoExisted(request);
+                if (!checkValidTrackingHeatmapInfo(request, userId))
+                {
+                    if (hasPre)
+                    {
+                        List<TrackingHeatmapInfo> trackingHeatmapInfos = context.TrackingHeatmapInfo.Where(
+                           s => s.TrackingUrl == request.trackingUrl && s.Removed == false).ToList();
+                        if (request.version != null)
+                        {
+                            List<string> versions = trackingHeatmapInfos.Select(s => s.Version).ToList();
+                            if (versions.Contains(request.version)) return new ConflictResult();
+                        }
+                        TrackingHeatmapInfo trackingHeatmapInfo = trackingHeatmapInfos.Last();
+                        trackingHeatmapInfo.Tracking = false;
+                        trackingHeatmapInfo.EndAt = (long)timeSpan.TotalSeconds;
+                    }
+                    else return new BadRequestResult();
+                }
                 TrackingHeatmapInfo info = new TrackingHeatmapInfo();
                 info.WebId = request.webID;
                 info.Name = request.name;
                 info.TrackingUrl = request.trackingUrl;
                 info.Removed = false;
-                var timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
                 info.CreatedAt = (long)timeSpan.TotalSeconds;
                 info.TypeUrl = request.typeUrl;
                 info.AuthorId = userId;
+                if (request.version != null) info.Version = request.version;
+                else
+                {
+                    if (hasPre)
+                    {
+                        DateTime dt = convertTimeStamp(timeSpan.TotalSeconds);
+                        info.Version = dt.ToString("ddMMyyyy.HHmmssUTC", CultureInfo.InvariantCulture);
+                    }
+                    else
+                    {
+                        info.Version = "Default";
+                    }
+                }
+                info.Tracking = true;
+                info.EndAt = 0;
                 try
                 {
-                    context.TrackingHeatmapInfo.Add(info);
-                    context.SaveChanges();
+                    try
+                    {
+                        context.TrackingHeatmapInfo.Add(info);
+                        context.SaveChanges();
+                    }catch(Exception e)
+                    {
+                        Console.WriteLine("Error " + e.Message);
+                        return new UnprocessableEntityResult();
+                    }
                     var client = new RestClient("https://browser-service.herokuapp.com/capture/" + info.WebId + "/" + info.TrackingHeatmapInfoId + "/" + request.captureUrl);
                     // client.Authenticator = new HttpBasicAuthenticator(username, password);
                     var requests = new RestRequest();
@@ -298,12 +399,26 @@ namespace HeatMapAPIServices.Repository
                     }
                     else
                     {
-                        CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
-                        info.SmImageUrl = captureResponse.smImageUrl;
-                        info.MdImageUrl = captureResponse.mdImageUrl;
-                        info.LgImageUrl = captureResponse.lgImageUrl;
-                        context.SaveChanges();
-                        return new OkObjectResult(info);
+                        try
+                        {
+                            CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
+                            info.SmImageUrl = captureResponse.smImageUrl;
+                            info.MdImageUrl = captureResponse.mdImageUrl;
+                            info.LgImageUrl = captureResponse.lgImageUrl;
+                            context.SaveChanges();
+                            return new OkObjectResult(info);
+                        }
+                        catch (Exception)
+                        {
+                            var response = client.Post(requests);
+                            content = response.Content;
+                            CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
+                            info.SmImageUrl = captureResponse.smImageUrl;
+                            info.MdImageUrl = captureResponse.mdImageUrl;
+                            info.LgImageUrl = captureResponse.lgImageUrl;
+                            context.SaveChanges();
+                            return new OkObjectResult(info);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -367,6 +482,9 @@ namespace HeatMapAPIServices.Repository
                     foreach (var data in datas)
                     {
                         data.Removed = true;
+                        TrackingHeatmapInfo trackingHeatmapPre = context.TrackingHeatmapInfo.FirstOrDefault(
+                            s => s.EndAt == data.CreatedAt);
+                        trackingHeatmapPre.Tracking = true;
                     }
                     context.SaveChanges();
                     return true;
@@ -726,10 +844,13 @@ namespace HeatMapAPIServices.Repository
                     .Where(s => s.TrackingHeatmapInfoId == trackingInfoID)
                     .FirstOrDefault();
                     if (trackingHeatmapInfo == null) return new NotFoundResult();
-                    if (trackingHeatmapInfo.Removed) return new NotFoundResult();
                     response.name = trackingHeatmapInfo.Name;
                     response.typeUrl = trackingHeatmapInfo.TypeUrl;
                     response.trackingUrl = trackingHeatmapInfo.TrackingUrl;
+                    if(trackingHeatmapInfo.Tracking == false)
+                    {
+                        to = (int)trackingHeatmapInfo.EndAt;
+                    }
                     switch (device)
                     {
                         case 0: response.imageUrl = trackingHeatmapInfo.SmImageUrl; break;
@@ -744,18 +865,21 @@ namespace HeatMapAPIServices.Repository
                             case "match":
                                 trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
                                    .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl)
+                                   .Where(s => s.CreatedAt >= trackingHeatmapInfo.CreatedAt)
                                    .Where(s => s.CreatedAt >= from)
                                    .Where(s => s.CreatedAt <= to)
                                    .Where(s => s.EventType == eventType).ToList(); break;
                             case "contain":
                                 trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
                                     .Where(s => s.TrackingUrl.Contains(trackingHeatmapInfo.TrackingUrl))
+                                    .Where(s => s.CreatedAt >= trackingHeatmapInfo.CreatedAt)
                                     .Where(s => s.CreatedAt >= from)
                                     .Where(s => s.CreatedAt <= to)
                                     .Where(s => s.EventType == eventType).ToList(); break;
                             case "start-with":
                                 trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
                                     .Where(s => s.TrackingUrl.LastIndexOf(trackingHeatmapInfo.TrackingUrl) == 0)
+                                    .Where(s => s.CreatedAt >= trackingHeatmapInfo.CreatedAt)
                                     .Where(s => s.CreatedAt >= from)
                                     .Where(s => s.CreatedAt <= to)
                                     .Where(s => s.EventType == eventType).ToList(); break;
@@ -763,11 +887,13 @@ namespace HeatMapAPIServices.Repository
                                 trackedHeatmapDatas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
                                     .Where(s => (s.TrackingUrl.LastIndexOf(trackingHeatmapInfo.TrackingUrl) + trackingHeatmapInfo.TrackingUrl.Length)
                                     == s.TrackingUrl.Length)
+                                    .Where(s => s.CreatedAt >= trackingHeatmapInfo.CreatedAt)
                                     .Where(s => s.CreatedAt >= from)
                                     .Where(s => s.CreatedAt <= to)
                                     .Where(s => s.EventType == eventType).ToList(); break;
                             case "regex":
                                 List<TrackedHeatmapData> trackedHeatmapData = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                                    .Where(s => s.CreatedAt >= trackingHeatmapInfo.CreatedAt)
                                     .Where(s => s.CreatedAt >= from)
                                     .Where(s => s.CreatedAt <= to)
                                     .Where(s => s.EventType == eventType).ToList();
@@ -876,6 +1002,7 @@ namespace HeatMapAPIServices.Repository
 
                     //count
                     List<TrackedHeatmapData> datas = context.TrackedHeatmapData.Where(s => s.WebId == webID)
+                            .Where(s => s.CreatedAt >= trackingHeatmapInfo.CreatedAt)
                             .Where(s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl && s.CreatedAt >= from && s.CreatedAt <= to)
                             .ToList();
 

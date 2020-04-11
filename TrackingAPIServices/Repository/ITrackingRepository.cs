@@ -15,6 +15,7 @@ namespace HeatMapAPIServices.Repository
         Boolean createTrackedHeatmapData(SaveDataRequest data);
         IEnumerable<TrackedHeatmapData> getTrackedHeatmapData(string trackingUrl, int type);
         IActionResult getTrackingHeatmapInfo(int websiteId, int userId);
+        IActionResult getAllVersionTrackingHeatmapInfo(int trackingUrl, int userId);
         IActionResult createHeatmapTrackingInfo(CreateTrackingHeatmapInforRequest request, int userId);
         IActionResult updateTrackingHeatmapInfo(UpdateTrackingHeatmapInforRequest request, int userId);
         bool deleteTrackingHeatmapInfo(int trackingHeatmapInfoId, int userId);

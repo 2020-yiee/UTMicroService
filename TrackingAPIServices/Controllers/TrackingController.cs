@@ -70,7 +70,13 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult getTrackingHeatmapInfo(int webID)
         {
             return iRepository.getTrackingHeatmapInfo(webID, GetUserId());
+        }
 
+        [HttpGet("api/tracking-info/all-version")]
+        [Authorize]
+        public IActionResult getAllVersionTrackingHeatmapInfo(int trackingHeatmapInfoID)
+        {
+            return iRepository.getAllVersionTrackingHeatmapInfo(trackingHeatmapInfoID, GetUserId());
         }
 
         [HttpPost("api/tracking-info")]
