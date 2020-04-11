@@ -16,5 +16,8 @@ namespace StatisticService.EFModels
         public string SmImageUrl { get; set; }
         public string TypeUrl { get; set; }
         public int AuthorId { get; set; }
+        public bool? Tracking { get; set; }
+        public long? EndAt { get; set; }
+        public string Version { get; set; }
     }
 }

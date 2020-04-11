@@ -12,5 +12,6 @@ namespace HeatMapAPIServices.Models
         public string trackingUrl { get; set; }
         public string typeUrl { get; set; }
         public string captureUrl { get; set; }
+        public string version { get; set; }
     }
 }

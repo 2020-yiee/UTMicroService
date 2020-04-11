@@ -59,10 +59,24 @@ namespace HeatMapAPIServices.Repository
             {
                 try
                 {
-                    Website website1 = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
-                    if (website1 == null || website1.Removed == true) return false;
-                    User user = context.User.Where(s => s.UserId == website1.AuthorId).FirstOrDefault();
-                    if (user == null || user.Actived == false) return false;
+                    List<string> validTrackingUrl = context.TrackingHeatmapInfo.Where(s =>
+                        s.Removed == false && s.Tracking == true
+                        && context.Website.Where(w =>
+                            w.Removed == false 
+                            && context.Organization.Where(o => 
+                                o.Removed == false 
+                                && context.User.Where(u => u.Actived == true).Select(u => u.UserId).ToList()
+                                .Contains(context.Access.FirstOrDefault(a =>
+                                    a.OrganizationId == o.OrganizationId && a.Role == 1).UserId))
+                            .Select(o => o.OrganizationId)
+                            .ToList()
+                            .Contains(w.OrganizationId))
+                        .Select(w => w.WebId)
+                        .ToList()
+                        .Contains(s.WebId))
+                       .Select(s => s.TrackingUrl).ToList();
+                    if (!validTrackingUrl.Contains(request.trackingUrl)) return false;
+
                     TrackedHeatmapData trackedData = new TrackedHeatmapData();
                     trackedData.TrackingUrl = request.trackingUrl;
                     trackedData.WebId = request.webID;
@@ -111,7 +125,9 @@ namespace HeatMapAPIServices.Repository
         {
             using (var context = new DBUTContext())
             {
-                List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => s.WebId == request.webID && s.Removed == false)
+                if (!TYPEURL.Contains(request.typeUrl)) return false;
+                List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s => 
+                s.WebId == request.webID && s.Removed == false && s.TypeUrl == request.typeUrl)
                 .ToList().Select(s => s.TrackingUrl).ToList();
                 List<string> listName = context.TrackingHeatmapInfo.Where(s => s.WebId == request.webID && s.Removed == false)
                     .ToList().Select(s => s.Name).ToList();
@@ -215,6 +231,7 @@ namespace HeatMapAPIServices.Repository
         {
             using (var context = new DBUTContext())
             {
+                if(context.User.FirstOrDefault(s => s.UserId == userId) == null) return false;
                 List<int> orgIds = context.Access.Where(s => s.UserId == userId).Select(s => s.OrganizationId).ToList();
                 if (orgIds == null || orgIds.Count == 0) return false;
                 Website website = context.Website.FirstOrDefault(s => s.WebId == websiteId);
@@ -618,9 +635,11 @@ namespace HeatMapAPIServices.Repository
                 {
                     Website website1 = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
                     if (website1 == null || website1.Removed == true) return false;
-                    User user = context.User.Where(s => s.UserId == website1.AuthorId).FirstOrDefault();
-                    if (user == null || user.Actived == false) return false;
-
+                    Organization organization = context.Organization.FirstOrDefault(s => s.OrganizationId == website1.OrganizationId);
+                    User user = context.User.FirstOrDefault(s => s.UserId ==
+                    context.Access.FirstOrDefault(a => a.OrganizationId == organization.OrganizationId
+                     && a.Role == 1).UserId && s.Actived == true);
+                    if (user == null) return false;
                     TrackedFunnelData datac = checkTrackedFunnelDataExisted(request.sessionID);
                     if (datac != null)
                     {

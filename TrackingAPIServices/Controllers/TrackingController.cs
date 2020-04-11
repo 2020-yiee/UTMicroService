@@ -39,8 +39,8 @@ namespace HeatMapAPIServices.Controllers
         public IActionResult createTrackedHeatmapData([FromBody] SaveDataRequest data)
         {
             Boolean result = iRepository.createTrackedHeatmapData(data);
-            if (result) return Ok();
-            return BadRequest();
+                if (result) return Ok();
+                return BadRequest();   
         }
 
 
@@ -161,6 +161,7 @@ namespace HeatMapAPIServices.Controllers
         [HttpPost("api/tracked-funnel-data")]
         public IActionResult createTrackedFunnelData([FromBody] SaveFunnelDataRequest data)
         {
+
             Boolean result = iRepository.createTrackedFunnelData(data);
             if (result) return Ok();
             return BadRequest();

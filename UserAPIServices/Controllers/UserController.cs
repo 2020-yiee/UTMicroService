@@ -16,7 +16,6 @@ namespace UserAPIServices.Controllers
     [EnableCors]
     public class UserController : Controller
     {
-
         protected int GetUserId()
         {
             try

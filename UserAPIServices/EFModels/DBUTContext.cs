@@ -188,6 +188,8 @@ namespace UserAPIServices.EFModels
 
                 entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
 
+                entity.Property(e => e.EndAt).HasColumnName("endAt");
+
                 entity.Property(e => e.LgImageUrl).HasColumnName("lgImageUrl");
 
                 entity.Property(e => e.MdImageUrl).HasColumnName("mdImageUrl");
@@ -200,6 +202,8 @@ namespace UserAPIServices.EFModels
 
                 entity.Property(e => e.SmImageUrl).HasColumnName("smImageUrl");
 
+                entity.Property(e => e.Tracking).HasColumnName("tracking");
+
                 entity.Property(e => e.TrackingUrl)
                     .IsRequired()
                     .HasColumnName("trackingUrl");
@@ -208,6 +212,10 @@ namespace UserAPIServices.EFModels
                     .HasColumnName("typeUrl")
                     .HasMaxLength(20)
                     .HasDefaultValueSql("('match')");
+
+                entity.Property(e => e.Version)
+                    .HasColumnName("version")
+                    .HasMaxLength(10);
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
             });
