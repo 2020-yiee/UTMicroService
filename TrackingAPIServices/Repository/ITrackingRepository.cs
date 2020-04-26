@@ -18,7 +18,7 @@ namespace HeatMapAPIServices.Repository
         IActionResult getAllVersionTrackingHeatmapInfo(int trackingUrl, int userId);
         IActionResult createHeatmapTrackingInfo(CreateTrackingHeatmapInforRequest request, int userId);
         IActionResult updateTrackingHeatmapInfo(UpdateTrackingHeatmapInforRequest request, int userId);
-        bool deleteTrackingHeatmapInfo(int trackingHeatmapInfoId, int userId);
+        bool deleteTrackingHeatmapInfo(int trackingHeatmapInfoId, int userId, bool isVersion);
         bool deleteTrackingFunnelInfo(int trackingId, int userId);
         IEnumerable<TrackingFunnelInfoResponse> getTrackingFunnelInfo(int webID, int v);
         IActionResult createFunnelTrackingInfo(CreateTrackingFunnelInforRequest request, int v);

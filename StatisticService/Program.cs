@@ -17,9 +17,9 @@ namespace StatisticService
         public static async System.Threading.Tasks.Task Main(string[] args)
         {
             List<int> EVENT_TYPE_LIST = new List<int>();
-            int currentClickHoverID = -1;
-            int currentScrollID = -1;
-            int currentFunnelID = -1;
+            int currentClickHoverID = 4233;
+            int currentScrollID = 4185;
+            int currentFunnelID = 912;
 
             Console.WriteLine("Hello World!");
             EVENT_TYPE_LIST.Add(0);
@@ -33,7 +33,7 @@ namespace StatisticService
                 currentFunnelID = await updateStatisticFunnelDataAsync();
                 currentClickHoverID = await updateStatisticClickHoverDataAsync();
 
-                Thread.Sleep(2 * 60 * 1000);
+                Thread.Sleep(1 * 5 * 1000);
             }
 
             //============================================================================================================================================================
@@ -162,6 +162,7 @@ namespace StatisticService
             }
 
             //============================================================================================================================================================
+            
             async System.Threading.Tasks.Task<int> updateStatisticClickHoverDataAsync()
             {
                 //click and hover
@@ -176,141 +177,209 @@ namespace StatisticService
                     if (item.TrackedHeatmapDataId > max) max = item.TrackedHeatmapDataId;
                 }
 
-                List<string> uniqueUrl = trackedList.Select(s => s.TrackingUrl).Distinct().ToList();
+                List<string> uniqueUrl = trackedList.Where(s => !s.TrackingUrl.Contains("3ktruongphi")).Select(s => s.TrackingUrl).Distinct().ToList();
 
                 foreach (var url in uniqueUrl)
                 {
                     try
                     {
                         List<TrackedHeatmapData> subTrackedList = trackedList.Where(s => s.TrackingUrl == url).ToList();
-                        List<List<RequestData>> requestData = new List<List<RequestData>>();
-                        List<RequestData> mobile = new List<RequestData>();
-                        List<RequestData> tablet = new List<RequestData>();
-                        List<RequestData> desktop = new List<RequestData>();
-
-                        foreach (var subItem in subTrackedList)
+                        if(subTrackedList.Count > 100)
                         {
-                            //List<RequestData> requestData = new List<RequestData>();
-
-                            List<data> data = new List<data>();
-                            try
+                            int count = 0;
+                            int lastCount = 0;
+                            while(count < subTrackedList.Count)
                             {
-                                data = JsonConvert.DeserializeObject<List<data>>(subItem.Data);
-                            }
-                            catch (Exception)
-                            {
-                            }
-                            if (data != null || data.Count != 0)
-                                foreach (var item in data)
+                                if(subTrackedList.Count - count > 100)
                                 {
-                                    if (subItem.ScreenWidth < 540)
-                                    {
-                                        mobile.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
-                                    }
-                                    if (540 <= subItem.ScreenWidth && subItem.ScreenWidth < 768)
-                                    {
-                                        tablet.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
-                                    }
-                                    if (subItem.ScreenWidth >= 768)
-                                    {
-                                        desktop.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
-                                    }
+                                    count += 100;
                                 }
-
-                        }
-
-                        requestData.Add(mobile);
-                        requestData.Add(tablet);
-                        requestData.Add(desktop);
-
-                        var client = new RestClient("http://localhost:8082/dom/coordinates/" + url);
-                        Console.WriteLine("start call api: " + client.BaseUrl.ToString());
-                        // client.Authenticator = new HttpBasicAuthenticator(username, password);
-                        var request = new RestRequest();
-                        //request.AddParameter("url", url);
-                        request.AddHeader("Content-Type", "application/json");
-                        //var json = JsonConvert.SerializeObject(requestData);
-                        request.AddJsonBody(requestData);
-                        request.Timeout = 60000;
-                        var response = client.Post(request);
-                        var content = response.Content;
-                        Console.WriteLine(" receive response");
-                        int countTime = 1;
-                        while ((content == null || response.StatusCode.Equals(System.Net.HttpStatusCode.BadRequest)) && countTime <= 5)
-                        {
-                            Console.WriteLine("Error browser service. try again.");
-                            countTime += 1;
-                            Thread.Sleep(5000);
-                            response = client.Post(request);
-                            content = response.Content;
-                        }
-                        if (content == null)
-                        {
-                            max = subTrackedList.Last().TrackedHeatmapDataId;
-                            Console.WriteLine("Error browser service. tried 5 time already and stop.");
-                            return max - 1;
-                        }
-                        Console.WriteLine(" done call api");
-                        Console.WriteLine(response.StatusCode.ToString());
-                        Console.WriteLine("response error message: " + response.ErrorMessage);
-                        List<ResponseData> responseData = new List<ResponseData>();
-                        var settings = new JsonSerializerSettings
-                        {
-                            NullValueHandling = NullValueHandling.Include,
-                            MissingMemberHandling = MissingMemberHandling.Ignore
-                        };
-                        List<List<ResponseData>> responseDatas = new List<List<ResponseData>>();
-                        try
-                        {
-                            responseDatas = JsonConvert.DeserializeObject<List<List<ResponseData>>>(content);
-                        }
-                        catch (Exception ex)
-                        {
-
-                            Console.WriteLine("ERROR from url " + url + " :" + ex.Message);
-                            max = subTrackedList.Last().TrackedHeatmapDataId;
-                            Console.WriteLine("Error browser service. stop.");
-                            return max - 1;
-                        }
-                        foreach (var item in responseDatas)
-                        {
-                            responseData.AddRange(item);
-                        }
-
-                        //responseData = JsonConvert.DeserializeObject<List<ResponseData>>(content);
-
-                        List<int> uniqueTrackedHeatmapDataID = responseData.Select(s => s.trackedHeatmapDataID).Distinct().ToList();
-
-                        foreach (var id in uniqueTrackedHeatmapDataID)
-                        {
-                            List<ResponseData> subData = responseData.Where(s => s.trackedHeatmapDataID == id).ToList();
-                            StatisticHeatmap statisticHeatmap = context.StatisticHeatmap.Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
-                            List<StatisticData> statisticDatas = new List<StatisticData>();
-                            foreach (var item in subData)
-                            {
-                                statisticDatas.Add(new StatisticData(item.x, item.y));
-                            }
-                            if (statisticHeatmap == null)
-                            {
-                                statisticHeatmap = new StatisticHeatmap();
-                                statisticHeatmap.TrackedHeatmapDataId = id;
-                                statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticDatas);
-                                
+                                else
+                                {
+                                    count = subTrackedList.Count;
+                                }
+                                List<TrackedHeatmapData> list = subTrackedList.GetRange(lastCount, count-lastCount);
+                                List<List<ResponseData>> responseDatas = new List<List<ResponseData>>();
+                                string content = callClickAndHoverApi(list, url);
                                 try
                                 {
-                                    context.StatisticHeatmap.Add(statisticHeatmap);
-                                    await context.SaveChangesAsync();
-                                    Console.WriteLine("ADD STATISTIC CLICK HOVER ID " + statisticHeatmap.TrackedHeatmapDataId);
+                                    responseDatas = JsonConvert.DeserializeObject<List<List<ResponseData>>>(content);
                                 }
                                 catch (Exception ex)
                                 {
-                                    Console.WriteLine(ex.Message);
+
+                                    Console.WriteLine("ERROR from url " + url + " :" + ex.Message);
+                                    max = subTrackedList.Last().TrackedHeatmapDataId;
+                                    Console.WriteLine("Error browser service. stop.");
                                     continue;
+                                    //return max - 1;
                                 }
+
+                                addStatisticClickAndHoverData(responseDatas);
+                                lastCount = count;
                             }
-                            else
+                        }
+                        else
+                        {
+                            List<List<ResponseData>> responseDatas = new List<List<ResponseData>>();
+                            string content = callClickAndHoverApi(subTrackedList, url);
+                            try
                             {
-                                if(statisticHeatmap.StatisticData != JsonConvert.SerializeObject(statisticDatas))
+                                responseDatas = JsonConvert.DeserializeObject<List<List<ResponseData>>>(content);
+                            }
+                            catch (Exception ex)
+                            {
+
+                                Console.WriteLine("ERROR from url " + url + " :" + ex.Message);
+                                max = subTrackedList.Last().TrackedHeatmapDataId;
+                                Console.WriteLine("Error browser service. stop.");
+                                continue;
+                                //return max - 1;
+                            }
+
+                            addStatisticClickAndHoverData(responseDatas);
+                        }
+                          
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("ERROR from url " + url + " :" + ex.Message);
+                        continue;
+                    }
+
+                }
+
+                Console.WriteLine("Statistic done .");
+                return max;
+
+            }
+
+            //==========================================================================================================
+
+            string callClickAndHoverApi(List<TrackedHeatmapData> subTrackedList,string url)
+            {
+                List<List<RequestData>> requestData = new List<List<RequestData>>();
+                List<RequestData> mobile = new List<RequestData>();
+                List<RequestData> tablet = new List<RequestData>();
+                List<RequestData> desktop = new List<RequestData>();
+
+                foreach (var subItem in subTrackedList)
+                {
+                    //List<RequestData> requestData = new List<RequestData>();
+
+                    List<data> data = new List<data>();
+                    try
+                    {
+                        data = JsonConvert.DeserializeObject<List<data>>(subItem.Data);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    if (data != null || data.Count != 0)
+                        foreach (var item in data)
+                        {
+                            if (subItem.ScreenWidth <= 540)
+                            {
+                                mobile.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
+                            }
+                            if (540 < subItem.ScreenWidth && subItem.ScreenWidth <= 768)
+                            {
+                                tablet.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
+                            }
+                            if (subItem.ScreenWidth > 768)
+                            {
+                                desktop.Add(new RequestData(subItem.TrackedHeatmapDataId, item.selector, item.width, item.height, item.offsetX, item.offsetY));
+                            }
+                        }
+
+                }
+
+                requestData.Add(mobile);
+                requestData.Add(tablet);
+                requestData.Add(desktop);
+
+                var client = new RestClient("http://localhost:8082/dom/coordinates/" + url);
+                Console.WriteLine("start call api: " + client.BaseUrl.ToString());
+                // client.Authenticator = new HttpBasicAuthenticator(username, password);
+                var request = new RestRequest();
+                //request.AddParameter("url", url);
+                request.AddHeader("Content-Type", "application/json");
+                //var json = JsonConvert.SerializeObject(requestData);
+                request.AddJsonBody(requestData);
+                request.Timeout = 60000;
+                var response = client.Post(request);
+                var content = response.Content;
+                Console.WriteLine(" receive response");
+                int countTime = 1;
+                while ((content == null || response.StatusCode.Equals(System.Net.HttpStatusCode.BadRequest)) && countTime <= 5)
+                {
+                    Console.WriteLine("Error browser service. try again.");
+                    countTime += 1;
+                    Thread.Sleep(5000);
+                    response = client.Post(request);
+                    content = response.Content;
+                }
+                if (content == null)
+                {
+                    Console.WriteLine("Error browser service. tried 5 time already and stop.");
+                    return null;
+                }
+                Console.WriteLine(" done call api");
+                Console.WriteLine(response.StatusCode.ToString());
+                Console.WriteLine("response error message: " + response.ErrorMessage);
+                return content;
+            }
+
+
+            //======================================================================================================
+
+
+            async void addStatisticClickAndHoverData(List<List<ResponseData>> responseDatas)
+            {
+                using (var context = new DBUTContext())
+                {
+                    List<ResponseData> responseData = new List<ResponseData>();
+                    foreach (var item in responseDatas)
+                    {
+                        responseData.AddRange(item);
+                    }
+
+                    //responseData = JsonConvert.DeserializeObject<List<ResponseData>>(content);
+
+                    List<int> uniqueTrackedHeatmapDataID = responseData.Select(s => s.trackedHeatmapDataID).Distinct().ToList();
+
+                    foreach (var id in uniqueTrackedHeatmapDataID)
+                    {
+                        List<ResponseData> subData = responseData.Where(s => s.trackedHeatmapDataID == id).ToList();
+                        StatisticHeatmap statisticHeatmap = context.StatisticHeatmap.Where(s => s.TrackedHeatmapDataId == id).FirstOrDefault();
+                        List<StatisticData> statisticDatas = new List<StatisticData>();
+                        foreach (var item in subData)
+                        {
+                            statisticDatas.Add(new StatisticData(item.x, item.y));
+                        }
+                        if (statisticHeatmap == null)
+                        {
+                            statisticHeatmap = new StatisticHeatmap();
+                            statisticHeatmap.TrackedHeatmapDataId = id;
+                            statisticHeatmap.StatisticData = JsonConvert.SerializeObject(statisticDatas);
+
+                            try
+                            {
+                                context.StatisticHeatmap.Add(statisticHeatmap);
+                                await context.SaveChangesAsync();
+                                Console.WriteLine("ADD STATISTIC CLICK HOVER ID " + statisticHeatmap.TrackedHeatmapDataId);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                if (statisticHeatmap.StatisticData != JsonConvert.SerializeObject(statisticDatas))
                                 {
 
                                     try
@@ -325,20 +394,14 @@ namespace StatisticService
                                     }
                                 }
                             }
-
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("ERROR from url " + url + " :" + ex.Message);
-                        continue;
-                    }
 
+                    }
                 }
-
-                Console.WriteLine("Statistic done .");
-                return max;
-
             }
 
         }

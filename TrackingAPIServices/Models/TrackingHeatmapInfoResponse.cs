@@ -14,8 +14,10 @@ namespace TrackingAPIServices.Models
         public String authorName { get; set; }
         public int visit { get; set; }
         public string version { get; set; }
+        public bool? tracking { get; set; }
+        public long? endAt { get; set; }
 
-        public TrackingHeatmapInfoResponse(int trackingHeatmapInfoId, string trackingUrl, string name, long createdAt, string authorName, int visit, string version)
+        public TrackingHeatmapInfoResponse(int trackingHeatmapInfoId, string trackingUrl, string name, long createdAt, string authorName, int visit, string version, bool? tracking, long? endAt)
         {
             this.trackingHeatmapInfoId = trackingHeatmapInfoId;
             this.trackingUrl = trackingUrl;
@@ -24,6 +26,8 @@ namespace TrackingAPIServices.Models
             this.authorName = authorName;
             this.visit = visit;
             this.version = version;
+            this.tracking = tracking;
+            this.endAt = endAt;
         }
     }
 }

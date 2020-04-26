@@ -44,6 +44,17 @@ namespace HeatMapAPIServices.Controllers
         }
 
 
+        [HttpGet("api/tracked-funnel-data")]
+        public IActionResult get(int ID)
+        {
+            using (var context = new DBUTContext())
+            {
+                return Ok(context.TrackedFunnelData.FirstOrDefault(s => s.TrackedFunnelDataId == ID));
+            }
+        }
+
+
+
         //=================================statistic heatmap=====================================================
 
 
@@ -103,10 +114,9 @@ namespace HeatMapAPIServices.Controllers
 
         [HttpDelete("api/tracking-info")]
         [Authorize]
-        public IActionResult deleteTrackingInfo(int trackingHeatmapInfoID)
+        public IActionResult deleteTrackingInfo(int trackingHeatmapInfoID, bool isVersion)
         {
-
-            bool result = iRepository.deleteTrackingHeatmapInfo(trackingHeatmapInfoID, GetUserId());
+            bool result = iRepository.deleteTrackingHeatmapInfo(trackingHeatmapInfoID, GetUserId(), isVersion);
             if (result)
             {
                 return Ok();
