@@ -7,5 +7,7 @@ namespace StatisticService.EFModels
     {
         public int TrackedHeatmapDataId { get; set; }
         public string StatisticData { get; set; }
+
+        public virtual TrackedHeatmapData TrackedHeatmapData { get; set; }
     }
 }

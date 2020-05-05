@@ -227,16 +227,15 @@ namespace HeatMapAPIServices.Repository
 
                     List<TrackingHeatmapInfoResponse> trackingHeatmapInfoResponses = new List<TrackingHeatmapInfoResponse>();
 
-                    foreach (var trackingInfo in trackingInfos)
+                    foreach (var lastTrackingInfo in trackingInfos)
                     {
+                        TrackingHeatmapInfo firstTrackingHeatmapInfo = context.TrackingHeatmapInfo.First(
+                            s => s.TrackingUrl == lastTrackingInfo.TrackingUrl && s.TypeUrl == lastTrackingInfo.TypeUrl && s.Removed == false);
                         List<TrackedHeatmapData> datas = new List<TrackedHeatmapData>();
                         foreach (var item in EVENT_TYPE_LIST)
                         {
-                            datas.AddRange(getTrackedHeatmapDataByType(trackingInfo.TypeUrl, websiteId, trackingInfo, 1111111111, 1911111111, item));
-                        }
-                        if (trackingInfo.Tracking == false)
-                        {
-                            datas = datas.Where(s => s.CreatedAt <= trackingInfo.EndAt).ToList();
+                            datas.AddRange(getTrackedHeatmapDataByType(lastTrackingInfo.TypeUrl, websiteId, firstTrackingHeatmapInfo,
+                                (int) firstTrackingHeatmapInfo.CreatedAt, lastTrackingInfo.Tracking == false ? (int)lastTrackingInfo.EndAt : 1911111111, item));
                         }
                         List<DateTime> times = new List<DateTime>();
                         foreach (var item in datas)
@@ -256,10 +255,10 @@ namespace HeatMapAPIServices.Repository
                             visit += countVisit(time, datas);
                         }
                         trackingHeatmapInfoResponses.Add(new TrackingHeatmapInfoResponse(
-                            trackingInfo.TrackingHeatmapInfoId,
-                            trackingInfo.TrackingUrl, trackingInfo.Name, trackingInfo.CreatedAt,
-                            context.User.Where(s => s.UserId == trackingInfo.AuthorId).FirstOrDefault().FullName, visit,
-                            trackingInfo.Version, trackingInfo.Tracking, trackingInfo.EndAt));
+                            lastTrackingInfo.TrackingHeatmapInfoId,
+                            lastTrackingInfo.TrackingUrl, lastTrackingInfo.Name, firstTrackingHeatmapInfo.CreatedAt,
+                            context.User.Where(s => s.UserId == lastTrackingInfo.AuthorId).FirstOrDefault().FullName, visit,
+                            lastTrackingInfo.Version, lastTrackingInfo.Tracking, lastTrackingInfo.EndAt));
                     }
 
                     return new OkObjectResult(trackingHeatmapInfoResponses);
