@@ -14,5 +14,8 @@ namespace AuthServer.EFModels
         public string SessionId { get; set; }
         public long? ScreenHeight { get; set; }
         public long? ScreenWidth { get; set; }
+
+        public virtual Website Web { get; set; }
+        public virtual StatisticHeatmap StatisticHeatmap { get; set; }
     }
 }

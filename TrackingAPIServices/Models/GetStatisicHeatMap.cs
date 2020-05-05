@@ -10,5 +10,6 @@
         public string name { get; set; }
         public string typeUrl { get; set; }
         public string trackingUrl { get; set; }
+        public string version { get; set; }
     }
 }

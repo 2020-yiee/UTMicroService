@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIGateway", "APIGateway\APIGateway.csproj", "{7C09B1F0-6758-4E18-935E-102C43C4CAE0}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AuthServer", "AuthServer\AuthServer.csproj", "{5CE215B3-1F2C-46DA-886C-BFBD1D8EF6E5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StatisticService", "StatisticService\StatisticService.csproj", "{979F1DC4-193A-49AF-86C9-2D3CC35D7CC4}"
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7C09B1F0-6758-4E18-935E-102C43C4CAE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7C09B1F0-6758-4E18-935E-102C43C4CAE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7C09B1F0-6758-4E18-935E-102C43C4CAE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7C09B1F0-6758-4E18-935E-102C43C4CAE0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5CE215B3-1F2C-46DA-886C-BFBD1D8EF6E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5CE215B3-1F2C-46DA-886C-BFBD1D8EF6E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CE215B3-1F2C-46DA-886C-BFBD1D8EF6E5}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -12,5 +12,7 @@ namespace UserAPIServices.EFModels
         public bool Removed { get; set; }
         public long CreatedAt { get; set; }
         public int AuthorId { get; set; }
+
+        public virtual Website Web { get; set; }
     }
 }
