@@ -10,5 +10,8 @@ namespace AuthServer.EFModels
         public int WebId { get; set; }
         public string TrackedSteps { get; set; }
         public long CreatedAt { get; set; }
+
+        public virtual Website Web { get; set; }
+        public virtual StatisticFunnel StatisticFunnel { get; set; }
     }
 }

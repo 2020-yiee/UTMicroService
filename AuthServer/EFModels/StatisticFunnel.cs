@@ -7,5 +7,7 @@ namespace AuthServer.EFModels
     {
         public int TrackedFunnelDataId { get; set; }
         public string StatisticData { get; set; }
+
+        public virtual TrackedFunnelData TrackedFunnelData { get; set; }
     }
 }

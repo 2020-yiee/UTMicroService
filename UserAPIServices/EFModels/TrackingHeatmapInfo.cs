@@ -19,5 +19,7 @@ namespace UserAPIServices.EFModels
         public bool? Tracking { get; set; }
         public long? EndAt { get; set; }
         public string Version { get; set; }
+
+        public virtual Website Web { get; set; }
     }
 }

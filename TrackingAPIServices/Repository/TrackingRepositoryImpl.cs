@@ -141,17 +141,33 @@ namespace HeatMapAPIServices.Repository
         {
             using (var context = new DBUTContext())
             {
-                if (!TYPEURL.Contains(request.typeUrl)) return false;
                 List<string> listTrackingUrl = context.TrackingHeatmapInfo.Where(s =>
                 s.WebId == request.webID && s.Removed == false && s.TypeUrl == request.typeUrl)
                 .ToList().Select(s => s.TrackingUrl).ToList();
                 List<string> listName = context.TrackingHeatmapInfo.Where(
                     s => s.WebId == request.webID && s.Removed == false)
                     .ToList().Select(s => s.Name).ToList();
-                if (listTrackingUrl.Contains(request.trackingUrl) == true || listName.Contains(request.name) == true) return true;
+                if (listTrackingUrl.Contains(request.trackingUrl) == true || listName.Contains(request.name) == true)
+                {
+                    TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.Where(s => s.TrackingUrl == request.trackingUrl &&
+                    s.TypeUrl == request.typeUrl && s.Name == request.name).FirstOrDefault();
+                    if (trackingHeatmapInfo != null) return true;
+                }
                 return false;
             }
 
+        }
+
+        private bool checkTrackingHeatmapInfoName(CreateTrackingHeatmapInforRequest request)
+        {
+            using (var context = new DBUTContext())
+            {
+                List<string> listName = context.TrackingHeatmapInfo.Where(
+                    s => s.WebId == request.webID && s.Removed == false)
+                    .ToList().Select(s => s.Name).ToList();
+                if (listName.Contains(request.name)) return true;
+                return false;
+            }
         }
         private bool checkDomainUrl(CreateTrackingHeatmapInforRequest request)
         {
@@ -159,6 +175,7 @@ namespace HeatMapAPIServices.Repository
             {
                 try
                 {
+                    if (!TYPEURL.Contains(request.typeUrl)) return false;
                     string domainUrl = context.Website.Where(s => s.WebId == request.webID).Select(s => s.DomainUrl).FirstOrDefault();
                     if (request.typeUrl == "start-with" || request.typeUrl == "match")
                     {
@@ -324,38 +341,52 @@ namespace HeatMapAPIServices.Repository
             }
         }
 
+        private String takeCapturePicture(TrackingHeatmapInfo info, string captureUrl)
+        {
+            var client = new RestClient("https://browser-service.herokuapp.com/capture/" + info.WebId + "/" + info.TrackingHeatmapInfoId + "/" + captureUrl);
+            // client.Authenticator = new HttpBasicAuthenticator(username, password);
+            var requests = new RestRequest();
+            requests.AddHeader("Content-Type", "application/json");
+            requests.Timeout = 60000;
+            string content = null;
+            try
+            {
+                int count = 0;
+                while (content == null && count < 4)
+                {
+                    var response = client.Post(requests);
+                    content = response.Content;
+                    count++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("ERROR: " + ex.Message);
+                return null;
+            }
+            return content;
+        }
+
         private bool checkValidTrackingHeatmapInfo(CreateTrackingHeatmapInforRequest request, int userId)
         {
             if (!checkWebsiteAuthencation(request.webID, userId, true)) return false;
             if (checkTrackingHeatmapInfoExisted(request)) return false;
             if (!checkDomainUrl(request)) return false;
             if (!TYPEURL.Contains(request.typeUrl)) return false;
+            if (checkTrackingHeatmapInfoName(request)) return false;
             return true;
         }
+
+
 
         public IActionResult createHeatmapTrackingInfo(CreateTrackingHeatmapInforRequest request, int userId)
         {
             using (var context = new DBUTContext())
             {
                 TimeSpan timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
-                bool hasPre = checkTrackingHeatmapInfoExisted(request);
                 if (!checkValidTrackingHeatmapInfo(request, userId))
                 {
-                    //if (hasPre)
-                    //{
-                    //    List<TrackingHeatmapInfo> trackingHeatmapInfos = context.TrackingHeatmapInfo.Where(
-                    //       s => s.TrackingUrl == request.trackingUrl && s.Removed == false).ToList();
-                    //    if (request.version != null)
-                    //    {
-                    //        List<string> versions = trackingHeatmapInfos.Select(s => s.Version).ToList();
-                    //        if (versions.Contains(request.version)) return new ConflictResult();
-                    //    }
-                    //    TrackingHeatmapInfo trackingHeatmapInfo = trackingHeatmapInfos.Last();
-                    //    trackingHeatmapInfo.Tracking = false;
-                    //    trackingHeatmapInfo.EndAt = (long)timeSpan.TotalSeconds;
-                    //}
-                    //else 
-                        return new BadRequestResult();
+                    return new BadRequestResult();
                 }
                 TrackingHeatmapInfo info = new TrackingHeatmapInfo();
                 info.WebId = request.webID;
@@ -365,84 +396,118 @@ namespace HeatMapAPIServices.Repository
                 info.CreatedAt = (long)timeSpan.TotalSeconds;
                 info.TypeUrl = request.typeUrl;
                 info.AuthorId = userId;
-                if (request.version != null) info.Version = request.version;
-                else
-                {
-                    if (hasPre)
-                    {
-                        DateTime dt = convertTimeStamp(timeSpan.TotalSeconds);
-                        info.Version = dt.ToString("ddMMyyyy.HHmmssUTC", CultureInfo.InvariantCulture);
-                    }
-                    else
-                    {
-                        info.Version = "Default";
-                    }
-                }
+                info.Version = "Version 1";
                 info.Tracking = true;
                 info.EndAt = 0;
                 try
                 {
+                    context.TrackingHeatmapInfo.Add(info);
+                    context.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error " + e.Message);
+                    return new UnprocessableEntityResult();
+                }
+
+                string content = takeCapturePicture(info, request.captureUrl);
+                if (content == null)
+                {
+                    context.TrackingHeatmapInfo.Remove(info);
+                    context.SaveChanges();
+                    return new UnprocessableEntityResult();
+                }
+                else
+                {
                     try
                     {
-                        context.TrackingHeatmapInfo.Add(info);
+                        CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
+                        info.SmImageUrl = captureResponse.smImageUrl;
+                        info.MdImageUrl = captureResponse.mdImageUrl;
+                        info.LgImageUrl = captureResponse.lgImageUrl;
                         context.SaveChanges();
+                        return new OkObjectResult(new TrackingHeatmapInfoResponse(info.TrackingHeatmapInfoId, info.TrackingUrl, info.Name,
+                            info.CreatedAt, context.User.Where(s => s.UserId == info.AuthorId).FirstOrDefault().FullName, 0, info.Version,
+                            info.Tracking, info.EndAt));
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Console.WriteLine("Error " + e.Message);
-                        return new UnprocessableEntityResult();
-                    }
-                    var client = new RestClient("https://browser-service.herokuapp.com/capture/" + info.WebId + "/" + info.TrackingHeatmapInfoId + "/" + request.captureUrl);
-                    // client.Authenticator = new HttpBasicAuthenticator(username, password);
-                    var requests = new RestRequest();
-                    requests.AddHeader("Content-Type", "application/json");
-                    requests.Timeout = 60000;
-                    string content = null;
-                    try
-                    {
-                        var response = client.Post(requests);
-                        content = response.Content;
-                    }
-                    catch (Exception)
-                    {
-                        context.TrackingHeatmapInfo.Remove(info);
-                        context.SaveChanges();
-                        return new UnprocessableEntityResult();
-                    }
-                    if (content == null)
-                    {
-                        context.TrackingHeatmapInfo.Remove(info);
-                        context.SaveChanges();
-                        return new UnprocessableEntityResult();
-                    }
-                    else
-                    {
-                        try
-                        {
-                            CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
-                            info.SmImageUrl = captureResponse.smImageUrl;
-                            info.MdImageUrl = captureResponse.mdImageUrl;
-                            info.LgImageUrl = captureResponse.lgImageUrl;
-                            context.SaveChanges();
-                            return new OkObjectResult(info);
-                        }
-                        catch (Exception)
-                        {
-                            var response = client.Post(requests);
-                            content = response.Content;
-                            CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
-                            info.SmImageUrl = captureResponse.smImageUrl;
-                            info.MdImageUrl = captureResponse.mdImageUrl;
-                            info.LgImageUrl = captureResponse.lgImageUrl;
-                            context.SaveChanges();
-                            return new OkObjectResult(info);
-                        }
+                        Console.WriteLine("ERROR: " + ex.Message);
+                        return new BadRequestResult();
                     }
                 }
-                catch (Exception ex)
+
+            }
+        }
+
+        public IActionResult createVersionHeatmapTrackingInfo(CreateVersionTrackingHeatmapInforRequest request, int userID)
+        {
+            using (var context = new DBUTContext())
+            {
+                TimeSpan timeSpan = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0));
+
+                TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.LastOrDefault(s => 
+                s.TrackingHeatmapInfoId == request.TrackingHeatmapInfoId && s.Removed == false);
+                if (trackingHeatmapInfo == null) return new NotFoundResult();
+                Website website = context.Website.FirstOrDefault(s => s.WebId == trackingHeatmapInfo.WebId);
+                Access access = context.Access.FirstOrDefault(s => s.OrganizationId == website.OrganizationId && s.UserId == userID);
+                if (access == null) return new UnauthorizedResult();
+                if (access.Role == 3) return new UnauthorizedResult();
+
+                TrackingHeatmapInfo lastTrackingHeatmapInfo = context.TrackingHeatmapInfo.LastOrDefault(s =>
+                s.TrackingUrl == trackingHeatmapInfo.TrackingUrl && s.Name == trackingHeatmapInfo.Name && s.TypeUrl == trackingHeatmapInfo.TypeUrl);
+                lastTrackingHeatmapInfo.Tracking = false;
+                lastTrackingHeatmapInfo.EndAt = (long)timeSpan.TotalSeconds;
+
+                TrackingHeatmapInfo info = new TrackingHeatmapInfo();
+                info.WebId = trackingHeatmapInfo.WebId;
+                info.Name = trackingHeatmapInfo.Name;
+                info.TrackingUrl = trackingHeatmapInfo.TrackingUrl;
+                info.Removed = false;
+                info.CreatedAt = (long)timeSpan.TotalSeconds;
+                info.TypeUrl = trackingHeatmapInfo.TypeUrl;
+                info.AuthorId = userID;
+                string[] b = trackingHeatmapInfo.Version.Split(" ");
+                int c = Int32.Parse(b[1]) + 1;
+                info.Version = "Version "+c;
+                info.Tracking = true;
+                info.EndAt = 0;
+                try
                 {
-                    Console.WriteLine("ERROR: " + ex.Message);
-                    return new BadRequestResult();
+                    context.TrackingHeatmapInfo.Add(info);
+                    context.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error " + e.Message);
+                    return new UnprocessableEntityResult();
+                }
+
+                string content = takeCapturePicture(info, request.captureUrl);
+                if (content == null)
+                {
+                    context.TrackingHeatmapInfo.Remove(info);
+                    context.SaveChanges();
+                    return new UnprocessableEntityResult();
+                }
+                else
+                {
+                    try
+                    {
+                        CaptureResponse captureResponse = JsonConvert.DeserializeObject<CaptureResponse>(content);
+                        info.SmImageUrl = captureResponse.smImageUrl;
+                        info.MdImageUrl = captureResponse.mdImageUrl;
+                        info.LgImageUrl = captureResponse.lgImageUrl;
+                        context.SaveChanges();
+                        return new OkObjectResult(new TrackingHeatmapInfoResponse(info.TrackingHeatmapInfoId,info.TrackingUrl,info.Name,
+                            info.CreatedAt, context.User.Where(s => s.UserId == info.AuthorId).FirstOrDefault().FullName,0,info.Version,
+                            info.Tracking,info.EndAt));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("ERROR: " + ex.Message);
+                        return new BadRequestResult();
+                    }
                 }
             }
         }
@@ -502,9 +567,11 @@ namespace HeatMapAPIServices.Repository
                         info.Removed = true;
                         TrackingHeatmapInfo trackingHeatmapPre = context.TrackingHeatmapInfo.FirstOrDefault(
                             s => s.EndAt == info.CreatedAt);
-                        trackingHeatmapPre.Tracking = true;
-                        trackingHeatmapPre.EndAt = 0;
-
+                        if(trackingHeatmapPre != null)
+                        {
+                            trackingHeatmapPre.Tracking = true;
+                            trackingHeatmapPre.EndAt = 0;
+                        } 
                     }
                     else
                     {
@@ -1225,6 +1292,8 @@ namespace HeatMapAPIServices.Repository
             }
             return statisticFunnelResponses;
         }
+
+
     }
 
 }

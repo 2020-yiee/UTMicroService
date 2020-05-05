@@ -99,6 +99,15 @@ namespace HeatMapAPIServices.Controllers
 
         }
 
+        [HttpPost("api/tracking-info/version")]
+        [Authorize]
+        public IActionResult createVersionTrackingInfo([FromBody]CreateVersionTrackingHeatmapInforRequest request)
+        {
+
+            return iRepository.createVersionHeatmapTrackingInfo(request, GetUserId());
+
+        }
+
         [HttpPut("api/tracking-info")]
         [Authorize]
         public IActionResult updateTrackingInfo([FromBody]UpdateTrackingHeatmapInforRequest request)

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: service-tracking-797ff4654c-wk9sc								
+  name: service-tracking-6dc69b7895-zdlxs								
 spec:
   type: ClusterIP
   selector:

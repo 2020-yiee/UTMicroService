@@ -32,7 +32,7 @@ namespace UserAPIServices.EFModels
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("server=35.240.190.80;Database=DBUT;Trusted_Connection=False;user Id=sqlserver;password=123");
+                optionsBuilder.UseSqlServer("server=34.87.96.112;Database=DBUT;Trusted_Connection=False;user Id=sqlserver;password=123");
             }
         }
 
@@ -44,13 +44,25 @@ namespace UserAPIServices.EFModels
             {
                 entity.HasKey(e => new { e.UserId, e.OrganizationId });
 
-                entity.Property(e => e.UserId).HasColumnName("userId");
+                entity.Property(e => e.UserId).HasColumnName("userID");
 
-                entity.Property(e => e.OrganizationId).HasColumnName("organizationId");
+                entity.Property(e => e.OrganizationId).HasColumnName("organizationID");
 
                 entity.Property(e => e.DayJoin).HasColumnName("dayJoin");
 
                 entity.Property(e => e.Role).HasColumnName("role");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.Access)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Access_Organization1");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Access)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Access_User1");
             });
 
             modelBuilder.Entity<Admin>(entity =>
@@ -100,6 +112,12 @@ namespace UserAPIServices.EFModels
                 entity.Property(e => e.StatisticData)
                     .IsRequired()
                     .HasColumnName("statisticData");
+
+                entity.HasOne(d => d.TrackedFunnelData)
+                    .WithOne(p => p.StatisticFunnel)
+                    .HasForeignKey<StatisticFunnel>(d => d.TrackedFunnelDataId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_StatisticFunnel_TrackedFunnelData");
             });
 
             modelBuilder.Entity<StatisticHeatmap>(entity =>
@@ -115,6 +133,12 @@ namespace UserAPIServices.EFModels
                 entity.Property(e => e.StatisticData)
                     .IsRequired()
                     .HasColumnName("statisticData");
+
+                entity.HasOne(d => d.TrackedHeatmapData)
+                    .WithOne(p => p.StatisticHeatmap)
+                    .HasForeignKey<StatisticHeatmap>(d => d.TrackedHeatmapDataId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_statisticHeatmap_TrackedHeatmapData");
             });
 
             modelBuilder.Entity<TrackedFunnelData>(entity =>
@@ -132,6 +156,12 @@ namespace UserAPIServices.EFModels
                     .HasColumnName("trackedSteps");
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
+
+                entity.HasOne(d => d.Web)
+                    .WithMany(p => p.TrackedFunnelData)
+                    .HasForeignKey(d => d.WebId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_TrackedFunnelData_Website");
             });
 
             modelBuilder.Entity<TrackedHeatmapData>(entity =>
@@ -157,6 +187,12 @@ namespace UserAPIServices.EFModels
                     .HasColumnName("trackingUrl");
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
+
+                entity.HasOne(d => d.Web)
+                    .WithMany(p => p.TrackedHeatmapData)
+                    .HasForeignKey(d => d.WebId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_TrackedHeatmapData_Website");
             });
 
             modelBuilder.Entity<TrackingFunnelInfo>(entity =>
@@ -178,6 +214,12 @@ namespace UserAPIServices.EFModels
                     .HasColumnName("steps");
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
+
+                entity.HasOne(d => d.Web)
+                    .WithMany(p => p.TrackingFunnelInfo)
+                    .HasForeignKey(d => d.WebId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_TrackingFunnelInfo_Website");
             });
 
             modelBuilder.Entity<TrackingHeatmapInfo>(entity =>
@@ -213,11 +255,15 @@ namespace UserAPIServices.EFModels
                     .HasMaxLength(20)
                     .HasDefaultValueSql("('match')");
 
-                entity.Property(e => e.Version)
-                    .HasColumnName("version")
-                    .HasMaxLength(10);
+                entity.Property(e => e.Version).HasColumnName("version");
 
                 entity.Property(e => e.WebId).HasColumnName("webID");
+
+                entity.HasOne(d => d.Web)
+                    .WithMany(p => p.TrackingHeatmapInfo)
+                    .HasForeignKey(d => d.WebId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_TrackingHeatmapInfo_Website");
             });
 
             modelBuilder.Entity<User>(entity =>
@@ -258,6 +304,18 @@ namespace UserAPIServices.EFModels
                 entity.Property(e => e.Removed).HasColumnName("removed");
 
                 entity.Property(e => e.Verified).HasColumnName("verified");
+
+                entity.HasOne(d => d.Author)
+                    .WithMany(p => p.Website)
+                    .HasForeignKey(d => d.AuthorId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Website_User");
+
+                entity.HasOne(d => d.Organization)
+                    .WithMany(p => p.Website)
+                    .HasForeignKey(d => d.OrganizationId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Website_Organization");
             });
         }
     }

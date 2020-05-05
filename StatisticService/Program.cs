@@ -17,9 +17,9 @@ namespace StatisticService
         public static async System.Threading.Tasks.Task Main(string[] args)
         {
             List<int> EVENT_TYPE_LIST = new List<int>();
-            int currentClickHoverID = 4233;
-            int currentScrollID = 4185;
-            int currentFunnelID = 912;
+            int currentClickHoverID = 4330;
+            int currentScrollID = 4317;
+            int currentFunnelID = 926;
 
             Console.WriteLine("Hello World!");
             EVENT_TYPE_LIST.Add(0);
