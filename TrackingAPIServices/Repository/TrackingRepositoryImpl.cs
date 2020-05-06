@@ -221,10 +221,17 @@ namespace HeatMapAPIServices.Repository
                     List<TrackingHeatmapInfo> trackingInfos = new List<TrackingHeatmapInfo>();
                     foreach (var url in trackingHeatmapUrls)
                     {
-                        trackingInfos.Add(context.TrackingHeatmapInfo.Last(
-                            s => s.TrackingUrl == url && s.Removed == false));
+                        List<string> typeUrls = context.TrackingHeatmapInfo.Where(
+                            s => s.TrackingUrl == url && s.Removed == false).Select(
+                            s=> s.TypeUrl).Distinct().ToList();
+                        foreach(var typeUrl in typeUrls)
+                        {
+                            TrackingHeatmapInfo trackingHeatmapInfo = context.TrackingHeatmapInfo.LastOrDefault(
+                                s => s.TrackingUrl == url && s.TypeUrl == typeUrl && s.Removed == false);
+                            if(trackingHeatmapInfo!=null)
+                            trackingInfos.Add(trackingHeatmapInfo);
+                        }
                     }
-
                     List<TrackingHeatmapInfoResponse> trackingHeatmapInfoResponses = new List<TrackingHeatmapInfoResponse>();
 
                     foreach (var lastTrackingInfo in trackingInfos)
@@ -280,7 +287,7 @@ namespace HeatMapAPIServices.Repository
                 if (trackingHeatmapInfo == null) return new NotFoundResult();
                 if (!checkWebsiteAuthencation(trackingHeatmapInfo.WebId, userId, false)) return new UnauthorizedResult();
                 List<TrackingHeatmapInfo> trackingHeatmapInfos = context.TrackingHeatmapInfo.Where(
-                    s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl
+                    s => s.TrackingUrl == trackingHeatmapInfo.TrackingUrl && s.TypeUrl == trackingHeatmapInfo.TypeUrl
                     && s.Removed == false).ToList();
                 List<TrackingHeatmapInfoResponse> responses = new List<TrackingHeatmapInfoResponse>();
                 foreach (var trackingInfo in trackingHeatmapInfos)
@@ -454,7 +461,8 @@ namespace HeatMapAPIServices.Repository
                 if (access.Role == 3) return new UnauthorizedResult();
 
                 TrackingHeatmapInfo lastTrackingHeatmapInfo = context.TrackingHeatmapInfo.LastOrDefault(s =>
-                s.TrackingUrl == trackingHeatmapInfo.TrackingUrl && s.Name == trackingHeatmapInfo.Name && s.TypeUrl == trackingHeatmapInfo.TypeUrl);
+                s.TrackingUrl == trackingHeatmapInfo.TrackingUrl && s.Name == trackingHeatmapInfo.Name && s.TypeUrl == trackingHeatmapInfo.TypeUrl
+                && s.Tracking == true && s.Removed == false);
                 lastTrackingHeatmapInfo.Tracking = false;
                 lastTrackingHeatmapInfo.EndAt = (long)timeSpan.TotalSeconds;
 
@@ -466,7 +474,7 @@ namespace HeatMapAPIServices.Repository
                 info.CreatedAt = (long)timeSpan.TotalSeconds;
                 info.TypeUrl = trackingHeatmapInfo.TypeUrl;
                 info.AuthorId = userID;
-                string[] b = trackingHeatmapInfo.Version.Split(" ");
+                string[] b = lastTrackingHeatmapInfo.Version.Split(" ");
                 int c = Int32.Parse(b[1]) + 1;
                 info.Version = "Version "+c;
                 info.Tracking = true;
