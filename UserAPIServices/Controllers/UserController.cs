@@ -116,10 +116,10 @@ namespace UserAPIServices.Controllers
         }
 
         [Authorize]
-        [HttpGet("api/user/organization/member/invite")]
-        public IActionResult inviteUser(string email,int organizationID, int roleID)
+        [HttpPost("api/user/organization/member/invite")]
+        public IActionResult inviteUser([FromBody] inviteUserRequest inviteUserRequest)
         {
-            return repository.inviteUser(GetUserId(), email,organizationID, roleID);
+            return repository.inviteUser(GetUserId(), inviteUserRequest.email, inviteUserRequest.organizationID, inviteUserRequest.roleID);
         }
 
         [Authorize]
@@ -142,9 +142,9 @@ namespace UserAPIServices.Controllers
 
         [Authorize]
         [HttpPut("api/user/organization/member/change-role")]
-        public IActionResult changeRole(string email, int organizationID)
+        public IActionResult changeRole([FromBody] changeRoleMemberRequest changeRoleMemberRequest) 
         {
-            return repository.changeRole(GetUserId(), email, organizationID);
+            return repository.changeRole(GetUserId(), changeRoleMemberRequest.email, changeRoleMemberRequest.organizationID);
         }
 
         //=======================================================================================

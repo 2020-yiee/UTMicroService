@@ -621,7 +621,7 @@ namespace UserAPIServices.Repository
                     context.SaveChanges();
                     sendInviteUserMail(member,user
                         ,context.Organization.FirstOrDefault(s => s.OrganizationId == orgID));
-                    return new OkObjectResult(access);
+                    return new OkObjectResult(new MemberResponse(member.UserId, member.Email, member.FullName, access.Role, access.DayJoin));
                 }
                 catch (Exception ex)
                 {
@@ -653,7 +653,7 @@ namespace UserAPIServices.Repository
                 if (access == null) return new NotFoundResult();
                 context.Access.Remove(access);
                 context.SaveChanges();
-                return new OkObjectResult(access);
+                return new OkResult();
             }
         }
 
@@ -668,7 +668,7 @@ namespace UserAPIServices.Repository
                 if (access == null) return new NotFoundResult();
                 if (access.Role == 2) access.Role = 3; else access.Role = 2;
                 context.SaveChanges();
-                return new OkObjectResult(access);
+                return new OkObjectResult(new MemberResponse(user.UserId, user.Email, user.FullName, access.Role, access.DayJoin));
             }
         }
 
