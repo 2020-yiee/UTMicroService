@@ -20,6 +20,7 @@ using NSwag;
 using Steeltoe.Discovery.Client;
 using HeatMapAPIServices.Repository;
 using TrackingAPIServices.EFModels;
+using TrackingAPIServices.Repository.TrackingFunnelRepository;
 
 namespace HeatMapAPIServices
 {
@@ -95,7 +96,8 @@ namespace HeatMapAPIServices
                    };
                });
 
-            services.AddScoped<ITrackingRepository, TrackingRepositoryImpl>();
+            services.AddScoped<ITrackingHeatmapRepository, TrackingHeatmapRepositoryImpl>();
+            services.AddScoped<ITrackingFunnelRepository, TrackingFunnelRepositoryImpl>();
 
             services.AddDiscoveryClient(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

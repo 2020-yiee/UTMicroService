@@ -35,52 +35,13 @@ namespace UserAPIServices.Controllers
             this.repository = repository;
         }
 
-        //==========================================admin====================================================
-
-        [Authorize(Roles = "admin")]
-        [HttpGet("api/admin/users")]
-        public IActionResult GetAllUser()
-        {
-            IEnumerable<User> result = repository.getAllUsers();
-            if (result != null) return Ok(result);
-            return BadRequest();
-        }
-
-        [Authorize(Roles = "admin")]
-        [HttpPut("api/admin/user/lock")]
-        public IActionResult lockUser([FromBody] LockRequest request)
-        {
-            return repository.lockUser(request);
-        }
-
-        [Authorize(Roles = "admin")]
-        [HttpGet("api/admin/ors-and-webs")]
-        public IActionResult getUserOrganizationAndWebsites(int userID)
-        {
-            return repository.getAllUserOrganizationAndWebsites(userID);
-        }
-
-        [Authorize(Roles = "admin")]
-        [HttpGet("api/admin/websites")]
-        public IActionResult getAllWebsites()
-        {
-            return repository.getAllWebSite();
-            
-        }
-
-        [Authorize(Roles = "admin")]
-        [HttpPut("api/admin/website/lock")]
-        public IActionResult lockWebsites([FromBody] LockRequest request)
-        {
-            return repository.lockWebsite(request);
-        }
-
+        
         //====================================user crud======================================================
         [Authorize]
         [HttpGet("api/user")]   
         public IActionResult getUser()
         {
-                return repository.getUser(GetUserId());
+                return repository.getNewInviteMember(GetUserId());
             
         }
 
@@ -126,8 +87,8 @@ namespace UserAPIServices.Controllers
         [HttpPost("api/user/organization/member/invite/new")]
         public IActionResult inviteNewUser([FromBody] InviteNewUserRequest request)
         {
-            return repository.inviteNewUser(request,GetUserId()
-                ,this.User.Claims.First(i => i.Type == "email").Value
+            return repository.inviteNewUser(request, GetUserId()
+                , this.User.Claims.First(i => i.Type == "mail").Value
                 , int.Parse(this.User.Claims.First(i => i.Type == "orgID").Value)
                 , int.Parse(this.User.Claims.First(i => i.Type == "orgRole").Value));
         }
@@ -147,7 +108,7 @@ namespace UserAPIServices.Controllers
             return repository.changeRole(GetUserId(), changeRoleMemberRequest.email, changeRoleMemberRequest.organizationID);
         }
 
-        //=======================================================================================
+        //===========================================website============================================
 
         [HttpPost("api/website/verify")]
         public IActionResult verifyWebsite([FromBody] verifiedRequest request)
@@ -185,7 +146,7 @@ namespace UserAPIServices.Controllers
             if (result) return Ok();
             return BadRequest();
         }
-        //===================================================================================
+        //========================================Organization===========================================
 
         [Authorize]
         [HttpPost("api/user/organization")]
@@ -218,15 +179,5 @@ namespace UserAPIServices.Controllers
         {
             return repository.getAllMemberOfOrganization(organizationID, GetUserId());
         }
-
-        //========================================================================================
-        // [Authorize]
-        // [HttpGet("api/user/statistic/{webID}/{trackingInfoID}")]
-        // public IActionResult getStatisticHeatmap([FromRoute] int webID,[FromRoute] int trackingInfoID,int from, int to)
-        // {
-        //     Object result = repository.getStatisticData(webID, trackingInfoID, from, to,GetUserId());
-        //     if (result != null) return Ok(result);
-        //     return BadRequest();
-        // }
     }
 }

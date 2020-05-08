@@ -14,8 +14,7 @@ namespace UserAPIServices.Repository
     public interface IUserRepository
     {
         IActionResult createUser(CreateUserRequest webOwner);
-        IEnumerable<User> getAllUsers();
-        IActionResult getUser(int webOwnerId);
+        IActionResult getNewInviteMember(int webOwnerId);
 
         Boolean deleteUser(int WebOwnerId);
         Boolean updateUser(UpdateUserRequest request,int userId);
@@ -27,10 +26,6 @@ namespace UserAPIServices.Repository
         object updateOrganization(UpdateOrganizationRequest request, int userId);
         object DeleteOrganization(int organizationID, int v);
         bool verifyWebsite(verifiedRequest request);
-        IActionResult lockUser(LockRequest request);
-        IActionResult getAllUserOrganizationAndWebsites(int userID);
-        IActionResult getAllWebSite();
-        IActionResult lockWebsite(LockRequest request);
         IActionResult getAllMemberOfOrganization(int organizationIDs,int v);
         IActionResult inviteUser(int userID,string email,int organizationID,int roleID);
         IActionResult uninviteUser(int v, string email, int organizationID);

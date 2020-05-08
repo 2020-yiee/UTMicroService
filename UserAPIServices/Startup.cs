@@ -20,6 +20,7 @@ using NSwag.Generation.Processors.Security;
 using NSwag;
 using Steeltoe.Discovery.Client;
 using UserAPIServices.Repository;
+using UserAPIServices.Repository.AdminRepository;
 
 namespace UserAPIServices
 {
@@ -99,6 +100,7 @@ namespace UserAPIServices
                });
 
             services.AddScoped<IUserRepository, UserRepositoryImpl>();
+            services.AddScoped<IAdminRepository, AdminRepositoryImpl>();
 
             services.AddDiscoveryClient(Configuration);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
