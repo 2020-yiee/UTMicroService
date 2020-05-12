@@ -40,6 +40,7 @@ namespace HeatMapAPIServices.Repository
             {
                 try
                 {
+                    if (request.sessionID.Contains("HeadlessChrome")) return false;
                     Website website = context.Website.Where(s => s.WebId == request.webID && s.Removed == false).FirstOrDefault();
                     if (website == null) return false;
                     Access access = context.Access.FirstOrDefault(s => s.OrganizationId == website.OrganizationId && s.Role == 1);

@@ -45,7 +45,8 @@ namespace StatisticService
                 foreach (var trackedFunnelData in context.TrackedFunnelData.ToList())
                 {
 
-                    StatisticFunnel statisticFunnel = context.StatisticFunnel.Where(s => s.TrackedFunnelDataId == trackedFunnelData.TrackedFunnelDataId).FirstOrDefault();
+                    StatisticFunnel statisticFunnel = context.StatisticFunnel.Where(
+                        s => s.TrackedFunnelDataId == trackedFunnelData.TrackedFunnelDataId).FirstOrDefault();
                     if (statisticFunnel == null)
                     {
                         Console.WriteLine("ADD STATISTIC FUNNEL FOR ID " + trackedFunnelData.TrackedFunnelDataId);
@@ -54,7 +55,6 @@ namespace StatisticService
                         newStatisticFunnel.StatisticData = trackedFunnelData.TrackedSteps;
                         context.StatisticFunnel.Add(newStatisticFunnel);
                         await context.SaveChangesAsync();
-
                         max = newStatisticFunnel.TrackedFunnelDataId;
                     }
                     else

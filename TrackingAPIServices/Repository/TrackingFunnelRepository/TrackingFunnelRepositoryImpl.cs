@@ -47,7 +47,7 @@ namespace TrackingAPIServices.Repository.TrackingFunnelRepository
                     {
                         List<Step> trackingInfoFunnelSteps = JsonConvert.DeserializeObject<List<Step>>(trackingInfo.Steps);
                         List<int> trackedFunnelDataIDs = context.TrackedFunnelData
-                            .Where(s => s.WebId == websiteId)
+                            .Where(s => s.WebId == websiteId && s.CreatedAt >= trackingInfo.CreatedAt)
                             .Select(s => s.TrackedFunnelDataId)
                             .ToList();
                         List<StatisticFunnel> statisticFunnels = context.StatisticFunnel.Where(s => trackedFunnelDataIDs.Contains(s.TrackedFunnelDataId)).ToList();
@@ -102,7 +102,7 @@ namespace TrackingAPIServices.Repository.TrackingFunnelRepository
 
                     List<Step> trackingInfoFunnelSteps = JsonConvert.DeserializeObject<List<Step>>(info.Steps);
                     List<int> trackedFunnelDataIDs = context.TrackedFunnelData
-                        .Where(s => s.WebId == request.webID)
+                        .Where(s => s.WebId == request.webID && s.CreatedAt >= info.CreatedAt)
                         .Select(s => s.TrackedFunnelDataId)
                         .ToList();
                     List<StatisticFunnel> statisticFunnels = context.StatisticFunnel.Where(s => trackedFunnelDataIDs.Contains(s.TrackedFunnelDataId)).ToList();
@@ -224,6 +224,7 @@ namespace TrackingAPIServices.Repository.TrackingFunnelRepository
             {
                 try
                 {
+                    if (request.sessionID.Contains("HeadlessChrome")) return false;
                     Website website1 = context.Website.Where(s => s.WebId == request.webID).FirstOrDefault();
                     if (website1 == null || website1.Removed == true) return false;
                     Organization organization = context.Organization.FirstOrDefault(s => s.OrganizationId == website1.OrganizationId);
@@ -235,6 +236,11 @@ namespace TrackingAPIServices.Repository.TrackingFunnelRepository
                     if (datac != null)
                     {
                         datac.TrackedSteps = request.trackedSteps;
+                        StatisticFunnel statisticFunnel = context.StatisticFunnel.FirstOrDefault(
+                            s => s.TrackedFunnelDataId == datac.TrackedFunnelDataId);
+                        if(statisticFunnel != null){
+                            statisticFunnel.StatisticData = datac.TrackedSteps;
+                        }
                         context.SaveChanges();
                         return true;
                     }
@@ -273,9 +279,10 @@ namespace TrackingAPIServices.Repository.TrackingFunnelRepository
                     if (!checkWebsiteAuthencation(webID, userId, false)) return new UnauthorizedResult();
                     TrackingFunnelInfo trackingFunnelInfo = context.TrackingFunnelInfo.FirstOrDefault(s =>
                     s.TrackingFunnelInfoId == trackingFunnelInfoID && s.Removed == false);
+                    if (trackingFunnelInfo == null) return new NotFoundResult();
                     List<Step> trackingInfoFunnelSteps = JsonConvert.DeserializeObject<List<Step>>(trackingFunnelInfo.Steps);
                     List<int> trackedFunnelDataIDs = context.TrackedFunnelData
-                        .Where(s => s.WebId == webID && from <= s.CreatedAt && s.CreatedAt <= to)
+                        .Where(s => s.WebId == webID && from <= s.CreatedAt && s.CreatedAt <= to && s.CreatedAt >= trackingFunnelInfo.CreatedAt)
                         .Select(s => s.TrackedFunnelDataId)
                         .ToList();
                     List<StatisticFunnel> statisticFunnels = context.StatisticFunnel.Where(s => trackedFunnelDataIDs.Contains(s.TrackedFunnelDataId)).ToList();
@@ -412,6 +419,14 @@ namespace TrackingAPIServices.Repository.TrackingFunnelRepository
 
         private bool Satisfying(Step f, string t)
         {
+            if (f.stepUrl[f.stepUrl.Length-1] == '/')
+            {
+                f.stepUrl = f.stepUrl.Substring(0, f.stepUrl.Length - 1);
+            }
+            if(t[t.Length-1] == '/')
+            {
+                t = t.Substring(0, t.Length - 1);
+            }
             if (f.typeUrl == "match")
             {
                 if (t.Equals(f.stepUrl))

@@ -16,7 +16,7 @@ spec:
         - env:
             - name: SPRING_EUREKA
               value: http://eureka-cluster-ip-service:8761/eureka
-          image: asia.gcr.io/citric-tiger-271310/service-tracking:2.1.8
+          image: asia.gcr.io/citric-tiger-271310/service-tracking:2.2.3
           name: service-tracking
           ports:
             - containerPort: 80
